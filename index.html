@@ -354,18 +354,19 @@
 
   /* ---- soundboard ---- */
   #sbStage{
-    flex:1;display:flex;align-items:center;justify-content:center;padding:0 16px;
+    flex:1;display:flex;align-items:center;justify-content:center;
+    padding:calc(env(safe-area-inset-top) + 104px) 16px calc(env(safe-area-inset-bottom) + 146px);
   }
   #sbGrid{
-    display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:360px;
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;
   }
   .sbBtn{
-    aspect-ratio:1;border:0;border-radius:24px;background:var(--chip);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    height:min(13vh,82px);border:0;border-radius:20px;background:var(--chip);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
     cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;
     transition:transform .08s cubic-bezier(.34,1.56,.64,1),background .08s ease;
   }
-  .sbBtn svg{width:min(9vw,34px);height:min(9vw,34px);}
+  .sbBtn svg{width:min(7vw,26px);height:min(7vw,26px);}
   .sbBtn .sbLabel{font:600 min(2.9vw,11px)/1.1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);text-align:center;}
   .sbBtn.active{transform:scale(.92);background:var(--chip-on);}
 
@@ -1451,7 +1452,7 @@
   }
   function initAudio(){
     try{ AC=new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'}); }catch(e){ AC=null; }
-    var ASSET_V='4';   // поменять это число — все звуки подгрузятся свежими, без кэша
+    var ASSET_V='5';   // поменять это число — все звуки подгрузятся свежими, без кэша
     if(AC){ Object.keys(SAMP).forEach(function(pc){
       try{ fetch(SAMP[pc]+'?v='+ASSET_V).then(function(r){return r.arrayBuffer();}).then(function(ab){AC.decodeAudioData(ab,function(b){buffers[pc]=b;},function(){});}).catch(function(){}); }catch(e){}
     });
@@ -1475,6 +1476,7 @@
       loadClip('assets/PRIZ.mp3',function(b){prizBuf=b;});
       loadClip('assets/PRIZ%20END.mp3',function(b){prizEndBuf=b;});
       loadClip('assets/KICK.mp3',function(b){kickBuf=b;});
+      loadClip('assets/CB_DROB.mp3',function(b){sbBuf.drum=b;});
       loadClip('assets/SB_FANFARE.mp3',function(b){sbBuf.fanfare=b;});
       loadClip('assets/SB_LAUGH.mp3',function(b){sbBuf.laugh=b;});
       loadClip('assets/SB_SAD.mp3',function(b){sbBuf.sad=b;});
@@ -2205,7 +2207,7 @@
       e.stopPropagation();
       ensureAC();
       var key=btn.dataset.snd;
-      var buf = key==='drum' ? drumBuf : sbBuf[key];
+      var buf = sbBuf[key];
       sbPlay(buf);
       btn.classList.add('active');
       setTimeout(function(){ btn.classList.remove('active'); },130);

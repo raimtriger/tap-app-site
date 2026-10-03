@@ -300,6 +300,75 @@
     color:var(--muted);margin-top:24px;min-height:1.2em;white-space:nowrap;
   }
 
+  /* ---- roulette ---- */
+  #rouletteStage{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    position:relative;cursor:pointer;gap:0;padding:0 18px;
+  }
+  #rouletteStage.editing #rouletteInputRow{position:relative;z-index:61;}
+  #rouletteInputRow{display:flex;gap:8px;align-items:center;}
+  #rouletteInput{
+    -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
+    font:600 15px/1 "Futura","Avenir Next",system-ui,sans-serif;text-align:center;
+    width:160px;max-width:52vw;padding:12px 15px;outline:none;
+  }
+  #rouletteInput::placeholder{color:var(--muted);}
+  #rouletteOk{border:0;border-radius:50%;background:var(--accent);color:#fff;width:42px;height:42px;
+    font:700 20px/1 "Futura","Avenir Next",system-ui,sans-serif;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  #rouletteOk:disabled,#rouletteInput:disabled{opacity:.4;}
+  #rouletteChips{
+    display:flex;flex-wrap:wrap;gap:7px;justify-content:center;max-width:320px;
+    margin-top:12px;min-height:0;
+  }
+  .rouletteChip{
+    display:flex;align-items:center;gap:6px;background:var(--chip);color:var(--ink);
+    font:600 12px/1 "Futura","Avenir Next",system-ui,sans-serif;padding:8px 10px 8px 9px;
+    border-radius:999px;cursor:pointer;white-space:nowrap;
+  }
+  .rouletteDot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
+  #rouletteWheelBox{position:relative;margin-top:24px;width:min(58vw,230px);height:min(58vw,230px);}
+  #rouletteWheelWrap{width:100%;height:100%;will-change:transform;}
+  #rouletteWheelWrap svg{width:100%;height:100%;display:block;}
+  #roulettePointer{
+    position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;
+    border-left:10px solid transparent;border-right:10px solid transparent;border-top:15px solid var(--ink);
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,.25));
+  }
+  #rouletteEmpty{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;
+    color:var(--muted);font:600 13px/1.4 "Futura","Avenir Next",system-ui,sans-serif;padding:0 20px;
+  }
+  #rouletteResult{
+    display:flex;align-items:center;gap:10px;margin-top:22px;min-height:40px;
+  }
+  #rouletteResult .rouletteDot{width:14px;height:14px;}
+  #rouletteResultWord{
+    font-family:"Georgia","Times New Roman",serif;font-weight:700;
+    font-size:min(9vw,34px);color:var(--ink);
+  }
+  #rouletteHint{
+    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    color:var(--muted);margin-top:16px;min-height:1.2em;text-align:center;
+  }
+
+  /* ---- soundboard ---- */
+  #sbStage{
+    flex:1;display:flex;align-items:center;justify-content:center;padding:0 16px;
+  }
+  #sbGrid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:360px;
+  }
+  .sbBtn{
+    aspect-ratio:1;border:0;border-radius:24px;background:var(--chip);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;
+    transition:transform .08s cubic-bezier(.34,1.56,.64,1),background .08s ease;
+  }
+  .sbBtn svg{width:min(9vw,34px);height:min(9vw,34px);}
+  .sbBtn .sbLabel{font:600 min(2.9vw,11px)/1.1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);text-align:center;}
+  .sbBtn.active{transform:scale(.92);background:var(--chip-on);}
+
   /* ---- bottle ---- */
   #bottleStage{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -828,6 +897,14 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></svg>
       <span>Орёл или решка</span>
     </button>
+    <button class="appbtn" data-app="roulette" aria-label="Рулетка выбора">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.2 3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+      <span>Рулетка выбора</span>
+    </button>
+    <button class="appbtn" data-app="sb" aria-label="Саундборд приколов">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="6.5"/><path d="M7 8.3c.5-.7 1.5-.7 2 0M11 8.3c.5-.7 1.5-.7 2 0" stroke-width="1.6"/><path d="M7.3 11.3a2.4 2.4 0 0 0 3.4 0"/><rect x="14.5" y="14.5" width="7" height="7" rx="1.8" stroke-width="1.7"/></svg>
+      <span>Саундборд приколов</span>
+    </button>
     <button class="appbtn" data-app="word" aria-label="Случайное слово">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 10h10M7 14h6"/></svg>
       <span>Случайное слово</span>
@@ -1040,6 +1117,58 @@
     </div>
     <div id="ynValue">?</div>
     <div id="ynHint">Впиши вопрос и жми ОК</div>
+  </div>
+
+  <div id="rouletteStage" style="display:none">
+    <div id="rouletteInputRow">
+      <input id="rouletteInput" type="text" placeholder="Вариант" aria-label="Вариант" maxlength="24" />
+      <button id="rouletteOk" aria-label="Добавить">+</button>
+    </div>
+    <div id="rouletteChips"></div>
+    <div id="rouletteWheelBox">
+      <div id="rouletteWheelWrap"><svg id="rouletteWheel" viewBox="0 0 220 220"></svg></div>
+      <div id="roulettePointer"></div>
+      <div id="rouletteEmpty">Добавь хотя бы 2 варианта</div>
+    </div>
+    <div id="rouletteResult"></div>
+    <div id="rouletteHint">Добавь варианты и крути рулетку</div>
+  </div>
+
+  <div id="sbStage" style="display:none">
+    <div id="sbGrid">
+      <button class="sbBtn" data-snd="drum" aria-label="Барабанная дробь">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="7" rx="7" ry="3"/><path d="M5 7v8a7 3 0 0 0 14 0V7"/><path d="M6 5l4 6M18 5l-4 6" stroke-width="1.6"/></svg>
+        <span class="sbLabel">Дробь</span>
+      </button>
+      <button class="sbBtn" data-snd="fanfare" aria-label="Победа">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a3 3 0 0 0 3 5M17 5h3a3 3 0 0 1-3 5"/><path d="M12 13v3M9 20h6M10 20v-2.5h4V20"/></svg>
+        <span class="sbLabel">Победа</span>
+      </button>
+      <button class="sbBtn" data-snd="laugh" aria-label="Смех">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 10.5c.4-.6 1.2-.6 1.6 0M14.4 10.5c.4-.6 1.2-.6 1.6 0" stroke-width="1.8"/><path d="M7.5 13.5c1 2.2 3 3 4.5 3s3.5-.8 4.5-3" stroke-width="1.8"/></svg>
+        <span class="sbLabel">Смех</span>
+      </button>
+      <button class="sbBtn" data-snd="sad" aria-label="Облом">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+        <span class="sbLabel">Облом</span>
+      </button>
+      <button class="sbBtn" data-snd="clap" aria-label="Овация">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="sbLabel">Овация</span>
+      </button>
+      <button class="sbBtn" data-snd="scare" aria-label="Испуг">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5" stroke-width="2.2"/><circle cx="12" cy="16.3" r="1.1" fill="currentColor" stroke="none"/></svg>
+        <span class="sbLabel">Испуг</span>
+      </button>
+      <button class="sbBtn" data-snd="wrong" aria-label="Ошибка">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+        <span class="sbLabel">Ошибка</span>
+      </button>
+      <button class="sbBtn" data-snd="airhorn" aria-label="Хайп">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1 3-4 4-4 8a4 4 0 0 0 8 0c0-1.5-1-2-1-3.5 1 1 2 2.5 2 4.5a5 5 0 0 1-10 0c0-5 3-6 5-9z"/></svg>
+        <span class="sbLabel">Хайп</span>
+      </button>
+    </div>
   </div>
 
   <div id="bottleStage" style="display:none">
@@ -1302,6 +1431,7 @@
   // ---- audio: Web Audio (low latency) + silent loop to keep iOS media session active ----
   var AC=null, buffers={}, silentLoop=null, started=false;
   var clickBuf=null, clockBuf=null, drumBuf=null, cubeBuf=null, cubeEndBuf=null, cube1Buf=null, prizBuf=null, prizEndBuf=null, mainBuf=null, tapBuf=null, colorBuf=null, kickBuf=null, cHighBuf=null, cHighShortBuf=null, cHighLongBuf=null, numSpinSrc=null, tmLastSec=0;
+  var sbBuf={};
   var yesnoBuf=null, yesnoEndBuf=null, bottleBuf=null, oneCubeBuf=null, oneCubeEndBuf=null;
   var pianoShortBuf={}, pianoLongBuf={};
   function b64ToBuf(uri){
@@ -1321,7 +1451,7 @@
   }
   function initAudio(){
     try{ AC=new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'}); }catch(e){ AC=null; }
-    var ASSET_V='3';   // поменять это число — все звуки подгрузятся свежими, без кэша
+    var ASSET_V='4';   // поменять это число — все звуки подгрузятся свежими, без кэша
     if(AC){ Object.keys(SAMP).forEach(function(pc){
       try{ fetch(SAMP[pc]+'?v='+ASSET_V).then(function(r){return r.arrayBuffer();}).then(function(ab){AC.decodeAudioData(ab,function(b){buffers[pc]=b;},function(){});}).catch(function(){}); }catch(e){}
     });
@@ -1345,6 +1475,13 @@
       loadClip('assets/PRIZ.mp3',function(b){prizBuf=b;});
       loadClip('assets/PRIZ%20END.mp3',function(b){prizEndBuf=b;});
       loadClip('assets/KICK.mp3',function(b){kickBuf=b;});
+      loadClip('assets/SB_FANFARE.mp3',function(b){sbBuf.fanfare=b;});
+      loadClip('assets/SB_LAUGH.mp3',function(b){sbBuf.laugh=b;});
+      loadClip('assets/SB_SAD.mp3',function(b){sbBuf.sad=b;});
+      loadClip('assets/SB_CLAP.mp3',function(b){sbBuf.clap=b;});
+      loadClip('assets/SB_SCARE.mp3',function(b){sbBuf.scare=b;});
+      loadClip('assets/SB_WRONG.mp3',function(b){sbBuf.wrong=b;});
+      loadClip('assets/SB_AIRHORN.mp3',function(b){sbBuf.airhorn=b;});
       NOTE_NAMES.forEach(function(name,pc){
         var enc=encodeURIComponent(name);             // C# -> C%23, остальные без изменений
         loadClip('assets/'+enc+'_SHORT.mp3',function(b){pianoShortBuf[pc]=b;});
@@ -1429,7 +1566,7 @@
     setTimeout(function(){ render(n); el.classList.remove('pop'); },80);
   }
 
-  var TITLES={home:'TAP APP',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',rhyme:'РИФМЫ',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'РИТМ-МАШИНА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',piano:'ПИАНИНО',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ'};
+  var TITLES={home:'TAP APP',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',rhyme:'РИФМЫ',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'РИТМ-МАШИНА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',piano:'ПИАНИНО',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
   function setApp(a){
     app=a;
     document.getElementById('title').textContent=TITLES[a];
@@ -1450,6 +1587,8 @@
     wordStage.style.display=a==='word'?'flex':'none';
     numStage.style.display = a==='num'?'flex':'none';
     ynStage.style.display = a==='yn'?'flex':'none';
+    rouletteStage.style.display = a==='roulette'?'flex':'none';
+    sbStage.style.display = a==='sb'?'flex':'none';
     bottleStage.style.display = a==='bottle'?'flex':'none';
     noiseStage.style.display = a==='noise'?'flex':'none';
     rhythmStage.style.display = a==='rhythm'?'flex':'none';
@@ -1493,6 +1632,8 @@
     resetTicker();
     resetMorse();
     resetYn();
+    resetRoulette();
+    resetSb();
     resetBottle();
     resetNoise();
     resetRhythm();
@@ -1896,6 +2037,184 @@
     ensureAC();
     goYn();
   });
+
+  // ---- roulette ----
+  var rouletteStage=document.getElementById('rouletteStage');
+  var rouletteInput=document.getElementById('rouletteInput');
+  var rouletteOk=document.getElementById('rouletteOk');
+  var rouletteChips=document.getElementById('rouletteChips');
+  var rouletteWheelWrap=document.getElementById('rouletteWheelWrap');
+  var rouletteWheelSvg=document.getElementById('rouletteWheel');
+  var rouletteEmpty=document.getElementById('rouletteEmpty');
+  var rouletteResult=document.getElementById('rouletteResult');
+  var rouletteHint=document.getElementById('rouletteHint');
+  var ROULETTE_PAL=['#e0a85e','#3d9e6f','#4a86c9','#c9574a','#9a5ac9','#4ac9b8','#c94a94','#8a8f3f'];
+  var rouletteWords=[], rouletteEditing=false, rouletteSpinning=false, rouletteRotation=0;
+  var ROULETTE_DUR=3600;
+
+  function setRouletteEditing(on){
+    rouletteEditing=on;
+    rouletteStage.classList.toggle('editing',on);
+    editLock.classList.toggle('on',on);
+    if(!on && document.activeElement===rouletteInput) rouletteInput.blur();
+  }
+  function rouletteUpdateOkState(){
+    var full=rouletteWords.length>=8;
+    rouletteOk.disabled=full; rouletteInput.disabled=full;
+  }
+  function rouletteUpdateHint(){
+    var n=rouletteWords.length;
+    if(rouletteSpinning) return;
+    if(n<2) rouletteHint.textContent='Добавь варианты и крути рулетку';
+    else if(n>=8) rouletteHint.textContent='Максимум 8 — тапни колесо';
+    else rouletteHint.textContent='Тапни колесо — крутить';
+  }
+  function rouletteRenderChips(){
+    rouletteChips.innerHTML='';
+    rouletteWords.forEach(function(w,i){
+      var chip=document.createElement('div');
+      chip.className='rouletteChip';
+      var dot=document.createElement('i'); dot.className='rouletteDot';
+      dot.style.background=ROULETTE_PAL[i%ROULETTE_PAL.length];
+      chip.appendChild(dot);
+      chip.appendChild(document.createTextNode(w+' ✕'));
+      chip.addEventListener('pointerdown',function(e){ e.stopPropagation(); rouletteRemove(i); });
+      rouletteChips.appendChild(chip);
+    });
+  }
+  function rouletteBuildWheel(){
+    rouletteWheelSvg.innerHTML='';
+    var n=rouletteWords.length;
+    rouletteEmpty.style.display = n<2 ? 'flex':'none';
+    if(n<2) return;
+    var ns='http://www.w3.org/2000/svg';
+    var g=document.createElementNS(ns,'g');
+    g.setAttribute('transform','translate(110,110)');
+    var per=360/n, r=95;
+    for(var i=0;i<n;i++){
+      var a0=(i*per-90)*Math.PI/180, a1=((i+1)*per-90)*Math.PI/180;
+      var x0=r*Math.cos(a0), y0=r*Math.sin(a0);
+      var x1=r*Math.cos(a1), y1=r*Math.sin(a1);
+      var large=per>180?1:0;
+      var path=document.createElementNS(ns,'path');
+      path.setAttribute('d','M0 0 L'+x0.toFixed(2)+' '+y0.toFixed(2)+' A'+r+' '+r+' 0 '+large+' 1 '+x1.toFixed(2)+' '+y1.toFixed(2)+' Z');
+      path.setAttribute('fill',ROULETTE_PAL[i%ROULETTE_PAL.length]);
+      g.appendChild(path);
+    }
+    var hub=document.createElementNS(ns,'circle');
+    hub.setAttribute('r','15');
+    hub.style.fill='var(--bg)'; hub.style.stroke='var(--ink)';
+    hub.setAttribute('stroke-width','1.5');
+    g.appendChild(hub);
+    rouletteWheelSvg.appendChild(g);
+  }
+  function rouletteAdd(){
+    var v=(rouletteInput.value||'').trim();
+    if(!v||rouletteWords.length>=8) return;
+    var exists=rouletteWords.some(function(w){ return w.toLowerCase()===v.toLowerCase(); });
+    rouletteInput.value='';
+    if(exists) return;
+    rouletteWords.push(v);
+    rouletteRenderChips(); rouletteBuildWheel(); rouletteUpdateOkState(); rouletteUpdateHint();
+    playBuf(tapBuf);
+  }
+  function rouletteRemove(i){
+    rouletteWords.splice(i,1);
+    rouletteRenderChips(); rouletteBuildWheel(); rouletteUpdateOkState(); rouletteUpdateHint();
+    rouletteResult.innerHTML='';
+  }
+  function rouletteShowResult(i){
+    rouletteResult.innerHTML='';
+    var dot=document.createElement('i'); dot.className='rouletteDot';
+    dot.style.background=ROULETTE_PAL[i%ROULETTE_PAL.length];
+    var word=document.createElement('span'); word.id='rouletteResultWord'; word.textContent=rouletteWords[i];
+    rouletteResult.appendChild(dot); rouletteResult.appendChild(word);
+  }
+  function rouletteSpin(){
+    if(rouletteSpinning||rouletteWords.length<2) return;
+    rouletteSpinning=true;
+    rouletteResult.innerHTML='';
+    rouletteHint.textContent='Крутим…';
+    ensureAC();
+    var n=rouletteWords.length, per=360/n;
+    var winIdx=Math.floor(Math.random()*n);
+    var center=winIdx*per+per/2;
+    var target=(360-center)%360;
+    var spins=5+Math.floor(Math.random()*3);
+    var cur=rouletteRotation%360; if(cur<0) cur+=360;
+    var diff=((target-cur)+360)%360;
+    rouletteRotation=rouletteRotation+spins*360+diff;
+    var spinSrc = prizBuf?playBufNode(prizBuf):null;
+    if(!prizBuf) playDrumRoll(ROULETTE_DUR/1000);
+    rouletteWheelWrap.style.transition='transform '+(ROULETTE_DUR/1000)+'s cubic-bezier(.17,.67,.2,1)';
+    rouletteWheelWrap.style.transform='rotate('+rouletteRotation+'deg)';
+    setTimeout(function(){
+      rouletteSpinning=false;
+      if(spinSrc){ try{spinSrc.stop();}catch(e){} }
+      if(prizEndBuf) playBuf(prizEndBuf); else numAccent();
+      celebrate(true);
+      rouletteShowResult(winIdx);
+      rouletteUpdateHint();
+    },ROULETTE_DUR+30);
+  }
+  function resetRoulette(){
+    rouletteSpinning=false;
+    rouletteWheelWrap.style.transition='';
+    rouletteUpdateHint();
+  }
+  rouletteRenderChips(); rouletteBuildWheel(); rouletteUpdateOkState(); rouletteUpdateHint();
+  rouletteInput.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
+  rouletteInput.addEventListener('focus',function(){ setRouletteEditing(true); });
+  rouletteInput.addEventListener('blur',function(){ if(rouletteEditing) setRouletteEditing(false); });
+  rouletteInput.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); rouletteAdd(); } });
+  rouletteOk.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
+  rouletteOk.addEventListener('click',function(e){ e.stopPropagation(); ensureAC(); rouletteAdd(); });
+  rouletteStage.addEventListener('pointerdown',function(e){
+    if(rouletteEditing) return;
+    if(e.target===rouletteInput||e.target===rouletteOk) return;
+    e.stopPropagation();
+    ensureAC();
+    rouletteSpin();
+  });
+
+  // ---- soundboard ----
+  var sbStage=document.getElementById('sbStage');
+  var sbActiveSrc=null, sbActiveGain=null;
+  var SB_FADE=1;
+  function sbPlay(buf){
+    if(!soundOn||!AC||!buf) return;
+    var now=AC.currentTime;
+    if(sbActiveSrc){
+      var prevSrc=sbActiveSrc, prevGain=sbActiveGain;
+      try{
+        prevGain.gain.cancelScheduledValues(now);
+        prevGain.gain.setValueAtTime(prevGain.gain.value,now);
+        prevGain.gain.linearRampToValueAtTime(0,now+SB_FADE);
+        prevSrc.stop(now+SB_FADE+0.05);
+      }catch(e){}
+    }
+    var src=AC.createBufferSource(); src.buffer=buf;
+    var g=AC.createGain(); g.gain.value=1;
+    src.connect(g); g.connect(AC.destination);
+    src.start(now);
+    sbActiveSrc=src; sbActiveGain=g;
+    src.onended=function(){ if(sbActiveSrc===src){ sbActiveSrc=null; sbActiveGain=null; } };
+  }
+  document.querySelectorAll('.sbBtn').forEach(function(btn){
+    btn.addEventListener('pointerdown',function(e){
+      e.stopPropagation();
+      ensureAC();
+      var key=btn.dataset.snd;
+      var buf = key==='drum' ? drumBuf : sbBuf[key];
+      sbPlay(buf);
+      btn.classList.add('active');
+      setTimeout(function(){ btn.classList.remove('active'); },130);
+    });
+  });
+  function resetSb(){
+    document.querySelectorAll('.sbBtn').forEach(function(b){ b.classList.remove('active'); });
+    if(sbActiveSrc){ try{ sbActiveSrc.stop(); }catch(e){} sbActiveSrc=null; sbActiveGain=null; }
+  }
 
   // ---- bottle ----
   var bottleStage=document.getElementById('bottleStage');
@@ -3540,6 +3859,7 @@
     if(ynEditing){ setYnEditing(false); return; }
     if(ynFading) return;
     if(ynHolding){ endYnHold(); return; }
+    if(rouletteEditing){ setRouletteEditing(false); return; }
   });
   diceStage.addEventListener('pointerdown',function(e){
     e.stopPropagation();

@@ -361,12 +361,12 @@
     display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;
   }
   .sbBtn{
-    height:min(13vh,82px);border:0;border-radius:20px;background:var(--chip);
+    aspect-ratio:1.9;border:0;border-radius:20px;background:var(--chip);color:var(--ink);
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
     cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;
     transition:transform .08s cubic-bezier(.34,1.56,.64,1),background .08s ease;
   }
-  .sbBtn svg{width:min(7vw,26px);height:min(7vw,26px);}
+  .sbBtn svg{width:26px;height:26px;flex:0 0 auto;}
   .sbBtn .sbLabel{font:600 min(2.9vw,11px)/1.1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);text-align:center;}
   .sbBtn.active{transform:scale(.92);background:var(--chip-on);}
 
@@ -902,9 +902,9 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.2 3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
       <span>Рулетка выбора</span>
     </button>
-    <button class="appbtn" data-app="sb" aria-label="Саундборд приколов">
+    <button class="appbtn" data-app="sb" aria-label="Саундборд">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="6.5"/><path d="M7 8.3c.5-.7 1.5-.7 2 0M11 8.3c.5-.7 1.5-.7 2 0" stroke-width="1.6"/><path d="M7.3 11.3a2.4 2.4 0 0 0 3.4 0"/><rect x="14.5" y="14.5" width="7" height="7" rx="1.8" stroke-width="1.7"/></svg>
-      <span>Саундборд приколов</span>
+      <span>Саундборд</span>
     </button>
     <button class="appbtn" data-app="word" aria-label="Случайное слово">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 10h10M7 14h6"/></svg>

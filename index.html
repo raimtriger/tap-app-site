@@ -78,6 +78,7 @@
   #acc{
     font-size:.5em;color:var(--accent);
     margin-right:.05em;font-weight:400;
+    font-family:"Apple Symbols","Segoe UI Symbol","Noto Sans Symbols",system-ui,sans-serif;  /* ♯/♭ не рендерятся в Georgia — fallback-шрифт даёт "тофу"-точку */
   }
   /* ---- staff mode ---- */
   #staff{width:min(70vw,330px);max-height:60vh;transition:opacity .1s ease,transform .1s ease;}
@@ -306,6 +307,8 @@
     position:relative;cursor:pointer;gap:0;padding:0 18px;
   }
   #rouletteStage.editing #rouletteInputRow{position:relative;z-index:61;}
+  .rouletteSlice{transition:opacity .5s ease,filter .5s ease;opacity:1;filter:blur(0);}
+  .rouletteSlice.enter{opacity:0;filter:blur(7px);}
   #rouletteInputRow{display:flex;gap:8px;align-items:center;}
   #rouletteInput{
     -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
@@ -359,17 +362,20 @@
     overflow-y:auto;-webkit-overflow-scrolling:touch;
   }
   #sbGrid{
-    display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px;
+    display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;width:100%;max-width:420px;
   }
   .sbBtn{
-    aspect-ratio:1.9;border:0;border-radius:20px;background:var(--chip);color:var(--ink);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    aspect-ratio:1.1;border:0;border-radius:16px;background:var(--chip);color:var(--ink);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
     cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;
     transition:transform .08s cubic-bezier(.34,1.56,.64,1),background .08s ease;
+    padding:4px 2px;
   }
-  .sbBtn svg{width:26px;height:26px;flex:0 0 auto;}
-  .sbBtn .sbLabel{font:600 min(2.9vw,11px)/1.1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);text-align:center;}
+  .sbBtn svg{width:19px;height:19px;flex:0 0 auto;}
+  .sbBtn .sbLabel{font:600 min(2.5vw,9.5px)/1.1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);text-align:center;}
   .sbBtn.active{transform:scale(.92);background:var(--chip-on);}
+  .sbBtn.empty{background:transparent;border:1.5px dashed var(--chip);cursor:default;}
+  .sbBtn.empty:active{transform:none;}
 
   /* ---- bottle ---- */
   #bottleStage{
@@ -563,32 +569,6 @@
     color:var(--muted);text-align:center;max-width:420px;
   }
 
-  /* ---- piano ---- */
-  #pianoStage{
-    flex:1;position:relative;overflow:hidden;
-    touch-action:none;user-select:none;-webkit-user-select:none;background:#0c0c0c;
-  }
-  #pianoRotate{
-    position:absolute;top:50%;left:50%;display:flex;flex-direction:row;align-items:stretch;
-  }
-  .pkey-white{
-    flex:1;position:relative;background:#f7f3ec;border-right:1px solid rgba(0,0,0,.18);
-    display:flex;align-items:flex-end;justify-content:center;padding-bottom:18px;
-    color:#9a958c;font:700 min(3.6vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
-    transition:background .05s ease;
-  }
-  .pkey-white:last-child{border-right:0;}
-  .pkey-white.active{background:#e3d9c4;color:var(--accent);}
-  .pkey-black{
-    position:absolute;top:0;width:9%;height:58%;transform:translateX(-50%);
-    background:#161616;border-radius:0 0 7px 7px;z-index:5;
-    box-shadow:0 6px 12px rgba(0,0,0,.45);
-    display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px;
-    color:#888;font:700 min(2.8vw,11px)/1 "Futura","Avenir Next",system-ui,sans-serif;
-    transition:background .05s ease;
-  }
-  .pkey-black.active{background:#3a2f1c;color:var(--accent);}
-
   /* ---- coin flip ---- */
   #coinStage{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -649,13 +629,19 @@
     -webkit-backface-visibility:hidden;backface-visibility:hidden;}
   #tickerTrack{position:absolute;inset:0;overflow:hidden;}
   #tickerText{
-    position:absolute;left:0;top:50%;white-space:nowrap;opacity:0;
+    position:absolute;left:0;top:50%;white-space:nowrap;opacity:0;text-transform:uppercase;
     font:800 1px system-ui,-apple-system,"Segoe UI",sans-serif;
     color:#ff2e2e;text-shadow:0 0 9px rgba(255,45,45,.85),0 0 22px rgba(255,0,0,.5);
     will-change:transform;
     -webkit-transform:translateZ(0);transform:translateZ(0);
     -webkit-backface-visibility:hidden;backface-visibility:hidden;
   }
+  #tickerRotateHint{
+    position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+    color:#fff;font:700 min(4.5vw,16px)/1.3 "Futura","Avenir Next",system-ui,sans-serif;text-align:center;
+  }
+  #tickerRotateHint svg{width:52px;height:52px;animation:tickerRotateIcon 1.6s ease-in-out infinite;}
+  @keyframes tickerRotateIcon{0%,45%{transform:rotate(0deg);}55%,100%{transform:rotate(-90deg);}}
   #editLock.strong{backdrop-filter:blur(16px) saturate(.82);-webkit-backdrop-filter:blur(16px) saturate(.82);}
 
   /* ---- morse flashlight ---- */
@@ -716,33 +702,6 @@
   .qrSwatch{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--muted);flex:0 0 auto;}
   .qrSwatch.black{background:#000;}
   .qrSwatch.white{background:#fff;}
-
-  /* ---- rhymes ---- */
-  #rhymeStage{
-    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    position:relative;cursor:pointer;gap:14px;padding:0 18px;
-  }
-  #rhymeStage.editing{z-index:61;}
-  #rhymeInputRow{display:flex;gap:8px;align-items:center;}
-  #rhymeInput{
-    -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
-    font:600 16px/1 "Futura","Avenir Next",system-ui,sans-serif;text-align:center;
-    width:200px;max-width:62vw;padding:13px 16px;outline:none;
-  }
-  #rhymeInput::placeholder{color:var(--muted);}
-  #rhymeOk{border:0;border-radius:999px;background:var(--accent);color:#fff;
-    font:700 15px/1 "Futura","Avenir Next",system-ui,sans-serif;padding:13px 18px;cursor:pointer;}
-  #rhymeHint{font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);min-height:1.2em;}
-  #rhymeWord{
-    font:600 min(5vw,19px)/1 "Futura","Avenir Next",system-ui,sans-serif;
-    color:var(--muted);letter-spacing:.02em;display:none;text-align:center;
-  }
-  #rhymeStage.shown #rhymeWord{display:block;}
-  #rhymeResult{
-    font-family:"Georgia","Times New Roman",serif;font-weight:700;
-    font-size:min(15vw,72px);line-height:1.05;color:var(--ink);text-align:center;
-    min-height:1.2em;transition:opacity .1s ease,transform .15s ease;
-  }
 
   /* ---- bottom controls ---- */
   #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:70;}
@@ -936,10 +895,6 @@
     </button>
 
     <div class="cathdr">ТВОРЧЕСТВО</div>
-    <button class="appbtn on" data-app="piano" aria-label="Пианино">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M7.5 4v9.5M12 4v9.5M16.5 4v9.5"/><rect x="6" y="4" width="3" height="8" fill="currentColor" stroke="none"/><rect x="10.5" y="4" width="3" height="8" fill="currentColor" stroke="none"/><rect x="15" y="4" width="3" height="8" fill="currentColor" stroke="none"/></svg>
-      <span>Пианино</span>
-    </button>
     <button class="appbtn" data-app="note" aria-label="Случайная нота">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 4.2 18 6v3.1l-5-1.45V16a3 3 0 1 1-2-2.83V4.2z"/></svg>
       <span>Случайная нота</span>
@@ -948,16 +903,12 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.8-.9 1.8-1.9 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.1 0-1 .8-1.8 1.8-1.8H16a5 5 0 0 0 5-5c0-3.9-4-7-9-7Z"/><circle cx="7.5" cy="10.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="10.5" r="1.1" fill="currentColor" stroke="none"/></svg>
       <span>Случайный цвет</span>
     </button>
-    <button class="appbtn" data-app="rhyme" aria-label="Рифмы">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18c2-7 5-11 8-11s6 4 8 11"/><circle cx="6.5" cy="18" r="1.4" fill="currentColor" stroke="none"/><circle cx="17.5" cy="18" r="1.4" fill="currentColor" stroke="none"/></svg>
-      <span>Рифмы</span>
-    </button>
     <button class="appbtn" data-app="bpm" aria-label="BPM кликер">
       <svg viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.25 5 Q12 3 13.75 5 L17 19.2 Q17.25 20.6 15.9 20.6 L8.1 20.6 Q6.75 20.6 7 19.2 Z M12 10.6 L13.7 15.2 L10.3 15.2 Z"/><path d="M12.4 8.6 16 5.9 16.8 6.95 13.2 9.65 Z"/><circle cx="16.4" cy="5.5" r="1.55"/></svg>
       <span>BPM кликер</span>
     </button>
     <button class="appbtn" data-app="metro" aria-label="Метроном">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8L14 4h-4L8 21z"/><path d="M12 6v10"/><path d="M12 6l4 11" stroke-width="1.6"/><circle cx="12" cy="6" r="1.4" fill="currentColor" stroke="none"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l4-5 4 5"/><path d="M8 7L5 22h14L16 7Z"/><path d="M10.7 8.5v10M13.3 8.5v10" stroke-width="1.3"/><path d="M9.3 19L19 7" stroke-width="1.6"/><rect x="16.6" y="6.1" width="3.2" height="3.2" rx="0.6" transform="rotate(45 18.2 7.7)" stroke-width="1.6"/><path d="M19.6 5.6l2.1-2.3" stroke-width="1.6"/></svg>
       <span>Метроном</span>
     </button>
     <button class="appbtn" data-app="rhythm" aria-label="Ритм-машина">
@@ -1032,24 +983,6 @@
 </g>
 </svg>
     <div id="homeHint">Тапни по мне 3 раза</div>
-  </div>
-
-  <div id="pianoStage" style="display:none">
-    <div id="pianoRotate">
-      <div class="pkey-white" data-pc="0"><span>C</span></div>
-      <div class="pkey-white" data-pc="2"><span>D</span></div>
-      <div class="pkey-white" data-pc="4"><span>E</span></div>
-      <div class="pkey-white" data-pc="5"><span>F</span></div>
-      <div class="pkey-white" data-pc="7"><span>G</span></div>
-      <div class="pkey-white" data-pc="9"><span>A</span></div>
-      <div class="pkey-white" data-pc="11"><span>B</span></div>
-      <div class="pkey-white" data-pc="0" data-high="1"><span>C</span></div>
-      <div class="pkey-black" data-pc="1" style="left:12.5%"><span>C#</span></div>
-      <div class="pkey-black" data-pc="3" style="left:25%"><span>D#</span></div>
-      <div class="pkey-black" data-pc="6" style="left:50%"><span>F#</span></div>
-      <div class="pkey-black" data-pc="8" style="left:62.5%"><span>G#</span></div>
-      <div class="pkey-black" data-pc="10" style="left:75%"><span>A#</span></div>
-    </div>
   </div>
 
   <div id="stage">
@@ -1153,7 +1086,7 @@
   <div id="sbStage" style="display:none">
     <div id="sbGrid">
       <button class="sbBtn" data-snd="drum" aria-label="Барабанная дробь">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="7" rx="7" ry="3"/><path d="M5 7v8a7 3 0 0 0 14 0V7"/><path d="M6 5l4 6M18 5l-4 6" stroke-width="1.6"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10c0-1.7 3.6-3 8-3s8 1.3 8 3v8c0 1.7-3.6 3-8 3s-8-1.3-8-3v-8z"/><path d="M4 10c0 1.7 3.6 3 8 3s8-1.3 8-3" stroke-width="1.5"/><path d="M6 11.5l5.3 7M18 11.5l-5.3 7M6 18.5l5.3-7M18 18.5l-5.3-7" stroke-width="1.1"/><path d="M7 3l5 5M17 3l-5 5" stroke-width="1.8"/></svg>
         <span class="sbLabel">Дробь</span>
       </button>
       <button class="sbBtn" data-snd="fanfare" aria-label="Победа">
@@ -1173,12 +1106,12 @@
         <span class="sbLabel">Облом</span>
       </button>
       <button class="sbBtn" data-snd="clap" aria-label="Овация">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l8 12" stroke-width="3.4"/><path d="M16 6l-8 12" stroke-width="3.4"/><path d="M12 2v2.2M4.5 7l1.8 1.3M19.5 7l-1.8 1.3M4.5 19l1.8-1.3M19.5 19l-1.8-1.3" stroke-width="1.6"/></svg>
         <span class="sbLabel">Овация</span>
       </button>
-      <button class="sbBtn" data-snd="scare" aria-label="Испуг">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5" stroke-width="2.2"/><circle cx="12" cy="16.3" r="1.1" fill="currentColor" stroke="none"/></svg>
-        <span class="sbLabel">Испуг</span>
+      <button class="sbBtn" data-snd="correct" aria-label="Верно">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5 10-11"/></svg>
+        <span class="sbLabel">Верно</span>
       </button>
       <button class="sbBtn" data-snd="wrong" aria-label="Ошибка">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
@@ -1189,9 +1122,14 @@
         <span class="sbLabel">Восторг</span>
       </button>
       <button class="sbBtn" data-snd="cat" aria-label="Мяу">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9L7 4l3 3.3"/><path d="M19 9l-2-5-3 3.3"/><path d="M5 9c0-1 .5-1.5 1.2-1.5h11.6C18.5 7.5 19 8 19 9v3a7 7 0 0 1-14 0V9z"/><path d="M9.3 11.2c.3-.5 1-.5 1.3 0M13.4 11.2c.3-.5 1-.5 1.3 0" stroke-width="1.6"/><path d="M10.2 14.3h3.6M7.5 13.3l-3-.5M7.5 14.6l-3 .9M16.5 13.3l3-.5M16.5 14.6l3 .9" stroke-width="1.4"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.3 10L4.5 4.2L9 8.4" stroke-width="1.8"/><path d="M17.7 10L19.5 4.2L15 8.4" stroke-width="1.8"/><circle cx="12" cy="14" r="7.3"/><circle cx="9.3" cy="13" r="1.1" fill="currentColor" stroke="none"/><circle cx="14.7" cy="13" r="1.1" fill="currentColor" stroke="none"/><path d="M11 15.6q1-.8 2 0q0 1.1-1 1.6q-1-.5-1-1.6z" fill="currentColor" stroke="none"/><path d="M12 17.1c-.6.8-1.6 1.1-2.3.6M12 17.1c.6.8 1.6 1.1 2.3.6" stroke-width="1.3"/></svg>
         <span class="sbLabel">Мяу</span>
       </button>
+      <button class="sbBtn" data-snd="scare" aria-label="Испуг">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5" stroke-width="2.2"/><circle cx="12" cy="16.3" r="1.1" fill="currentColor" stroke="none"/></svg>
+        <span class="sbLabel">Испуг</span>
+      </button>
+      <button class="sbBtn empty" aria-hidden="true" tabindex="-1"></button>
     </div>
   </div>
 
@@ -1264,6 +1202,10 @@
   </div>
 
   <div id="tickerFull">
+    <div id="tickerRotateHint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+      <div>Поверни телефон</div>
+    </div>
     <div id="tickerRotate">
       <div id="tickerTrack"><span id="tickerText"></span></div>
     </div>
@@ -1292,16 +1234,6 @@
         <button class="qrDlBtn" id="qrDlWhite"><i class="qrSwatch white"></i>PNG белый</button>
       </div>
     </div>
-  </div>
-
-  <div id="rhymeStage" style="display:none">
-    <div id="rhymeInputRow">
-      <input id="rhymeInput" type="text" inputmode="text" pattern="[А-Яа-яЁё\-\s]*" placeholder="Слово" aria-label="Слово" />
-      <button id="rhymeOk">ОК</button>
-    </div>
-    <div id="rhymeHint">Впиши слово и жми ОК</div>
-    <div id="rhymeWord"></div>
-    <div id="rhymeResult"></div>
   </div>
 
   <div id="bar">
@@ -1457,13 +1389,12 @@
     return {l:sp.l,a:sp.a,pc:idx};
   }
 
-  // ---- audio: real piano samples (embedded), synth fallback ----
+  // ---- audio: real note samples (embedded), synth fallback ----
   // ---- audio: Web Audio (low latency) + silent loop to keep iOS media session active ----
   var AC=null, buffers={}, silentLoop=null, started=false;
-  var clickBuf=null, clockBuf=null, drumBuf=null, cubeBuf=null, cubeEndBuf=null, cube1Buf=null, prizBuf=null, prizEndBuf=null, mainBuf=null, tapBuf=null, colorBuf=null, kickBuf=null, cHighBuf=null, cHighShortBuf=null, cHighLongBuf=null, numSpinSrc=null, tmLastSec=0;
+  var clickBuf=null, clockBuf=null, drumBuf=null, cubeBuf=null, cubeEndBuf=null, cube1Buf=null, prizBuf=null, prizEndBuf=null, mainBuf=null, tapBuf=null, colorBuf=null, kickBuf=null, numSpinSrc=null, tmLastSec=0;
   var sbBuf={};
   var yesnoBuf=null, yesnoEndBuf=null, bottleBuf=null, oneCubeBuf=null, oneCubeEndBuf=null;
-  var pianoShortBuf={}, pianoLongBuf={};
   function b64ToBuf(uri){
     var b64=uri.split(',')[1], bin=atob(b64), len=bin.length, arr=new Uint8Array(len);
     for(var i=0;i<len;i++) arr[i]=bin.charCodeAt(i);
@@ -1481,7 +1412,7 @@
   }
   function initAudio(){
     try{ AC=new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'}); }catch(e){ AC=null; }
-    var ASSET_V='8';   // поменять это число — все звуки подгрузятся свежими, без кэша
+    var ASSET_V='9';   // поменять это число — все звуки подгрузятся свежими, без кэша
     if(AC){ Object.keys(SAMP).forEach(function(pc){
       try{ fetch(SAMP[pc]+'?v='+ASSET_V).then(function(r){return r.arrayBuffer();}).then(function(ab){AC.decodeAudioData(ab,function(b){buffers[pc]=b;},function(){});}).catch(function(){}); }catch(e){}
     });
@@ -1493,7 +1424,7 @@
       loadClip('assets/CUBE%20END.mp3',function(b){cubeEndBuf=b;});
       loadClip('assets/CUBE%201.mp3',function(b){cube1Buf=b;});
       loadClip('assets/DANET.mp3',function(b){yesnoBuf=b;});
-      loadClip('assets/YESNO%20END.mp3',function(b){yesnoEndBuf=b;});
+      loadClip('assets/DANETEND.mp3',function(b){yesnoEndBuf=b;});
       loadClip('assets/BOTTLE_FLIP.mp3',function(b){bottleBuf=b;});
       loadClip('assets/ONE%20CUBE.mp3',function(b){oneCubeBuf=b;});
       loadClip('assets/ONE%20CUBE%20END.mp3',function(b){oneCubeEndBuf=b;});
@@ -1511,18 +1442,11 @@
       loadClip('assets/SB_SAD.mp3',function(b){sbBuf.sad=b;});
       loadClip('assets/SB_CLAP.mp3',function(b){sbBuf.clap=b;});
       loadClip('assets/SB_SCARE.mp3',function(b){sbBuf.scare=b;});
+      loadClip('assets/CORRECT.mp3',function(b){sbBuf.correct=b;});
       loadClip('assets/SB_WRONG.mp3',function(b){sbBuf.wrong=b;});
       loadClip('assets/SB_AIRHORN.mp3',function(b){sbBuf.airhorn=b;});
       loadClip('assets/UUUUU.mp3',function(b){sbBuf.crowd=b;});
       loadClip('assets/CAT.mp3',function(b){sbBuf.cat=b;});
-      NOTE_NAMES.forEach(function(name,pc){
-        var enc=encodeURIComponent(name);             // C# -> C%23, остальные без изменений
-        loadClip('assets/'+enc+'_SHORT.mp3',function(b){pianoShortBuf[pc]=b;});
-        loadClip('assets/'+enc+'_LONG.mp3',function(b){pianoLongBuf[pc]=b;});
-      });
-      loadClip('assets/C_HIGH.mp3',function(b){cHighBuf=b;});
-      loadClip('assets/C_HIGH_SHORT.mp3',function(b){cHighShortBuf=b;});
-      loadClip('assets/C_HIGH_LONG.mp3',function(b){cHighLongBuf=b;});
     }
     silentLoop=new Audio(silentWav()); silentLoop.loop=true; silentLoop.setAttribute('playsinline','');
   }
@@ -1599,7 +1523,7 @@
     setTimeout(function(){ render(n); el.classList.remove('pop'); },80);
   }
 
-  var TITLES={home:'TAP APP',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',rhyme:'РИФМЫ',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'РИТМ-МАШИНА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',piano:'ПИАНИНО',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
+  var TITLES={home:'TAP APP',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'РИТМ-МАШИНА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
   function setApp(a){
     app=a;
     document.getElementById('title').textContent=TITLES[a];
@@ -1608,8 +1532,6 @@
       b.classList.toggle('on',b.dataset.app===a);
     });
     homeStage.style.display = a==='home'?'flex':'none';
-    pianoStage.style.display = a==='piano'?'flex':'none';
-    if(a==='piano') pianoLayout();
     stage.style.display   = a==='note' ?'flex':'none';
     bpmStage.style.display= a==='bpm'  ?'flex':'none';
     metroStage.style.display= a==='metro' ?'flex':'none';
@@ -1632,7 +1554,6 @@
     tickerStage.style.display = a==='ticker'?'flex':'none';
     morseStage.style.display = a==='morse'?'flex':'none';
     qrStage.style.display = a==='qr'?'flex':'none';
-    rhymeStage.style.display = a==='rhyme'?'flex':'none';
     revStage.style.display = a==='rev'?'flex':'none';
     document.getElementById('mode').style.display = a==='note'?'flex':'none';
     document.getElementById('wordModeSeg').style.display = a==='word'?'flex':'none';
@@ -1640,7 +1561,7 @@
     document.getElementById('numModeSeg').style.display = a==='num'?'flex':'none';
     document.getElementById('voicePitchSeg').style.display = a==='voice'?'flex':'none';
     document.getElementById('metroSigSeg').style.display = a==='metro'?'flex':'none';
-    document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='rhyme'||a==='morse'||a==='bottle'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
+    document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='morse'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
     document.getElementById('autoBtn').style.display = a==='note'?'':'none';
     document.getElementById('resetBpmBtn').style.display = a==='bpm'?'':'none';
     document.getElementById('resetCounterBtn').style.display = a==='counter'?'':'none';
@@ -1675,9 +1596,7 @@
     if(a==='rev') revPrimeMic();
     resetMetro();
     if(a==='time') timeStart(); else timeStop();
-    resetPiano();
     resetQr();
-    resetRhyme();
     if(a==='home') resetHome();
     if(a==='note') render(pick());
     if(typeof fxc!=='undefined' && fxc){ fxParts.length=0; fxc.clearRect(0,0,fx.width,fx.height); }
@@ -2083,7 +2002,7 @@
   var rouletteResult=document.getElementById('rouletteResult');
   var rouletteHint=document.getElementById('rouletteHint');
   var ROULETTE_PAL=['#e0a85e','#3d9e6f','#4a86c9','#c9574a','#9a5ac9','#4ac9b8','#c94a94','#8a8f3f'];
-  var rouletteWords=[], rouletteEditing=false, rouletteSpinning=false, rouletteRotation=0;
+  var rouletteWords=[], rouletteEditing=false, rouletteSpinning=false, rouletteRotation=0, rouletteLastN=0;
   var ROULETTE_DUR=3600;
 
   function setRouletteEditing(on){
@@ -2119,21 +2038,32 @@
   function rouletteBuildWheel(){
     rouletteWheelSvg.innerHTML='';
     var n=rouletteWords.length;
-    rouletteEmpty.style.display = n<2 ? 'flex':'none';
-    if(n<2) return;
+    rouletteEmpty.style.display = n<1 ? 'flex':'none';
+    if(n<1){ rouletteLastN=0; return; }
     var ns='http://www.w3.org/2000/svg';
     var g=document.createElementNS(ns,'g');
     g.setAttribute('transform','translate(110,110)');
-    var per=360/n, r=95;
-    for(var i=0;i<n;i++){
-      var a0=(i*per-90)*Math.PI/180, a1=((i+1)*per-90)*Math.PI/180;
-      var x0=r*Math.cos(a0), y0=r*Math.sin(a0);
-      var x1=r*Math.cos(a1), y1=r*Math.sin(a1);
-      var large=per>180?1:0;
-      var path=document.createElementNS(ns,'path');
-      path.setAttribute('d','M0 0 L'+x0.toFixed(2)+' '+y0.toFixed(2)+' A'+r+' '+r+' 0 '+large+' 1 '+x1.toFixed(2)+' '+y1.toFixed(2)+' Z');
-      path.setAttribute('fill',ROULETTE_PAL[i%ROULETTE_PAL.length]);
-      g.appendChild(path);
+    var isNew = n>rouletteLastN;          // слово только что добавили (не удалили)
+    if(n===1){
+      var circle=document.createElementNS(ns,'circle');
+      circle.setAttribute('r','95');
+      circle.setAttribute('fill',ROULETTE_PAL[0]);
+      circle.setAttribute('class','rouletteSlice'+(isNew?' enter':''));
+      g.appendChild(circle);
+    }else{
+      var per=360/n, r=95;
+      for(var i=0;i<n;i++){
+        var a0=(i*per-90)*Math.PI/180, a1=((i+1)*per-90)*Math.PI/180;
+        var x0=r*Math.cos(a0), y0=r*Math.sin(a0);
+        var x1=r*Math.cos(a1), y1=r*Math.sin(a1);
+        var large=per>180?1:0;
+        var path=document.createElementNS(ns,'path');
+        path.setAttribute('d','M0 0 L'+x0.toFixed(2)+' '+y0.toFixed(2)+' A'+r+' '+r+' 0 '+large+' 1 '+x1.toFixed(2)+' '+y1.toFixed(2)+' Z');
+        path.setAttribute('fill',ROULETTE_PAL[i%ROULETTE_PAL.length]);
+        var newly = isNew && i===n-1;      // новый, только что добавленный цвет
+        path.setAttribute('class','rouletteSlice'+(newly?' enter':''));
+        g.appendChild(path);
+      }
     }
     var hub=document.createElementNS(ns,'circle');
     hub.setAttribute('r','15');
@@ -2141,6 +2071,12 @@
     hub.setAttribute('stroke-width','1.5');
     g.appendChild(hub);
     rouletteWheelSvg.appendChild(g);
+    rouletteLastN=n;
+    requestAnimationFrame(function(){                   // запускаем переход из блюра у новых сегментов
+      rouletteWheelSvg.querySelectorAll('.rouletteSlice.enter').forEach(function(el){
+        el.classList.remove('enter');
+      });
+    });
   }
   function rouletteAdd(){
     var v=(rouletteInput.value||'').trim();
@@ -2234,7 +2170,7 @@
     sbActiveSrc=src; sbActiveGain=g;
     src.onended=function(){ if(sbActiveSrc===src){ sbActiveSrc=null; sbActiveGain=null; } };
   }
-  document.querySelectorAll('.sbBtn').forEach(function(btn){
+  document.querySelectorAll('.sbBtn:not(.empty)').forEach(function(btn){
     btn.addEventListener('pointerdown',function(e){
       e.stopPropagation();
       ensureAC();
@@ -2264,7 +2200,8 @@
     var s=AC.createBufferSource(); s.buffer=bottleBuf; s.loop=true;
     var g=AC.createGain();
     g.gain.setValueAtTime(0,AC.currentTime);
-    g.gain.linearRampToValueAtTime(1,AC.currentTime+0.12);   // фейд-ин
+    g.gain.linearRampToValueAtTime(.85,AC.currentTime+0.035);  // резкий старт
+    g.gain.linearRampToValueAtTime(1,AC.currentTime+0.12);     // и плавный довод до полной громкости
     s.connect(g); g.connect(AC.destination);
     s.start(0);
     btlSndSrc=s; btlGainNode=g;
@@ -2345,7 +2282,7 @@
   var noiseHint=document.getElementById('noiseHint');
   var micStream=null, micAnalyser=null, micFloatBuf=null, micRequesting=false, micDenied=false;
   var noiseMeasuring=false, noiseRaf=null, noiseSamples=[], noiseStartT=0;
-  var NOISE_DUR=1300, NOISE_OFFSET=100;
+  var NOISE_DUR=7000, NOISE_OFFSET=100;
   function noiseLabelFor(db){
     if(db<30) return ['Тишина','#6fae6f'];
     if(db<45) return ['Тихо','#6fae6f'];
@@ -3066,83 +3003,6 @@
     if(timeInterval){ clearInterval(timeInterval); timeInterval=null; }
   }
 
-  // ---- piano ----
-  var pianoStage=document.getElementById('pianoStage');
-  var pianoRotate=document.getElementById('pianoRotate');
-  var pianoKeys=document.querySelectorAll('#pianoStage .pkey-white, #pianoStage .pkey-black');
-  function pianoFadeOut(src,g){
-    try{
-      var now=AC.currentTime;
-      g.gain.cancelScheduledValues(now);
-      g.gain.setValueAtTime(g.gain.value,now);
-      g.gain.linearRampToValueAtTime(0,now+0.06);
-      src.stop(now+0.07);
-    }catch(e){}
-  }
-  function pianoStartSample(el,buf,rate){
-    if(el._src) pianoFadeOut(el._src, el._gain);
-    var src=AC.createBufferSource(); src.buffer=buf; src.playbackRate.value=rate||1;
-    var g=AC.createGain(); g.gain.value=1;
-    src.connect(g); g.connect(AC.destination);
-    src.start(0);
-    el._src=src; el._gain=g;
-    return buf.duration*1000/(rate||1);     // длительность с учётом скорости воспроизведения
-  }
-  function pianoGetMain(el){
-    if(el.dataset.high==='1') return cHighBuf || buffers[0];   // верхнее До: живой сэмпл, либо запасной трюк ниже
-    return buffers[+el.dataset.pc];
-  }
-  function pianoKeyOn(el){
-    if(!soundOn||!AC) return;
-    el._held=true;
-    el.classList.add('active');
-    var buf=pianoGetMain(el);
-    if(el.dataset.high==='1' && !cHighBuf && buffers[0]){
-      pianoStartSample(el,buffers[0],2);                        // запасной план, пока верхнее До не загрузилось
-      return;
-    }
-    if(!buf) return;
-    pianoStartSample(el,buf,1);
-  }
-  function pianoKeyOff(el){
-    el._held=false;
-    el.classList.remove('active');
-    if(el._src){ pianoFadeOut(el._src, el._gain); el._src=null; el._gain=null; }
-  }
-  function resetPiano(){
-    pianoKeys.forEach(function(el){ pianoKeyOff(el); });
-  }
-  function pianoIsMobile(){
-    var fine=window.matchMedia && window.matchMedia('(pointer:fine)').matches;
-    var touch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
-    if(fine && !touch) return false;
-    return window.innerHeight>=window.innerWidth;   // не повторно поворачиваем, если браузер уже сам в landscape
-  }
-  function pianoLayout(){
-    if(pianoStage.style.display==='none') return;
-    // меряем по самому контейнеру — надёжно совпадает с реальным экраном
-    var fw=pianoStage.clientWidth||window.innerWidth, fh=pianoStage.clientHeight||window.innerHeight;
-    if(pianoIsMobile()){
-      pianoRotate.style.width=fh+'px';
-      pianoRotate.style.height=fw+'px';
-      pianoRotate.style.transform='translate(-50%,-50%) rotate(-90deg)';
-    }else{
-      pianoRotate.style.width=fw+'px';
-      pianoRotate.style.height=fh+'px';
-      pianoRotate.style.transform='translate(-50%,-50%)';
-    }
-  }
-  window.addEventListener('resize',pianoLayout);
-  pianoKeys.forEach(function(el){
-    el.addEventListener('pointerdown',function(e){
-      e.stopPropagation(); e.preventDefault();
-      ensureAC(); pianoKeyOn(el);
-      try{ el.setPointerCapture(e.pointerId); }catch(err){}
-    });
-    el.addEventListener('pointerup',function(e){ e.stopPropagation(); pianoKeyOff(el); });
-    el.addEventListener('pointercancel',function(e){ e.stopPropagation(); pianoKeyOff(el); });
-  });
-
   // ---- dice ----
   function makeDie(){
     var d=document.createElement('div'); d.className='die'; var dots=[];
@@ -3257,31 +3117,35 @@
       tickerHint=document.getElementById('tickerHint'),
       tickerFull=document.getElementById('tickerFull'),
       tickerRotate=document.getElementById('tickerRotate'),
+      tickerRotateHint=document.getElementById('tickerRotateHint'),
       tickerText=document.getElementById('tickerText');
-  var tickerEditing=false, tickerRunning=false, tickerRaf=null, tickerX=0, tickerLast=0, tickerDelayT=null, tickerLastVertical=null;
-  function tickerIsVertical(){
-    // десктоп (мышь, без касаний) — всегда горизонтально
+  var tickerEditing=false, tickerRunning=false, tickerRaf=null, tickerX=0, tickerLast=0, tickerDelayT=null;
+  function tickerNeedsRotate(){
+    // десктоп (мышь, без касаний) — всегда ок, без поворота
     var fine = window.matchMedia && window.matchMedia('(pointer:fine)').matches;
     var touch = ('ontouchstart' in window) || navigator.maxTouchPoints>0;
     if(fine && !touch) return false;
-    // мобильный: трюк с поворотом нужен только пока экран РЕАЛЬНО портретный —
-    // если человек уже физически повернул телефон (и блокировка ориентации выключена),
-    // браузер сам стал landscape, и наш CSS-поворот накладывался бы поверх него
-    return window.innerHeight>=window.innerWidth;
+    // мобильный — бегущая строка работает только в ландшафте
+    return window.innerHeight>window.innerWidth;
   }
-  function layoutTickerBox(vertical){
+  function tickerShowRotateHint(){
+    if(tickerRaf){ cancelAnimationFrame(tickerRaf); tickerRaf=null; }
+    if(tickerDelayT){ clearTimeout(tickerDelayT); tickerDelayT=null; }
+    tickerRunning=false;
+    tickerRotateHint.style.display='flex';
+    tickerRotate.style.display='none';
+  }
+  function tickerHideRotateHint(){
+    tickerRotateHint.style.display='none';
+    tickerRotate.style.display='block';
+  }
+  function layoutTickerBox(){
     // меряем по самому полноэкранному слою (fixed;inset:0) — надёжно совпадает
     // с реальным экраном в любом окружении (Safari, PWA, Telegram, десктоп)
     var fw=tickerFull.clientWidth||window.innerWidth, fh=tickerFull.clientHeight||window.innerHeight;
-    if(vertical){
-      tickerRotate.style.width=fh+'px';
-      tickerRotate.style.height=fw+'px';
-      tickerRotate.style.transform='translate(-50%,-50%) rotate(-90deg)';  // низ текста — справа, верх — слева
-    }else{
-      tickerRotate.style.width=fw+'px';
-      tickerRotate.style.height=fh+'px';
-      tickerRotate.style.transform='translate(-50%,-50%)';
-    }
+    tickerRotate.style.width=fw+'px';
+    tickerRotate.style.height=fh+'px';
+    tickerRotate.style.transform='translate(-50%,-50%)';
   }
   function setTickerEditing(on){
     tickerEditing=on;
@@ -3300,23 +3164,22 @@
     tickerText.style.opacity='0';
     tickerText.textContent=''; tickerText.style.transform='';
     tickerHint.textContent='Впиши текст и жми ОК';
+    tickerRotateHint.style.display='none';
+    tickerRotate.style.display='';
   }
   function runTicker(){
     tickerRunning=true;
-    var vertical=tickerIsVertical();
-    tickerLastVertical=vertical;
-    layoutTickerBox(vertical);
+    tickerHideRotateHint();
+    layoutTickerBox();
     var fw=tickerFull.clientWidth||window.innerWidth, fh=tickerFull.clientHeight||window.innerHeight;
-    // размер букв: считаем от той стороны экрана, что становится "высотой" строки
-    var fontPx = vertical ? Math.min(260, Math.max(40, fw*0.656))
-                           : Math.max(40, fh*0.5);
+    var fontPx = Math.max(40, fh*0.5);
     tickerText.style.fontSize=fontPx+'px';
-    var stageW=tickerRotate.clientWidth || (vertical?fh:fw);
+    var stageW=tickerRotate.clientWidth || fw;
     requestAnimationFrame(function(){
       var tw=tickerText.offsetWidth||300;
       var baseSpeed=Math.max(640, stageW/0.8);
-      var speed = vertical ? baseSpeed : baseSpeed*0.7;   // на ПК — на 30% медленнее
-      tickerX = vertical ? -stageW : stageW;              // старт за нужным краем экрана
+      var speed = baseSpeed*0.467;        // в 1.5 раза медленнее обычной скорости
+      tickerX = stageW;                   // старт за правым краем экрана
       // ставим стартовую позицию СРАЗУ, синхронно с открытием прозрачности —
       // иначе один кадр текст виден ещё на старом месте (по центру) до начала движения
       tickerText.style.transform='translate3d('+tickerX.toFixed(1)+'px,-50%,0)';
@@ -3325,13 +3188,8 @@
       function step(now){
         if(!tickerRunning) return;
         var dt=(now-tickerLast)/1000; tickerLast=now;
-        if(vertical){
-          tickerX+=speed*dt;
-          if(tickerX>tw) tickerX=-stageW;              // зациклить (снизу вверх)
-        }else{
-          tickerX-=speed*dt;
-          if(tickerX<-tw) tickerX=stageW;               // зациклить (справа налево)
-        }
+        tickerX-=speed*dt;
+        if(tickerX<-tw) tickerX=stageW;               // зациклить (справа налево)
         tickerText.style.transform='translate3d('+tickerX.toFixed(1)+'px,-50%,0)';
         tickerRaf=requestAnimationFrame(step);
       }
@@ -3342,7 +3200,7 @@
     var txt=(tickerInput.value||'').trim();
     if(!txt){ tickerInput.focus(); return; }
     setTickerEditing(false); tickerInput.blur();
-    tickerText.textContent=txt; tickerText.style.transform='translate3d(0px,-50%,0)';
+    tickerText.textContent=txt.toUpperCase(); tickerText.style.transform='translate3d(0px,-50%,0)';
     tickerText.style.opacity='0';                          // текст скрыт, пока не начнётся движение
     tickerFull.classList.add('show');
     tickerFull.style.transition='none'; tickerFull.style.opacity='0';
@@ -3350,7 +3208,12 @@
       tickerFull.style.transition='opacity .9s ease';     // плавный уход в темноту
       tickerFull.style.opacity='1';
     });
-    tickerDelayT=setTimeout(runTicker, 1900);              // 1.9с чёрный экран, потом текст
+    if(tickerNeedsRotate()){
+      tickerShowRotateHint();                              // чёрный экран + намёк повернуть телефон
+    }else{
+      tickerHideRotateHint();
+      tickerDelayT=setTimeout(runTicker, 1900);            // 1.9с чёрный экран, потом текст
+    }
   }
   function stopTicker(){
     tickerRunning=false;
@@ -3361,16 +3224,20 @@
       tickerFull.classList.remove('show');
       tickerFull.style.transition=''; tickerFull.style.opacity='';
       tickerHint.textContent='Впиши текст и жми ОК';        // остаёмся на экране ввода бегущей строки
+      tickerRotateHint.style.display='none';
+      tickerRotate.style.display='';
     },460);
   }
   window.addEventListener('resize',function(){
-    if(!tickerRunning) return;
-    var v=tickerIsVertical();
-    if(v!==tickerLastVertical){
-      if(tickerRaf){ cancelAnimationFrame(tickerRaf); tickerRaf=null; }
-      runTicker();                              // ориентация реально сменилась — пересобираем чисто
-    }else{
-      layoutTickerBox(v);
+    if(!tickerFull.classList.contains('show')) return;
+    if(tickerNeedsRotate()){
+      tickerShowRotateHint();
+    }else if(tickerRotateHint.style.display==='flex'){
+      // телефон только что повернули в ландшафт — запускаем бегущую строку
+      if(tickerDelayT) clearTimeout(tickerDelayT);
+      tickerDelayT=setTimeout(runTicker, 300);
+    }else if(tickerRunning){
+      layoutTickerBox();
     }
   });
   tickerInput.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
@@ -3583,15 +3450,15 @@
   }
   function closeQr(){
     if(qrAppearT){ clearTimeout(qrAppearT); qrAppearT=null; }
-    qrBox.style.transition='opacity 2s ease'; qrBox.style.opacity='0';     // QR гаснет, фон остаётся размытым
+    qrBox.style.transition='opacity 1s ease'; qrBox.style.opacity='0';     // QR гаснет, фон остаётся размытым (в 2 раза быстрее)
     setTimeout(function(){
       qrBox.style.display='none';
       qrStage.classList.remove('shown'); qrShown=false;
       qrHint.textContent='Впиши текст или ссылку';
-      editLock.style.transition='opacity .4s ease,visibility .4s';
+      editLock.style.transition='opacity .2s ease,visibility .2s';
       editLock.classList.remove('on','strong');                          // и только теперь снимаем размытие
-      setTimeout(function(){ editLock.style.transition=''; },420);
-    },2000);
+      setTimeout(function(){ editLock.style.transition=''; },210);
+    },1000);
   }
   qrInput.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
   qrInput.addEventListener('focus',function(){ setQrEditing(true); });
@@ -3615,110 +3482,6 @@
     qrInput.focus();
   });
 
-  // ---- rhymes ----
-  var rhymeStage=document.getElementById('rhymeStage'),
-      rhymeInput=document.getElementById('rhymeInput'),
-      rhymeOk=document.getElementById('rhymeOk'),
-      rhymeHint=document.getElementById('rhymeHint'),
-      rhymeWord=document.getElementById('rhymeWord'),
-      rhymeResult=document.getElementById('rhymeResult');
-  var rhymeEditing=false, rhymeShown=false, rhymeData=null, rhymeWordKey=null, rhymeLibLoading=null;
-  var rhymeQueue=[], rhymeAllForWord=[], rhymeCurWord='';
-  var RHYME_VOWELS='аеиоуыэюя';
-  function setRhymeEditing(on){
-    rhymeEditing=on;
-    rhymeStage.classList.toggle('editing',on);
-    editLock.classList.toggle('on',on);
-    if(!on && document.activeElement===rhymeInput) rhymeInput.blur();
-  }
-  function resetRhyme(){
-    rhymeEditing=false; rhymeShown=false;
-    rhymeStage.classList.remove('editing','shown');
-    editLock.classList.remove('on'); editLock.style.transition='';
-    rhymeWord.textContent=''; rhymeResult.textContent='';
-    rhymeHint.textContent='Впиши слово и жми ОК';
-  }
-  function loadRhymeData(cb){
-    if(rhymeData){ cb(); return; }
-    if(rhymeLibLoading){ rhymeLibLoading.push(cb); return; }
-    rhymeLibLoading=[cb];
-    fetch('assets/rhymes.json').then(function(r){return r.json();}).then(function(json){
-      rhymeData=json;
-      rhymeWordKey={};
-      Object.keys(rhymeData).forEach(function(k){
-        rhymeData[k].split(',').forEach(function(w){ rhymeWordKey[w]=k; });
-      });
-      rhymeLibLoading.forEach(function(f){f();}); rhymeLibLoading=null;
-    }).catch(function(){
-      rhymeHint.textContent='Не удалось загрузить словарь рифм';
-      rhymeLibLoading=null;
-    });
-  }
-  function rhymeFallbackKey(word){
-    var ei=word.lastIndexOf('ё');
-    if(ei>=0) return word.slice(ei);
-    for(var i=word.length-1;i>=0;i--){
-      if(RHYME_VOWELS.indexOf(word[i])>=0) return word.slice(i);
-    }
-    return word;
-  }
-  function shuffle(arr){
-    for(var i=arr.length-1;i>0;i--){
-      var j=Math.floor(Math.random()*(i+1));
-      var t=arr[i]; arr[i]=arr[j]; arr[j]=t;
-    }
-    return arr;
-  }
-  function startRhyme(){
-    var raw=(rhymeInput.value||'').trim().toLowerCase().replace(/[^а-яё\-\s]/g,'');
-    if(!raw){ rhymeInput.focus(); return; }
-    setRhymeEditing(false); rhymeInput.blur();
-    rhymeCurWord=raw;
-    rhymeHint.textContent='Готовим рифмы…';
-    loadRhymeData(function(){
-      var key = rhymeWordKey.hasOwnProperty(raw) ? rhymeWordKey[raw] : rhymeFallbackKey(raw);
-      var list = rhymeData[key] ? rhymeData[key].split(',') : [];
-      rhymeAllForWord = list.filter(function(w){ return w!==raw; });
-      rhymeQueue = shuffle(rhymeAllForWord.slice());
-      rhymeStage.classList.add('shown'); rhymeShown=true;
-      rhymeWord.textContent='Рифмы к слову «'+raw+'»';
-      if(rhymeAllForWord.length===0){
-        rhymeResult.textContent='—';
-        rhymeHint.textContent='Рифм не нашлось, попробуй другое слово';
-      }else{
-        rhymeResult.textContent='?';
-        rhymeHint.textContent='Тапни — рифма';
-      }
-    });
-  }
-  function nextRhyme(){
-    if(!rhymeShown || !rhymeAllForWord.length) return;
-    playBuf(tapBuf);
-    if(!rhymeQueue.length) rhymeQueue=shuffle(rhymeAllForWord.slice());
-    var w=rhymeQueue.pop();
-    rhymeResult.style.transition='none'; rhymeResult.style.opacity='.4'; rhymeResult.style.transform='scale(.94)';
-    rhymeResult.textContent=w;
-    requestAnimationFrame(function(){
-      rhymeResult.style.transition='opacity .15s ease,transform .15s ease';
-      rhymeResult.style.opacity='1'; rhymeResult.style.transform='scale(1)';
-    });
-  }
-  rhymeInput.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
-  rhymeInput.addEventListener('focus',function(){ setRhymeEditing(true); });
-  rhymeInput.addEventListener('blur',function(){ if(rhymeEditing) setRhymeEditing(false); });
-  rhymeInput.addEventListener('input',function(){
-    var c=rhymeInput.value.replace(/[^А-Яа-яЁё\-\s]/g,'');     // только буквы — без цифр
-    if(c!==rhymeInput.value) rhymeInput.value=c;
-  });
-  rhymeInput.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); startRhyme(); } });
-  rhymeOk.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
-  rhymeOk.addEventListener('click',function(e){ e.stopPropagation(); startRhyme(); });
-  rhymeStage.addEventListener('pointerdown',function(e){
-    if(rhymeEditing) return;
-    if(e.target===rhymeInput||e.target===rhymeOk) return;
-    e.stopPropagation();
-    if(rhymeShown){ ensureAC(); nextRhyme(); } else rhymeInput.focus();
-  });
 
   // ---- color ----
   var colorStage=document.getElementById('colorStage');
@@ -3909,6 +3672,7 @@
     soundOn=!soundOn;
     this.classList.toggle('on',soundOn);
     this.innerHTML=soundOn?IC_SPK_ON:IC_SPK_OFF;
+    if(!soundOn){ try{ btlSoundStop(); }catch(err){} }
   });
   document.getElementById('autoBtn').addEventListener('click',function(e){
     e.stopPropagation();setAuto();
@@ -3973,7 +3737,6 @@
     if(morseRunning){ stopMorse(); return; }
     if(morseEditing){ setMorseEditing(false); return; }
     if(qrEditing){ setQrEditing(false); return; }
-    if(rhymeEditing){ setRhymeEditing(false); return; }
     if(numEditing){ setNumEditing(false); return; }
     if(numFading) return;
     if(numHolding){ endNumberHold(); return; }
@@ -4049,7 +3812,7 @@
   var _h=document.getElementById('hint'); if(_h) setTimeout(function(){_h.style.opacity='0';},4000);
 
   document.getElementById('soundBtn').innerHTML=IC_SPK_ON;
-  initAudio();      // decode piano samples ahead of time
+  initAudio();      // decode note samples ahead of time
   setApp('home');
   render(pick());
 })();

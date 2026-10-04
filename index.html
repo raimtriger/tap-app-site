@@ -307,6 +307,7 @@
     position:relative;cursor:pointer;gap:0;padding:0 18px;
   }
   #rouletteStage.editing #rouletteInputRow{position:relative;z-index:61;}
+  #rouletteStage.spinning #rouletteWheelBox,#rouletteStage.spinning #rouletteResult{position:relative;z-index:61;}
   .rouletteSlice{transition:opacity .5s ease,filter .5s ease;opacity:1;filter:blur(0);}
   .rouletteSlice.enter{opacity:0;filter:blur(7px);}
   #rouletteInputRow{display:flex;gap:8px;align-items:center;}
@@ -706,10 +707,14 @@
   /* ---- bottom controls ---- */
   #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:70;}
   #bar{
+    position:fixed;left:0;right:0;z-index:6;
+    bottom:calc(env(safe-area-inset-bottom) + 144px);
     display:flex;gap:8px;justify-content:center;align-items:center;
-    padding:14px 12px calc(14px + env(safe-area-inset-bottom));
+    padding:0 12px;
     flex-wrap:wrap;
+    pointer-events:none;
   }
+  #bar>*{pointer-events:auto;}
   .seg{display:flex;background:var(--chip);border-radius:999px;padding:3px;}
   .seg button{
     border:0;background:transparent;color:var(--muted);
@@ -2103,6 +2108,8 @@
   function rouletteSpin(){
     if(rouletteSpinning||rouletteWords.length<2) return;
     rouletteSpinning=true;
+    rouletteStage.classList.add('spinning');
+    editLock.classList.add('on');
     rouletteResult.innerHTML='';
     rouletteHint.textContent='Крутим…';
     ensureAC();
@@ -2125,10 +2132,16 @@
       celebrate(true);
       rouletteShowResult(winIdx);
       rouletteUpdateHint();
+      editLock.style.transition='opacity .6s ease,visibility .6s';
+      editLock.classList.remove('on');
+      rouletteStage.classList.remove('spinning');
+      setTimeout(function(){ editLock.style.transition=''; },610);
     },ROULETTE_DUR+30);
   }
   function resetRoulette(){
     rouletteSpinning=false;
+    rouletteStage.classList.remove('spinning');
+    editLock.classList.remove('on'); editLock.style.transition='';
     rouletteWheelWrap.style.transition='';
     rouletteUpdateHint();
   }
@@ -2189,7 +2202,7 @@
   // ---- bottle ----
   var bottleStage=document.getElementById('bottleStage');
   var bottleImg=document.getElementById('bottleImg');
-  var btlAngle=0, btlVel=0, btlDragging=false, btlLastAngle=0, btlLastT=0, btlCenter={x:0,y:0}, btlRaf=null, btlPid=null, btlSndSrc=null;
+  var btlAngle=0, btlVel=0, btlDragging=false, btlLastAngle=0, btlLastT=0, btlCenter={x:0,y:0}, btlRaf=null, btlPid=null, btlSndSrc=null, btlIdleT=null;
   function btlGetAngle(x,y){
     return Math.atan2(y-btlCenter.y, x-btlCenter.x)*180/Math.PI;
   }
@@ -2224,6 +2237,7 @@
   function resetBottle(){
     btlDragging=false; btlVel=0;
     btlStopMomentum();
+    if(btlIdleT){ clearTimeout(btlIdleT); btlIdleT=null; }
     btlSoundStop(true);
   }
   function btlMomentumStep(){
@@ -2245,7 +2259,7 @@
     btlPid=e.pointerId;
     try{ bottleStage.setPointerCapture(e.pointerId); }catch(err){}
     bottleStage.style.cursor='grabbing';
-    ensureAC(); btlSoundStart();
+    ensureAC();
   }
   function btlPointerMove(e){
     if(!btlDragging) return;
@@ -2259,6 +2273,11 @@
     btlVel=btlVel*0.7+instVel*0.3;
     bottleImg.style.transform='rotate('+btlAngle+'deg)';
     btlLastAngle=ang; btlLastT=now;
+    if(Math.abs(d)>0.03){
+      if(!btlSndSrc) btlSoundStart();
+      if(btlIdleT) clearTimeout(btlIdleT);
+      btlIdleT=setTimeout(function(){ btlIdleT=null; btlSoundStop(); },90);
+    }
   }
   function btlPointerUp(e){
     if(!btlDragging) return;
@@ -2266,6 +2285,7 @@
     bottleStage.style.cursor='grab';
     if(btlPid!==null){ try{ bottleStage.releasePointerCapture(btlPid); }catch(err){} btlPid=null; }
     btlLastT=performance.now();
+    if(btlIdleT){ clearTimeout(btlIdleT); btlIdleT=null; }
     if(Math.abs(btlVel)>0.001){ btlRaf=requestAnimationFrame(btlMomentumStep); }
     else { btlSoundStop(); }
   }

@@ -694,13 +694,24 @@
   #qrHint{font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);}
   #qrStage.shown #qrInputRow,#qrStage.shown #qrHint{display:none;}
   #qrBox{
-    position:fixed;inset:0;z-index:62;display:none;
-    align-items:center;justify-content:center;
+    position:fixed;inset:0;z-index:62;display:none;flex-direction:column;
+    align-items:center;justify-content:center;gap:22px;
     background:transparent;color:var(--ink);
     opacity:0;
   }
   #qrCanvasWrap{cursor:pointer;}
   #qrCanvasWrap canvas{display:block;width:min(78vw,68vh);height:min(78vw,68vh);}
+  #qrDownloadRow{display:none;gap:10px;}
+  #qrDownloadRow.show{display:flex;}
+  .qrDlBtn{
+    display:flex;align-items:center;gap:8px;border:0;border-radius:999px;
+    background:rgba(128,128,128,.16);color:var(--ink);
+    font:600 12.5px/1 "Futura","Avenir Next",system-ui,sans-serif;
+    padding:11px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  .qrSwatch{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--muted);flex:0 0 auto;}
+  .qrSwatch.black{background:#000;}
+  .qrSwatch.white{background:#fff;}
 
   /* ---- rhymes ---- */
   #rhymeStage{
@@ -1262,7 +1273,13 @@
       <button id="qrOk">ОК</button>
     </div>
     <div id="qrHint">Впиши текст или ссылку</div>
-    <div id="qrBox"><div id="qrCanvasWrap"></div></div>
+    <div id="qrBox">
+      <div id="qrCanvasWrap"></div>
+      <div id="qrDownloadRow">
+        <button class="qrDlBtn" id="qrDlBlack"><i class="qrSwatch black"></i>PNG чёрный</button>
+        <button class="qrDlBtn" id="qrDlWhite"><i class="qrSwatch white"></i>PNG белый</button>
+      </div>
+    </div>
   </div>
 
   <div id="rhymeStage" style="display:none">
@@ -1292,6 +1309,10 @@
     <div class="seg" id="numModeSeg" style="display:none">
       <button data-nm="simple" class="on">Классика</button>
       <button data-nm="draw">Розыгрыш</button>
+    </div>
+    <div class="seg" id="qrModeSeg" style="display:none">
+      <button data-qm="instant" class="on">Мгновенно</button>
+      <button data-qm="download">Скачать</button>
     </div>
     <div class="seg" id="voicePitchSeg" style="display:none">
       <button data-vp="down" class="on">Ниже</button>
@@ -1607,6 +1628,7 @@
     document.getElementById('wordModeSeg').style.display = a==='word'?'flex':'none';
     document.getElementById('diceSeg').style.display = a==='dice'?'flex':'none';
     document.getElementById('numModeSeg').style.display = a==='num'?'flex':'none';
+    document.getElementById('qrModeSeg').style.display = a==='qr'?'flex':'none';
     document.getElementById('voicePitchSeg').style.display = a==='voice'?'flex':'none';
     document.getElementById('metroSigSeg').style.display = a==='metro'?'flex':'none';
     document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='rhyme'||a==='morse'||a==='bottle'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
@@ -3411,8 +3433,15 @@
       qrOk=document.getElementById('qrOk'),
       qrHint=document.getElementById('qrHint'),
       qrBox=document.getElementById('qrBox'),
-      qrCanvasWrap=document.getElementById('qrCanvasWrap');
-  var qrEditing=false, qrShown=false, qrLibLoading=null, qrAppearT=null;
+      qrCanvasWrap=document.getElementById('qrCanvasWrap'),
+      qrDownloadRow=document.getElementById('qrDownloadRow'),
+      qrDlBlack=document.getElementById('qrDlBlack'),
+      qrDlWhite=document.getElementById('qrDlWhite');
+  var qrEditing=false, qrShown=false, qrLibLoading=null, qrAppearT=null, qrCurrentText='', qrMode='instant';
+  function setQrMode(m){
+    qrMode=m;
+    document.querySelectorAll('#qrModeSeg button').forEach(function(b){ b.classList.toggle('on',b.dataset.qm===m); });
+  }
   function setQrEditing(on){
     qrEditing=on;
     qrStage.classList.toggle('editing',on);
@@ -3426,6 +3455,8 @@
     editLock.classList.remove('on','strong'); editLock.style.transition='';
     qrBox.style.transition=''; qrBox.style.opacity='0'; qrBox.style.display='none';
     qrCanvasWrap.innerHTML='';
+    qrDownloadRow.classList.remove('show');
+    qrCurrentText='';
     qrHint.textContent='Впиши текст или ссылку';
   }
   function loadQrLib(cb){
@@ -3447,6 +3478,30 @@
     ctx.fillStyle=ink;
     for(var r=0;r<n;r++) for(var c=0;c<n;c++){ if(qr.isDark(r,c)) ctx.fillRect(c*cell,r*cell,cell,cell); }
     qrCanvasWrap.innerHTML=''; qrCanvasWrap.appendChild(cv);
+    qrCurrentText=text;
+  }
+  function qrBuildDownloadCanvas(color){                // прозрачный фон, крупный размер под печать/соцсети
+    var qr=window.qrcode(0,'M');
+    qr.addData(qrCurrentText); qr.make();
+    var n=qr.getModuleCount(), cell=20, size=n*cell;
+    var cv=document.createElement('canvas'); cv.width=size; cv.height=size;
+    var ctx=cv.getContext('2d');
+    ctx.clearRect(0,0,size,size);
+    ctx.fillStyle=color;
+    for(var r=0;r<n;r++) for(var c=0;c<n;c++){ if(qr.isDark(r,c)) ctx.fillRect(c*cell,r*cell,cell,cell); }
+    return cv;
+  }
+  function qrDownload(color,name){
+    if(!qrCurrentText) return;
+    var cv=qrBuildDownloadCanvas(color);
+    cv.toBlob(function(blob){
+      if(!blob) return;
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=url; a.download=name;
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); },400);
+    },'image/png');
   }
   function startQr(){
     var txt=(qrInput.value||'').trim();
@@ -3456,6 +3511,7 @@
     loadQrLib(function(){
       try{
         renderQr(txt);
+        qrDownloadRow.classList.toggle('show',qrMode==='download');
         qrStage.classList.add('shown'); qrShown=true;
         editLock.style.transition='opacity .6s ease,visibility .6s';
         editLock.classList.add('on','strong');              // фон быстро размывается (0.6с)
@@ -3485,9 +3541,18 @@
   qrInput.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); startQr(); } });
   qrOk.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
   qrOk.addEventListener('click',function(e){ e.stopPropagation(); startQr(); });
+  qrDlBlack.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
+  qrDlBlack.addEventListener('click',function(e){ e.stopPropagation(); qrDownload('#000000','qr-black.png'); });
+  qrDlWhite.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
+  qrDlWhite.addEventListener('click',function(e){ e.stopPropagation(); qrDownload('#ffffff','qr-white.png'); });
   qrBox.addEventListener('pointerdown',function(e){    // тап (в любом месте QR-экрана) — плавно убрать
+    if(e.target===qrDlBlack||e.target===qrDlWhite||qrDlBlack.contains(e.target)||qrDlWhite.contains(e.target)) return;
     e.stopPropagation();
+    if(qrMode==='download') return;                   // в режиме «Скачать» ждём, пока скачают — тапом не закрываем
     closeQr();
+  });
+  document.querySelectorAll('#qrModeSeg button').forEach(function(b){
+    b.addEventListener('click',function(e){ e.stopPropagation(); setQrMode(b.dataset.qm); });
   });
   qrStage.addEventListener('pointerdown',function(e){
     if(qrEditing||qrShown) return;

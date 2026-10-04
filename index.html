@@ -515,8 +515,8 @@
   #revRecordBtn.denied{animation:revShake .25s ease;}
   @keyframes revBlink{0%,100%{opacity:.45;}50%{opacity:.9;}}
   @keyframes revShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
-  #revPlayBtn{background:#3f8f52;}
-  #revReverseBtn{background:#3572b0;}
+  #revPlayBtn{background:#3f8f52;touch-action:none;position:relative;z-index:1;}
+  #revReverseBtn{background:#3572b0;touch-action:none;position:relative;z-index:1;}
   #revStage .revBtn.disabled{opacity:.35;cursor:default;}
   #revStage .revBtn.active{filter:brightness(1.18);}
   @keyframes revPulse{0%,100%{filter:brightness(1);}50%{filter:brightness(1.25);}}
@@ -1661,6 +1661,7 @@
     resetRhythm();
     resetVoice();
     resetRev();
+    if(a==='rev') revPrimeMic();
     resetMetro();
     if(a==='time') timeStart(); else timeStop();
     resetPiano();
@@ -2651,7 +2652,14 @@
   var revDot=revRecordBtn.querySelector('.revDot');
   var revPlayBtn=document.getElementById('revPlayBtn');
   var revReverseBtn=document.getElementById('revReverseBtn');
-  var revMicStream=null, revRecorder=null, revChunks=[], revRecording=false, revBusy=false, revDenied=false;
+  var revMicStream=null, revRecorder=null, revChunks=[], revRecording=false, revBusy=false, revDenied=false, revMicPrimed=false;
+  function revPrimeMic(){
+    if(revMicPrimed || revDenied || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      revMicPrimed=true;
+      stream.getTracks().forEach(function(t){ t.stop(); });     // просим разрешение заранее, сам поток не держим
+    }).catch(function(){ revDenied=true; });
+  }
   var revBuffer=null, revReversedBuffer=null, revSrc=null;
   var REV_MAX_MS=30000, REV_MIN_MS=250;
 
@@ -2755,7 +2763,12 @@
     var src=AC.createBufferSource();
     src.buffer=buf;
     src.connect(AC.destination);
-    src.onended=function(){ btn.classList.remove('active'); revStage.classList.remove('focus'); if(revSrc===src) revSrc=null; };
+    src.onended=function(){
+      if(revSrc!==src) return;           // стары колбэк от уже остановленного источника — игнор
+      revSrc=null;
+      btn.classList.remove('active');
+      revStage.classList.remove('focus');
+    };
     revSrc=src;
     btn.classList.add('active');
     revStage.classList.add('focus');
@@ -2771,16 +2784,24 @@
   });
   revRecordBtn.addEventListener('pointerup',function(e){ e.stopPropagation(); e.preventDefault(); revEndHold(); });
   revRecordBtn.addEventListener('pointercancel',function(e){ e.stopPropagation(); revEndHold(); });
-  revPlayBtn.addEventListener('click',function(e){
-    e.stopPropagation();
+  revPlayBtn.addEventListener('contextmenu',function(e){ e.preventDefault(); });
+  revPlayBtn.addEventListener('pointerdown',function(e){
+    e.stopPropagation(); e.preventDefault();
     if(revPlayBtn.classList.contains('disabled')) return;
+    try{ revPlayBtn.setPointerCapture(e.pointerId); }catch(err){}
     revPlayBuffer(revBuffer, revPlayBtn);
   });
-  revReverseBtn.addEventListener('click',function(e){
-    e.stopPropagation();
+  revPlayBtn.addEventListener('pointerup',function(e){ e.stopPropagation(); e.preventDefault(); revStopPlayback(); });
+  revPlayBtn.addEventListener('pointercancel',function(e){ e.stopPropagation(); revStopPlayback(); });
+  revReverseBtn.addEventListener('contextmenu',function(e){ e.preventDefault(); });
+  revReverseBtn.addEventListener('pointerdown',function(e){
+    e.stopPropagation(); e.preventDefault();
     if(revReverseBtn.classList.contains('disabled')) return;
+    try{ revReverseBtn.setPointerCapture(e.pointerId); }catch(err){}
     revPlayBuffer(revReversedBuffer, revReverseBtn);
   });
+  revReverseBtn.addEventListener('pointerup',function(e){ e.stopPropagation(); e.preventDefault(); revStopPlayback(); });
+  revReverseBtn.addEventListener('pointercancel',function(e){ e.stopPropagation(); revStopPlayback(); });
 
   // ---- metronome ----
   var metroStage=document.getElementById('metroStage');

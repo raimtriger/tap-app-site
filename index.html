@@ -495,13 +495,17 @@
   #revStage .revBtn{
     flex:1;max-width:170px;border-radius:26px;
     display:flex;align-items:center;justify-content:center;
-    cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
-    transition:filter .15s ease,opacity .2s ease;
-    color:#fff;
+    cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;
+    transition:filter .15s ease,opacity .6s cubic-bezier(.22,.61,.36,1),transform .6s cubic-bezier(.22,.61,.36,1);
+    color:#fff;transform:scale(1) translateZ(0);backface-visibility:hidden;-webkit-backface-visibility:hidden;
   }
   #revStage .revBtn svg{width:38%;height:38%;}
-  #revRecordBtn{background:#b6392f;}
+  #revRecordBtn{background:#b6392f;touch-action:none;position:relative;z-index:1;-webkit-touch-callout:none;}
   #revRecordBtn.recording{background:#d1302f;animation:revPulse 1s ease-in-out infinite;}
+  #revStage.holding #revRecordBtn{transform:scale(1.05) translateZ(0);z-index:3;}
+  #revStage.holding .revBtn:not(#revRecordBtn){opacity:.35;transform:scale(.94) translateZ(0);}
+  #revStage.focus .revBtn.active{transform:scale(1.05) translateZ(0);z-index:3;}
+  #revStage.focus .revBtn:not(.active){opacity:.35;filter:blur(1px);transform:scale(.94) translateZ(0);}
   #revRecordBtn .revDot{
     width:32%;aspect-ratio:1;border-radius:50%;background:#fff;
     transition:border-radius .2s ease,width .2s ease;
@@ -2658,6 +2662,7 @@
     if(revSrc){ try{ revSrc.stop(); }catch(e){} revSrc=null; }
     revPlayBtn.classList.remove('active');
     revReverseBtn.classList.remove('active');
+    revStage.classList.remove('focus');
   }
   function revSetPlayEnabled(on){
     revPlayBtn.classList.toggle('disabled',!on);
@@ -2669,10 +2674,11 @@
   }
   function resetRev(){
     if(revRecorder && revRecording){ try{ revRecorder.stop(); }catch(e){} }
-    revRecording=false; revBusy=false;
+    revRecording=false; revBusy=false; revWantStop=false;
     revStopMic();
     revStopPlayback();
     revRecordBtn.classList.remove('recording','processing');
+    revStage.classList.remove('holding');
     revBuffer=null; revReversedBuffer=null;
     revSetPlayEnabled(false);
   }
@@ -2685,10 +2691,12 @@
     }
     return rev;
   }
+  var revWantStop=false;
   function revStartRecording(){
     if(revBusy || revRecording) return;
     ensureAC();
     revBusy=true;
+    revWantStop=false;
     revStopPlayback();
     navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
       revDenied=false; revMicStream=stream;
@@ -2724,6 +2732,7 @@
       revRecordBtn.classList.add('recording');
       revBusy=false;
       revMaxT=setTimeout(function(){ if(revRecording) revStopRecording(); }, REV_MAX_MS);
+      if(revWantStop){ revWantStop=false; revStopRecording(); }
     }).catch(function(){
       revDenied=true; revBusy=false;
       revFlashDenied();
@@ -2734,8 +2743,9 @@
     if(revMaxT){ clearTimeout(revMaxT); revMaxT=null; }
     if(revRecorder && revRecording){ try{ revRecorder.stop(); }catch(e){} }
   }
-  function revToggleRecord(){
-    if(revRecording){ revStopRecording(); } else { revStartRecording(); }
+  function revEndHold(){
+    revStage.classList.remove('holding');
+    if(revRecording){ revStopRecording(); } else { revWantStop=true; }
   }
   function revPlayBuffer(buf, btn){
     if(!buf) return;
@@ -2745,12 +2755,22 @@
     var src=AC.createBufferSource();
     src.buffer=buf;
     src.connect(AC.destination);
-    src.onended=function(){ btn.classList.remove('active'); if(revSrc===src) revSrc=null; };
+    src.onended=function(){ btn.classList.remove('active'); revStage.classList.remove('focus'); if(revSrc===src) revSrc=null; };
     revSrc=src;
     btn.classList.add('active');
+    revStage.classList.add('focus');
     try{ src.start(); }catch(e){}
   }
-  revRecordBtn.addEventListener('click',function(e){ e.stopPropagation(); revToggleRecord(); });
+  revRecordBtn.addEventListener('contextmenu',function(e){ e.preventDefault(); });
+  revRecordBtn.addEventListener('pointerdown',function(e){
+    e.stopPropagation(); e.preventDefault();
+    if(revBusy || revRecording) return;
+    try{ revRecordBtn.setPointerCapture(e.pointerId); }catch(err){}
+    revStage.classList.add('holding');
+    revStartRecording();
+  });
+  revRecordBtn.addEventListener('pointerup',function(e){ e.stopPropagation(); e.preventDefault(); revEndHold(); });
+  revRecordBtn.addEventListener('pointercancel',function(e){ e.stopPropagation(); revEndHold(); });
   revPlayBtn.addEventListener('click',function(e){
     e.stopPropagation();
     if(revPlayBtn.classList.contains('disabled')) return;

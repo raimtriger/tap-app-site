@@ -14,14 +14,14 @@
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <title>TAP APP — мини-аппы для контента, розыгрышей и музыки</title>
-<meta name="description" content="TAP APP — сборник мини-приложений в одном тапе: случайная нота, BPM-кликер, тюнер, бегущая строка, рифмы, кубик, монетка, розыгрыши Да/Нет и многое другое. Бесплатно, без рекламы.">
-<meta name="keywords" content="tap app, генератор случайных нот, мини-приложения, мини апп, онлайн пианино, виртуальное пианино, тюнер онлайн, bpm кликер, метроном онлайн, ритм машина, барабанная машина онлайн, рифмы онлайн, подбор рифм, генератор рифм, бегущая строка онлайн, фонарик морзе, азбука морзе онлайн, изменитель голоса онлайн, счётчик онлайн, счетчик кликов, генератор qr кода, генератор qr онлайн, случайное число онлайн, генератор случайных чисел, случайное слово, случайный цвет, генератор цвета, кубик онлайн, бросить кубик, орёл или решка, монетка онлайн, да или нет онлайн, бутылочка игра, крутить бутылочку, уровень шума онлайн, измеритель шума, розыгрыш онлайн, игры для компании, инструменты для блогера, инструменты для музыканта">
-<link rel="canonical" href="https://generatornot.ru/">
+<meta name="description" content="TAP APP — сборник мини-приложений в одном тапе: случайная нота, BPM-кликер, тюнер, бегущая строка, кубик, монетка, розыгрыши Да/Нет и многое другое. Бесплатно, без рекламы.">
+<meta name="keywords" content="tap app, генератор случайных нот, мини-приложения, мини апп, тюнер онлайн, bpm кликер, метроном онлайн, ритм машина, барабанная машина онлайн, бегущая строка онлайн, фонарик морзе, азбука морзе онлайн, изменитель голоса онлайн, счётчик онлайн, счетчик кликов, генератор qr кода, генератор qr онлайн, случайное число онлайн, генератор случайных чисел, случайное слово, случайный цвет, генератор цвета, кубик онлайн, бросить кубик, орёл или решка, монетка онлайн, да или нет онлайн, бутылочка игра, крутить бутылочку, уровень шума онлайн, измеритель шума, розыгрыш онлайн, игры для компании, инструменты для блогера, инструменты для музыканта">
+<link rel="canonical" href="https://tap-app.ru/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="TAP APP — мини-аппы для контента и розыгрышей">
-<meta property="og:description" content="Случайная нота, BPM-кликер, тюнер, бегущая строка, рифмы, кубик, монетка, Да/Нет и другое — в одном тапе.">
-<meta property="og:url" content="https://generatornot.ru/">
-<meta property="og:image" content="https://generatornot.ru/assets/icon-512.png">
+<meta property="og:description" content="Случайная нота, BPM-кликер, тюнер, бегущая строка, кубик, монетка, Да/Нет и другое — в одном тапе.">
+<meta property="og:url" content="https://tap-app.ru/">
+<meta property="og:image" content="https://tap-app.ru/assets/icon-512.png">
 <meta name="yandex-verification" content="2c2a689113551869">
 
 <style>
@@ -1415,43 +1415,65 @@
     var b=new Uint8Array(buf),s=''; for(var i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);
     return 'data:audio/wav;base64,'+btoa(s);
   }
+  var ASSET_V='9';   // поменять это число — все звуки подгрузятся свежими, без кэша
+  var loadClip=function(url,set){ if(!AC) return; fetch(url+(url.indexOf('?')>=0?'&':'?')+'v='+ASSET_V).then(function(r){ if(!r.ok) throw 0; return r.arrayBuffer();}).then(function(ab){AC.decodeAudioData(ab,function(b){set(b);},function(){});}).catch(function(){}); };
+  // ---- ленивая подгрузка звуков по апп-группам (не тормозит первый тап на старте) ----
+  var lazyLoaded={};
+  var LAZY_APP_MAP={dice:'dice',yn:'yn',bottle:'bottle',color:'color',coin:'coin',rhythm:'rhythm',sb:'sb'};
+  function lazyLoad(group){
+    if(lazyLoaded[group]) return;
+    lazyLoaded[group]=true;
+    var jobs={
+      dice:function(){
+        loadClip('assets/CUBE.mp3',function(b){cubeBuf=b;});
+        loadClip('assets/CUBE%20END.mp3',function(b){cubeEndBuf=b;});
+        loadClip('assets/CUBE%201.mp3',function(b){cube1Buf=b;});
+        loadClip('assets/ONE%20CUBE.mp3',function(b){oneCubeBuf=b;});
+        loadClip('assets/ONE%20CUBE%20END.mp3',function(b){oneCubeEndBuf=b;});
+      },
+      yn:function(){
+        loadClip('assets/DANET.mp3',function(b){yesnoBuf=b;});
+        loadClip('assets/DANETEND.mp3',function(b){yesnoEndBuf=b;});
+      },
+      bottle:function(){ loadClip('assets/BOTTLE_FLIP.mp3',function(b){bottleBuf=b;}); },
+      color:function(){ loadClip('assets/COLOR.mp3',function(b){colorBuf=b;}); },
+      coin:function(){
+        loadClip('assets/COIN.mp3',function(b){coinBuf=b;});
+        loadClip('assets/COIN%20END.mp3',function(b){coinEndBuf=b;});
+      },
+      rhythm:function(){ loadClip('assets/KICK.mp3',function(b){kickBuf=b;}); },
+      sb:function(){
+        loadClip('assets/CB_DROB.mp3',function(b){sbBuf.drum=b;});
+        loadClip('assets/SB_FANFARE.mp3',function(b){sbBuf.fanfare=b;});
+        loadClip('assets/SB_LAUGH.mp3',function(b){sbBuf.laugh=b;});
+        loadClip('assets/SB_SAD.mp3',function(b){sbBuf.sad=b;});
+        loadClip('assets/SB_CLAP.mp3',function(b){sbBuf.clap=b;});
+        loadClip('assets/SB_SCARE.mp3',function(b){sbBuf.scare=b;});
+        loadClip('assets/CORRECT.mp3',function(b){sbBuf.correct=b;});
+        loadClip('assets/SB_WRONG.mp3',function(b){sbBuf.wrong=b;});
+        loadClip('assets/SB_AIRHORN.mp3',function(b){sbBuf.airhorn=b;});
+        loadClip('assets/UUUUU.mp3',function(b){sbBuf.crowd=b;});
+        loadClip('assets/CAT.mp3',function(b){sbBuf.cat=b;});
+      }
+    };
+    if(jobs[group]) jobs[group]();
+  }
+  function lazyPreloadAll(){               // фоновая догрузка в простое, чтобы при переходе уже было готово
+    Object.keys(LAZY_APP_MAP).forEach(function(k){ lazyLoad(LAZY_APP_MAP[k]); });
+  }
   function initAudio(){
     try{ AC=new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'}); }catch(e){ AC=null; }
-    var ASSET_V='9';   // поменять это число — все звуки подгрузятся свежими, без кэша
     if(AC){ Object.keys(SAMP).forEach(function(pc){
       try{ fetch(SAMP[pc]+'?v='+ASSET_V).then(function(r){return r.arrayBuffer();}).then(function(ab){AC.decodeAudioData(ab,function(b){buffers[pc]=b;},function(){});}).catch(function(){}); }catch(e){}
     });
-      var loadClip=function(url,set){ fetch(url+(url.indexOf('?')>=0?'&':'?')+'v='+ASSET_V).then(function(r){ if(!r.ok) throw 0; return r.arrayBuffer();}).then(function(ab){AC.decodeAudioData(ab,function(b){set(b);},function(){});}).catch(function(){}); };
+      // ядро: звуки, которые используются сразу в нескольких аппах (тап, розыгрыш, таймер) — грузим сразу
       loadClip('assets/CLICK.mp3',function(b){clickBuf=b;});
       loadClip('assets/CLOCKS.mp3',function(b){clockBuf=b;});
       loadClip('assets/DRUMROLL.mp3',function(b){drumBuf=b;});
-      loadClip('assets/CUBE.mp3',function(b){cubeBuf=b;});
-      loadClip('assets/CUBE%20END.mp3',function(b){cubeEndBuf=b;});
-      loadClip('assets/CUBE%201.mp3',function(b){cube1Buf=b;});
-      loadClip('assets/DANET.mp3',function(b){yesnoBuf=b;});
-      loadClip('assets/DANETEND.mp3',function(b){yesnoEndBuf=b;});
-      loadClip('assets/BOTTLE_FLIP.mp3',function(b){bottleBuf=b;});
-      loadClip('assets/ONE%20CUBE.mp3',function(b){oneCubeBuf=b;});
-      loadClip('assets/ONE%20CUBE%20END.mp3',function(b){oneCubeEndBuf=b;});
       loadClip('assets/MAIN%20MENU.mp3',function(b){mainBuf=b;});
       loadClip('assets/TAP.mp3',function(b){tapBuf=b;});
-      loadClip('assets/COLOR.mp3',function(b){colorBuf=b;});
-      loadClip('assets/COIN.mp3',function(b){coinBuf=b;});
-      loadClip('assets/COIN%20END.mp3',function(b){coinEndBuf=b;});
       loadClip('assets/PRIZ.mp3',function(b){prizBuf=b;});
       loadClip('assets/PRIZ%20END.mp3',function(b){prizEndBuf=b;});
-      loadClip('assets/KICK.mp3',function(b){kickBuf=b;});
-      loadClip('assets/CB_DROB.mp3',function(b){sbBuf.drum=b;});
-      loadClip('assets/SB_FANFARE.mp3',function(b){sbBuf.fanfare=b;});
-      loadClip('assets/SB_LAUGH.mp3',function(b){sbBuf.laugh=b;});
-      loadClip('assets/SB_SAD.mp3',function(b){sbBuf.sad=b;});
-      loadClip('assets/SB_CLAP.mp3',function(b){sbBuf.clap=b;});
-      loadClip('assets/SB_SCARE.mp3',function(b){sbBuf.scare=b;});
-      loadClip('assets/CORRECT.mp3',function(b){sbBuf.correct=b;});
-      loadClip('assets/SB_WRONG.mp3',function(b){sbBuf.wrong=b;});
-      loadClip('assets/SB_AIRHORN.mp3',function(b){sbBuf.airhorn=b;});
-      loadClip('assets/UUUUU.mp3',function(b){sbBuf.crowd=b;});
-      loadClip('assets/CAT.mp3',function(b){sbBuf.cat=b;});
     }
     silentLoop=new Audio(silentWav()); silentLoop.loop=true; silentLoop.setAttribute('playsinline','');
   }
@@ -1531,6 +1553,7 @@
   var TITLES={home:'TAP APP',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'РИТМ-МАШИНА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
   function setApp(a){
     app=a;
+    if(LAZY_APP_MAP[a]) lazyLoad(LAZY_APP_MAP[a]);
     document.getElementById('title').textContent=TITLES[a];
     document.querySelector('.titlewrap').classList.toggle('oncolor', a==='color');
     document.querySelectorAll('#appnav button').forEach(function(b){
@@ -3835,7 +3858,16 @@
   initAudio();      // decode note samples ahead of time
   setApp('home');
   render(pick());
+  if('requestIdleCallback' in window) requestIdleCallback(function(){ lazyPreloadAll(); },{timeout:6000});
+  else setTimeout(lazyPreloadAll,4000);
 })();
+</script>
+<script>
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',function(){
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    });
+  }
 </script>
 </body>
 </html>

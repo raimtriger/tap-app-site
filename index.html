@@ -1472,7 +1472,7 @@
   }
   function initAudio(){
     try{ AC=new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'}); }catch(e){ AC=null; }
-    var ASSET_V='5';   // поменять это число — все звуки подгрузятся свежими, без кэша
+    var ASSET_V='6';   // поменять это число — все звуки подгрузятся свежими, без кэша
     if(AC){ Object.keys(SAMP).forEach(function(pc){
       try{ fetch(SAMP[pc]+'?v='+ASSET_V).then(function(r){return r.arrayBuffer();}).then(function(ab){AC.decodeAudioData(ab,function(b){buffers[pc]=b;},function(){});}).catch(function(){}); }catch(e){}
     });
@@ -1485,7 +1485,7 @@
       loadClip('assets/CUBE%201.mp3',function(b){cube1Buf=b;});
       loadClip('assets/YESNO.mp3',function(b){yesnoBuf=b;});
       loadClip('assets/YESNO%20END.mp3',function(b){yesnoEndBuf=b;});
-      loadClip('assets/BOTTLE.mp3',function(b){bottleBuf=b;});
+      loadClip('assets/BOTTLE_FLIP.mp3',function(b){bottleBuf=b;});
       loadClip('assets/ONE%20CUBE.mp3',function(b){oneCubeBuf=b;});
       loadClip('assets/ONE%20CUBE%20END.mp3',function(b){oneCubeEndBuf=b;});
       loadClip('assets/MAIN%20MENU.mp3',function(b){mainBuf=b;});
@@ -2762,7 +2762,9 @@
     revStopPlayback();
     var src=AC.createBufferSource();
     src.buffer=buf;
-    src.connect(AC.destination);
+    var revGain=AC.createGain();
+    revGain.gain.value=2;                    // громче в 2 раза, чем исходная запись
+    src.connect(revGain); revGain.connect(AC.destination);
     src.onended=function(){
       if(revSrc!==src) return;           // стары колбэк от уже остановленного источника — игнор
       revSrc=null;

@@ -26,6 +26,8 @@
 
 <style>
 @font-face{font-family:"Dancing Script";font-style:normal;font-weight:600;font-display:swap;src:url(assets/dancing-script-600.woff2) format("woff2");}
+@font-face{font-family:"Benzin";font-style:normal;font-weight:800;font-display:swap;src:url(assets/Benzin-ExtraBold.woff2) format("woff2"),url(assets/Benzin-ExtraBold.woff) format("woff"),url(assets/Benzin-ExtraBold.ttf) format("truetype"),url(assets/Benzin-ExtraBold.otf) format("opentype");}
+@font-face{font-family:"Yellowtail";font-style:normal;font-weight:400;font-display:swap;src:url(assets/yellowtail.woff2) format("woff2");}
 @font-face{font-family:"Playfair Display";font-style:normal;font-weight:700;font-display:swap;src:url(assets/playfair-display-700.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}
 @font-face{font-family:"Playfair Display";font-style:normal;font-weight:700;font-display:swap;src:url(assets/playfair-display-700-2.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
 </style>
@@ -308,6 +310,10 @@
   }
   #rouletteStage.editing #rouletteInputRow{position:relative;z-index:61;}
   #rouletteStage.spinning #rouletteWheelBox,#rouletteStage.spinning #rouletteResult{position:relative;z-index:61;}
+  #rouletteStage.tight #rouletteHint{display:none;}
+  #rouletteStage.tight #rouletteChips{max-height:68px;overflow-y:auto;margin-top:8px;}
+  #rouletteStage.tight #rouletteWheelBox{margin-top:16px;}
+  #rouletteStage.tight #rouletteResult{margin-top:10px;min-height:34px;}
   .rouletteSlice{transition:opacity .5s ease,filter .5s ease;opacity:1;filter:blur(0);}
   .rouletteSlice.enter{opacity:0;filter:blur(7px);}
   #rouletteInputRow{display:flex;gap:8px;align-items:center;}
@@ -557,18 +563,28 @@
   /* ---- home launcher ---- */
   #homeStage{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:26px;padding:0 24px;cursor:pointer;user-select:none;
+    gap:34px;padding:0 24px;cursor:pointer;user-select:none;
   }
-  #homeLogo{
-    width:min(49vw,245px);height:auto;max-height:37vh;display:block;
-    color:var(--ink);pointer-events:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;
-    transition:transform .12s ease;
+  /* форма главной кнопки: 50% = круг; 30% = квадрат со сильно скруглёнными углами */
+  #homeTap{
+    --tapRadius:50%;
+    width:min(40vw,190px);aspect-ratio:1;border-radius:var(--tapRadius);background:var(--ink);
+    pointer-events:none;transition:transform .12s ease;
   }
-  #homeStage.tap #homeLogo{transform:scale(1.07);}
+  #homeStage.tap #homeTap{transform:scale(1.07);}
   #homeHint{
-    font:600 min(4.6vw,17px)/1.3 "Futura","Avenir Next",system-ui,sans-serif;
-    color:var(--muted);text-align:center;max-width:420px;
+    font:800 min(3.3vw,13px)/1.3 "Benzin","Arial Black",system-ui,sans-serif;
+    color:var(--muted);text-align:center;max-width:420px;letter-spacing:.01em;
+    animation:homeFade .8s ease 1.5s backwards;
   }
+  #homeTap{position:relative;animation:tapIn .75s cubic-bezier(.2,.9,.25,1.25) .95s backwards;}
+  #homeTap .ring{
+    position:absolute;inset:0;border-radius:inherit;border:3px solid var(--ink);
+    pointer-events:none;animation:ringOut .9s cubic-bezier(.2,.6,.3,1) forwards;
+  }
+  @keyframes tapIn{0%{opacity:0;transform:scale(.35);}100%{opacity:1;transform:scale(1);}}
+  @keyframes ringOut{0%{opacity:.7;transform:scale(1);}100%{opacity:0;transform:scale(2.1);}}
+  @keyframes homeFade{0%{opacity:0;transform:translateY(8px);}100%{opacity:1;transform:none;}}
 
   /* ---- coin flip ---- */
   #coinStage{
@@ -829,6 +845,60 @@
   .themebtn svg{width:21px;height:21px;display:block;}
   #soundBtn{color:var(--ink);display:flex;align-items:center;justify-content:center;}
   #soundBtn svg{width:20px;height:20px;display:block;}
+
+  /* заголовок главной: Benzin + влёт букв + кружок */
+  .titlewrap.home .title{
+    font-family:"Benzin","Arial Black",system-ui,sans-serif;font-weight:800;
+    font-size:26px;letter-spacing:0;line-height:1;opacity:1;
+    display:inline-flex;align-items:baseline;justify-content:center;
+  }
+  .title .ch{display:inline-block;animation:chIn .8s cubic-bezier(.2,.9,.25,1.15) calc(var(--i) * 75ms + 100ms) backwards;}
+  .title .sp{display:inline-block;width:.32em;}
+  .title .dot{
+    position:relative;display:inline-block;width:.8em;height:.8em;margin-left:.16em;border-radius:50%;background:currentColor;
+    animation:dotIn .9s cubic-bezier(.3,.8,.4,1) .75s backwards;
+  }
+  .title .dot::after{
+    content:"";position:absolute;inset:0;border-radius:50%;border:2px solid currentColor;opacity:0;
+    animation:dotRing 1.1s cubic-bezier(.2,.6,.3,1) 1.5s backwards;
+  }
+  @keyframes chIn{
+    0%{opacity:0;transform:translateY(-64px) scale(.55) rotate(-9deg);filter:blur(10px);}
+    55%{opacity:1;filter:blur(0);}
+    100%{opacity:1;transform:none;filter:blur(0);}
+  }
+  @keyframes dotIn{
+    0%{opacity:0;transform:translateY(-130px) scale(.3);}
+    52%{opacity:1;transform:translateY(0) scale(1.3,.7);}
+    72%{transform:translateY(-8px) scale(.88,1.12);}
+    100%{transform:none;}
+  }
+  @keyframes dotRing{0%{opacity:.8;transform:scale(1);}100%{opacity:0;transform:scale(3);}}
+  .titlewrap.home .byline{
+    font-family:"Yellowtail","Dancing Script",cursive;font-weight:400;
+    font-size:min(6.2vw,25px);color:var(--ink);letter-spacing:.02em;margin-top:8px;
+    animation:bylineIn 1s cubic-bezier(.3,.6,.2,1) 1.2s backwards;
+  }
+  @keyframes bylineIn{0%{opacity:0;clip-path:inset(0 100% 0 0);}20%{opacity:1;}100%{opacity:1;clip-path:inset(0 0 0 0);}}
+  @media (prefers-reduced-motion:reduce){
+    .title .ch,.title .dot,.title .dot::after,.titlewrap.home .byline,#homeTap,#homeHint{animation:none !important;}
+  }
+
+  /* ---- анти-наезд: каждый экран живёт строго между заголовком и нижними кнопками ---- */
+  :root{--padT:112px;--padB:140px;--padX:18px;}
+  #stage,body>[id$="Stage"]:not(#sbStage):not(#revStage){
+    padding:var(--padT) var(--padX) var(--padB) !important;min-height:0;
+  }
+  @media (max-height:520px){
+    .byline{display:none;}
+    .titlewrap{top:calc(env(safe-area-inset-top) + 8px);}
+    .title{font-size:20px;}
+    #menuBtn{top:calc(env(safe-area-inset-top) + 6px);}
+    .utilbar{left:auto;right:calc(env(safe-area-inset-right) + 14px);top:50%;bottom:auto;
+      transform:translateY(-50%);flex-direction:column;}
+    #bar{bottom:calc(env(safe-area-inset-bottom) + 10px);}
+    #sbStage{padding-top:calc(env(safe-area-inset-top) + 48px);padding-bottom:calc(env(safe-area-inset-bottom) + 70px);}
+  }
 </style>
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
@@ -972,21 +1042,7 @@
   </div>
 
   <div id="homeStage" style="display:none">
-    <svg id="homeLogo" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="210.77 181.97 176.99 266.67">
-<defs>
-<clipPath id="clip_1">
-<path transform="matrix(2.7777777,0,0,-2.7777777,2.7777777,626.8528)" d="M-1-1H428.2843V225.0671H-1Z"/>
-</clipPath>
-</defs>
-<g clip-path="url(#clip_1)">
-<g id="layer_1" data-name="Слой 1">
-
-<path transform="matrix(2.7777777,0,0,-2.7777777,2.7777777,626.8528)" d="M106.7502 156.5606C110.4134 156.5606 113.7308 155.0755 116.1317 152.6743 118.533 150.2731 120.0183 146.956 120.0183 143.2925 120.0183 139.6295 118.533 136.3122 116.1317 133.9109 113.7308 131.51 110.4134 130.0246 106.7502 130.0246 103.0867 130.0246 99.7696 131.51 97.3687 133.9109 94.9674 136.3122 93.4821 139.6293 93.4821 143.2925 93.4821 146.956 94.9674 150.2731 97.3687 152.6743 99.7696 155.0755 103.0867 156.5606 106.7502 156.5606ZM111.8554 148.398C110.5492 149.7039 108.7441 150.5117 106.7502 150.5117 104.756 150.5117 102.9512 149.7039 101.645 148.398 100.3391 147.0915 99.5309 145.2866 99.5309 143.2925 99.5309 141.2986 100.3391 139.4938 101.645 138.1873 102.9512 136.8816 104.7563 136.0735 106.7502 136.0735 108.7441 136.0735 110.5492 136.8816 111.8554 138.1873 113.1613 139.4935 113.9695 141.2986 113.9695 143.2925 113.9695 145.2866 113.1613 147.0917 111.8554 148.398" fill="currentColor"/>
-<path transform="matrix(2.7777777,0,0,-2.7777777,2.7777777,626.8528)" d="M88.5827 127.2671C94.9212 127.9483 101.3924 127.7986 106.7502 127.8065 112.108 127.7986 118.5792 127.9483 124.9177 127.2671H124.9189C125.1037 127.2626 125.2874 127.2404 125.4685 127.2042 127.4496 126.951 129.0161 126.3631 129.0161 124.8483 129.0161 123.84 128.3219 123.2427 127.2736 122.881 126.5063 122.6458 125.816 122.5244 124.9733 122.4357 121.1012 121.972 112.1236 122.1001 106.7502 122.0919 101.3769 122.1001 92.3992 121.972 88.5271 122.4357 87.6844 122.5244 86.9941 122.6458 86.2268 122.881 85.1786 123.2427 84.4843 123.84 84.4843 124.8483 84.4843 126.3631 86.0508 126.951 88.0319 127.2042 88.213 127.2404 88.3967 127.2626 88.5815 127.2671Z" fill="currentColor" fill-rule="evenodd"/>
-<path transform="matrix(2.7777777,0,0,-2.7777777,2.7777777,626.8528)" d="M106.3933 119.8066C102.9163 119.7539 98.566 118.7311 95.7013 116.6998 89.8679 112.2395 84.3352 106.7193 79.2646 101.4678 77.3192 99.415 79.3125 98.102 81.7869 98.9824 87.0052 100.9902 89.6145 101.9942 89.6145 101.9942 90.625 102.3398 91.7487 102.153 92.5821 101.5002 93.4157 100.8473 93.8398 99.8223 93.7026 98.7928 93.2587 94.2897 92.5339 90.4422 91.3538 82.7566 90.4904 75.5334 90.0272 71.4501 89.9603 69.0253 90.1242 68.3195 90.6797 67.7594 91.4003 67.5726 92.1214 67.386 92.8913 67.6012 93.3976 68.1333 97.141 73.122 100.385 83.0316 106.7502 83.0316 113.1154 83.0316 116.3594 73.122 120.1028 68.1333 120.6091 67.6012 121.379 67.386 122.1001 67.5726 122.8207 67.7594 123.3763 68.3195 123.5401 69.0253 123.4732 71.4501 123.01 75.5334 122.1466 82.7566 120.9665 90.4422 120.2417 94.2897 119.7978 98.7928 119.6606 99.8223 120.0847 100.8473 120.9183 101.5002 121.7517 102.153 122.8754 102.3398 123.8859 101.9942 123.8859 101.9942 126.4952 100.9902 131.7135 98.9824 134.1879 98.102 136.1812 99.415 134.2358 101.4678 129.1652 106.7193 123.6325 112.2395 117.7991 116.6998 114.9344 118.7311 110.5841 119.7539 107.1071 119.8066 106.9883 119.8117 106.8693 119.8151 106.7502 119.8182 106.6311 119.8151 106.5121 119.8117 106.3933 119.8066" fill="currentColor" fill-rule="evenodd"/>
-</g>
-</g>
-</svg>
+    <div id="homeTap"></div>
     <div id="homeHint">Тапни по мне 3 раза</div>
   </div>
 
@@ -1554,8 +1610,16 @@
   function setApp(a){
     app=a;
     if(LAZY_APP_MAP[a]) lazyLoad(LAZY_APP_MAP[a]);
-    document.getElementById('title').textContent=TITLES[a];
+    (function(){
+      var te=document.getElementById('title');
+      if(a==='home'){
+        te.innerHTML='TAP APP'.split('').map(function(c,i){ return c===' ' ? '<span class="sp"></span>' : '<span class="ch" style="--i:'+i+'">'+c+'</span>'; }).join('')+'<span class="dot"></span>';
+        te.setAttribute('aria-label','TAP APP');
+      }else{ te.textContent=TITLES[a]; te.style.fontSize=''; te.removeAttribute('aria-label'); }
+    })();
     document.querySelector('.titlewrap').classList.toggle('oncolor', a==='color');
+    document.querySelector('.titlewrap').classList.toggle('home', a==='home');
+    document.querySelector('.byline').textContent = a==='home' ? 'by RAIMTRIGER' : 'by RAIM TRIGER';
     document.querySelectorAll('#appnav button').forEach(function(b){
       b.classList.toggle('on',b.dataset.app===a);
     });
@@ -1628,6 +1692,7 @@
     if(a==='home') resetHome();
     if(a==='note') render(pick());
     if(typeof fxc!=='undefined' && fxc){ fxParts.length=0; fxc.clearRect(0,0,fx.width,fx.height); }
+    if(typeof layoutSoon==='function'){ layoutFit(); layoutSoon(); }
   }
 
   function setMode(m){
@@ -3311,7 +3376,10 @@
     'с':'...','т':'-','у':'..-','ф':'..-.','х':'....','ц':'-.-.','ч':'---.','ш':'----','щ':'--.-',
     'ъ':'--.--','ы':'-.--','ь':'-..-','э':'..-..','ю':'..--','я':'.-.-',
     '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.',
-    '.':'.-.-.-',',':'--..--','?':'..--..','-':'-....-'
+    '.':'.-.-.-',',':'--..--','?':'..--..','-':'-....-','!':'-.-.--',
+    'a':'.-','b':'-...','c':'-.-.','d':'-..','e':'.','f':'..-.','g':'--.','h':'....','i':'..','j':'.---',
+    'k':'-.-','l':'.-..','m':'--','n':'-.','o':'---','p':'.--.','q':'--.-','r':'.-.','s':'...','t':'-',
+    'u':'..-','v':'...-','w':'.--','x':'-..-','y':'-.--','z':'--..'
   };
   function setMorseEditing(on){
     morseEditing=on;
@@ -3366,6 +3434,7 @@
   function startMorse(){
     var txt=(morseInput.value||'').trim();
     if(!txt){ morseInput.focus(); return; }
+    if(!buildMorseSegments(txt).length){ morseHint.textContent='Нужны буквы или цифры'; return; }
     setMorseEditing(false); morseInput.blur();
     morseFull.classList.add('show'); morseFull.classList.remove('on');
     morseFull.style.transition='none'; morseFull.style.opacity='0';
@@ -3803,6 +3872,7 @@
     ensureAC(); playBuf(mainBuf);
     homeTaps++;
     homeStage.classList.add('tap');
+    (function(){ var t=document.getElementById('homeTap'), r=document.createElement('span'); r.className='ring'; t.appendChild(r); r.addEventListener('animationend',function(){ r.remove(); }); })();
     setTimeout(function(){ homeStage.classList.remove('tap'); },130);
     if(homeTaps>=3){ resetHome(); setMenu(true); return; }
     var left=3-homeTaps;
@@ -3858,6 +3928,64 @@
   initAudio();      // decode note samples ahead of time
   setApp('home');
   render(pick());
+  // ---- раскладка: считаем свободную зону между заголовком и нижними кнопками ----
+  var fitRaf=0;
+  function fitRoulette(){
+    if(!rouletteStage || rouletteStage.style.display==='none') return;
+    var box=document.getElementById('rouletteWheelBox'), row=document.getElementById('rouletteInputRow'), res=document.getElementById('rouletteResult'), hint=document.getElementById('rouletteHint');
+    var cs=getComputedStyle(rouletteStage);
+    var avail=rouletteStage.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+    function other(){
+      var m=function(e){ var c=getComputedStyle(e); return (parseFloat(c.marginTop)||0)+(parseFloat(c.marginBottom)||0); };
+      var h=row.offsetHeight+rouletteChips.offsetHeight+m(rouletteChips)+m(box)+res.offsetHeight+m(res);
+      if(getComputedStyle(hint).display!=='none') h+=hint.offsetHeight+m(hint);
+      return h;
+    }
+    rouletteStage.classList.remove('tight');
+    var size=avail-other()-4;
+    if(size<150){ rouletteStage.classList.add('tight'); size=avail-other()-4; }
+    size=Math.max(84,Math.min(230,innerWidth*0.58,size));
+    box.style.width=size+'px'; box.style.height=size+'px';
+  }
+  function layoutFit(){
+    var H=window.innerHeight, W=window.innerWidth, root=document.documentElement;
+    var tw=document.querySelector('.titlewrap'), ub=document.querySelector('.utilbar'), bar=document.getElementById('bar');
+    var bcs=getComputedStyle(document.body);
+    var bTop=parseFloat(bcs.paddingTop)||0, bBot=parseFloat(bcs.paddingBottom)||0;
+    if(tw.classList.contains('home')){
+      var te=document.getElementById('title'); te.style.fontSize='24px';
+      var cw=te.getBoundingClientRect().width||1, avail=Math.max(120,W-136);
+      te.style.fontSize=Math.max(14,Math.min(36,24*avail/cw))+'px';
+    }
+    var top=tw.getBoundingClientRect().bottom+8;
+    var ur=ub.getBoundingClientRect();
+    var side=(ur.width<120 && ur.height>120);        // короткий экран: utilbar стоит столбиком справа
+    var bot = side ? 10 : (H-ur.top+8);
+    var bt=null;
+    Array.prototype.forEach.call(bar.children,function(c){
+      if(getComputedStyle(c).display==='none') return;
+      var r=c.getBoundingClientRect(); if(r.height>0) bt=(bt===null)?r.top:Math.min(bt,r.top);
+    });
+    if(bt!==null) bot=Math.max(bot,H-bt+8);
+    var padT=Math.max(0,top-bTop), padB=Math.max(0,bot-bBot);
+    var padX=18;
+    if(side) padX=Math.max(18,W-ur.left+8);
+    root.style.setProperty('--padT',Math.round(padT)+'px');
+    root.style.setProperty('--padB',Math.round(padB)+'px');
+    root.style.setProperty('--padX',Math.round(padX)+'px');
+    fitRoulette();
+  }
+  function layoutSoon(){ if(fitRaf) return; fitRaf=requestAnimationFrame(function(){ fitRaf=0; layoutFit(); }); }
+  window.addEventListener('resize',layoutSoon);
+  window.addEventListener('orientationchange',function(){ setTimeout(layoutSoon,250); });
+  if(window.ResizeObserver){
+    var lro=new ResizeObserver(layoutSoon);
+    lro.observe(document.querySelector('.titlewrap')); lro.observe(document.getElementById('bar')); lro.observe(document.querySelector('.utilbar'));
+    lro.observe(rouletteChips); lro.observe(document.getElementById('rouletteResult'));
+  }
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(layoutSoon);
+  layoutFit();
+
   if('requestIdleCallback' in window) requestIdleCallback(function(){ lazyPreloadAll(); },{timeout:6000});
   else setTimeout(lazyPreloadAll,4000);
 })();

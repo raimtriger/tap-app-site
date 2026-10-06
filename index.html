@@ -846,42 +846,44 @@
   #soundBtn{color:var(--ink);display:flex;align-items:center;justify-content:center;}
   #soundBtn svg{width:20px;height:20px;display:block;}
 
-  /* заголовок главной: Benzin + влёт букв + кружок */
+  /* заголовок главной: Benzin, прижат влево, TAP и APP заезжают с разных сторон */
+  .titlewrap.home{text-align:left;padding:0 76px 0 24px;}
   .titlewrap.home .title{
     font-family:"Benzin","Arial Black",system-ui,sans-serif;font-weight:800;
     font-size:26px;letter-spacing:0;line-height:1;opacity:1;
-    display:inline-flex;align-items:baseline;justify-content:center;
+    display:inline-flex;align-items:baseline;justify-content:flex-start;
   }
-  .title .ch{display:inline-block;animation:chIn .8s cubic-bezier(.2,.9,.25,1.15) calc(var(--i) * 75ms + 100ms) backwards;}
-  .title .sp{display:inline-block;width:.32em;}
+  .title .w{display:inline-block;}
+  .title .w1{animation:slideL 1.05s cubic-bezier(.16,1,.3,1) .1s backwards;}
+  .title .w2{display:inline-flex;align-items:baseline;animation:slideR 1.05s cubic-bezier(.16,1,.3,1) .3s backwards;}
+  .title .sp{display:inline-block;width:.34em;}
   .title .dot{
     position:relative;display:inline-block;width:.8em;height:.8em;margin-left:.16em;border-radius:50%;background:currentColor;
-    animation:dotIn .9s cubic-bezier(.3,.8,.4,1) .75s backwards;
+    animation:dotPop .7s cubic-bezier(.3,1.7,.5,1) 1s backwards;
   }
   .title .dot::after{
     content:"";position:absolute;inset:0;border-radius:50%;border:2px solid currentColor;opacity:0;
-    animation:dotRing 1.1s cubic-bezier(.2,.6,.3,1) 1.5s backwards;
+    animation:dotRing 1.1s cubic-bezier(.2,.6,.3,1) 1.35s backwards;
   }
-  @keyframes chIn{
-    0%{opacity:0;transform:translateY(-64px) scale(.55) rotate(-9deg);filter:blur(10px);}
-    55%{opacity:1;filter:blur(0);}
-    100%{opacity:1;transform:none;filter:blur(0);}
-  }
-  @keyframes dotIn{
-    0%{opacity:0;transform:translateY(-130px) scale(.3);}
-    52%{opacity:1;transform:translateY(0) scale(1.3,.7);}
-    72%{transform:translateY(-8px) scale(.88,1.12);}
-    100%{transform:none;}
-  }
+  @keyframes slideL{0%{opacity:0;transform:translateX(-115vw);filter:blur(7px);}25%{opacity:1;}100%{opacity:1;transform:none;filter:blur(0);}}
+  @keyframes slideR{0%{opacity:0;transform:translateX(115vw);filter:blur(7px);}25%{opacity:1;}100%{opacity:1;transform:none;filter:blur(0);}}
+  @keyframes dotPop{0%{opacity:0;transform:scale(0);}100%{opacity:1;transform:scale(1);}}
   @keyframes dotRing{0%{opacity:.8;transform:scale(1);}100%{opacity:0;transform:scale(3);}}
   .titlewrap.home .byline{
-    font-family:"Yellowtail","Dancing Script",cursive;font-weight:400;
+    font-family:"Yellowtail","Dancing Script",cursive;font-weight:400;text-align:left;
     font-size:min(6.2vw,25px);color:var(--ink);letter-spacing:.02em;margin-top:8px;
-    animation:bylineIn 1s cubic-bezier(.3,.6,.2,1) 1.2s backwards;
+    animation:bylineIn 1.2s ease-out 1.15s backwards;
   }
-  @keyframes bylineIn{0%{opacity:0;clip-path:inset(0 100% 0 0);}20%{opacity:1;}100%{opacity:1;clip-path:inset(0 0 0 0);}}
+  @keyframes bylineIn{0%{opacity:0;filter:blur(14px);transform:translateY(6px);}100%{opacity:1;filter:blur(0);transform:none;}}
   @media (prefers-reduced-motion:reduce){
-    .title .ch,.title .dot,.title .dot::after,.titlewrap.home .byline,#homeTap,#homeHint{animation:none !important;}
+    .title .w1,.title .w2,.title .dot,.title .dot::after,.titlewrap.home .byline,#homeTap,#homeHint{animation:none !important;}
+  }
+
+  /* подсказки во всех приложениях — Benzin (широкий шрифт → перенос строк, чтобы не вылезало) */
+  [id$="Hint"]:not(#homeHint){
+    font-family:"Benzin","Arial Black",system-ui,sans-serif !important;font-weight:800 !important;
+    font-size:min(3.1vw,12px) !important;line-height:1.35 !important;letter-spacing:.01em;
+    white-space:normal !important;max-width:min(92vw,420px);text-align:center;
   }
 
   /* ---- анти-наезд: каждый экран живёт строго между заголовком и нижними кнопками ---- */
@@ -1613,13 +1615,12 @@
     (function(){
       var te=document.getElementById('title');
       if(a==='home'){
-        te.innerHTML='TAP APP'.split('').map(function(c,i){ return c===' ' ? '<span class="sp"></span>' : '<span class="ch" style="--i:'+i+'">'+c+'</span>'; }).join('')+'<span class="dot"></span>';
+        te.innerHTML='<span class="w w1">TAP</span><span class="sp"></span><span class="w w2">APP<span class="dot"></span></span>';
         te.setAttribute('aria-label','TAP APP');
       }else{ te.textContent=TITLES[a]; te.style.fontSize=''; te.removeAttribute('aria-label'); }
     })();
     document.querySelector('.titlewrap').classList.toggle('oncolor', a==='color');
     document.querySelector('.titlewrap').classList.toggle('home', a==='home');
-    document.querySelector('.byline').textContent = a==='home' ? 'by RAIMTRIGER' : 'by RAIM TRIGER';
     document.querySelectorAll('#appnav button').forEach(function(b){
       b.classList.toggle('on',b.dataset.app===a);
     });
@@ -3954,7 +3955,7 @@
     var bTop=parseFloat(bcs.paddingTop)||0, bBot=parseFloat(bcs.paddingBottom)||0;
     if(tw.classList.contains('home')){
       var te=document.getElementById('title'); te.style.fontSize='24px';
-      var cw=te.getBoundingClientRect().width||1, avail=Math.max(120,W-136);
+      var cw=te.getBoundingClientRect().width||1, avail=Math.max(120,W-100);
       te.style.fontSize=Math.max(14,Math.min(36,24*avail/cw))+'px';
     }
     var top=tw.getBoundingClientRect().bottom+8;

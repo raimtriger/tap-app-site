@@ -25,18 +25,19 @@
 <meta name="yandex-verification" content="2c2a689113551869">
 
 <style>
-@font-face{font-family:"Montserrat";font-style:normal;font-weight:600;font-display:swap;src:url(assets/montserrat-600-cyr.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}
-@font-face{font-family:"Montserrat";font-style:normal;font-weight:600;font-display:swap;src:url(assets/montserrat-600-lat.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
-@font-face{font-family:"Montserrat";font-style:normal;font-weight:700;font-display:swap;src:url(assets/montserrat-700-cyr.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}
-@font-face{font-family:"Montserrat";font-style:normal;font-weight:700;font-display:swap;src:url(assets/montserrat-700-lat.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
-@font-face{font-family:"Benzin";font-style:normal;font-weight:800;font-display:swap;src:url(assets/Benzin-ExtraBold.woff2) format("woff2"),url(assets/Benzin-ExtraBold.woff) format("woff"),url(assets/Benzin-ExtraBold.ttf) format("truetype"),url(assets/Benzin-ExtraBold.otf) format("opentype");}
-@font-face{font-family:"Yellowtail";font-style:normal;font-weight:400;font-display:swap;src:url(assets/yellowtail.woff2) format("woff2");}
+@font-face{font-family:"Unbounded";font-style:normal;font-weight:400;font-display:swap;src:url(assets/Unbounded-Regular.ttf) format("truetype");}
+@font-face{font-family:"Unbounded";font-style:normal;font-weight:600;font-display:swap;src:url(assets/Unbounded-SemiBold.ttf) format("truetype");}
+@font-face{font-family:"Unbounded";font-style:normal;font-weight:800;font-display:swap;src:url(assets/Unbounded-ExtraBold.ttf) format("truetype");}
+@font-face{font-family:"Unbounded";font-style:normal;font-weight:900;font-display:swap;src:url(assets/Unbounded-Black.ttf) format("truetype");}
+@font-face{font-family:"Flourish";font-style:normal;font-weight:400;font-display:swap;src:url(assets/RhetoricalFlourishDemoReg-R9mMI.ttf) format("truetype"),url(assets/RhetoricalFlourishDemoReg-R9mMI.otf) format("opentype");}
+
 </style>
 
 <style>
   :root{
-    --fd:"Benzin","Arial Black",system-ui,sans-serif;   /* display: заголовки, подсказки, крупные цифры */
-    --fu:"Montserrat","Futura","Avenir Next",system-ui,sans-serif; /* интерфейс: кнопки, поля, меню, слова */
+    --fd:"Unbounded",system-ui,-apple-system,"Segoe UI",sans-serif;   /* заголовки, крупные цифры, подсказки */
+    --fu:"Unbounded",system-ui,-apple-system,"Segoe UI",sans-serif;   /* интерфейс: кнопки, поля, меню */
+    --fs:"Flourish","Segoe Script","Brush Script MT",cursive; /* подпись by raim triger */
     color-scheme:dark;
     --bg:#0d0d0f;
     --ink:#f3efe6;
@@ -576,7 +577,7 @@
   }
   #homeStage.tap #homeTap{transform:scale(1.07);}
   #homeHint{
-    font:800 min(3.3vw,13px)/1.3 "Benzin","Arial Black",system-ui,sans-serif;
+    font:400 min(3.3vw,13px)/1.3 var(--fd);
     color:var(--muted);text-align:center;max-width:420px;letter-spacing:.01em;
     animation:homeFade .8s ease 1.5s backwards;
   }
@@ -824,7 +825,7 @@
     font-weight:800;font-size:26px;line-height:1.15;text-transform:uppercase;
     color:var(--ink);letter-spacing:.01em;opacity:.95;
     font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1;}
-  .byline{font-family:"Yellowtail","Segoe Script",cursive;font-style:normal;
+  .byline{font-family:var(--fs);font-style:normal;
     font-weight:400;font-size:min(5.8vw,22px);color:var(--muted);letter-spacing:.02em;margin-top:4px;}
   .titlewrap.oncolor .title,.titlewrap.oncolor .byline{color:var(--ink);opacity:1;}
   .hint{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 84px);
@@ -849,10 +850,10 @@
   #soundBtn{color:var(--ink);display:flex;align-items:center;justify-content:center;}
   #soundBtn svg{width:20px;height:20px;display:block;}
 
-  /* заголовок главной: Benzin, прижат влево, TAP и APP заезжают с разных сторон */
+  /* заголовок главной: Unbounded, прижат влево, TAP и APP заезжают с разных сторон */
   .titlewrap.home{text-align:left;padding:0 76px 0 24px;}
   .titlewrap.home .title{
-    font-family:"Benzin","Arial Black",system-ui,sans-serif;font-weight:800;
+    font-family:var(--fd);font-weight:900;
     font-size:26px;letter-spacing:0;line-height:1;opacity:1;
     display:inline-flex;align-items:baseline;justify-content:flex-start;
   }
@@ -873,7 +874,7 @@
   @keyframes dotPop{0%{opacity:0;transform:scale(0);}100%{opacity:1;transform:scale(1);}}
   @keyframes dotRing{0%{opacity:.8;transform:scale(1);}100%{opacity:0;transform:scale(3);}}
   .titlewrap.home .byline{
-    font-family:"Yellowtail","Segoe Script",cursive;font-weight:400;text-align:left;
+    font-family:var(--fs);font-weight:400;text-align:left;
     color:var(--ink);margin-top:8px;
     animation:bylineIn 1.2s ease-out 1.15s backwards;
   }
@@ -882,12 +883,15 @@
     .title .w1,.title .w2,.title .dot,.title .dot::after,.titlewrap.home .byline,#homeTap,#homeHint{animation:none !important;}
   }
 
-  /* подсказки во всех приложениях — Benzin (широкий шрифт → перенос строк, чтобы не вылезало) */
+  /* подсказки во всех приложениях — Unbounded Regular (широкий шрифт → перенос строк, чтобы не вылезало) */
   [id$="Hint"]:not(#homeHint){
-    font-family:"Benzin","Arial Black",system-ui,sans-serif !important;font-weight:800 !important;
+    font-family:var(--fd) !important;font-weight:400 !important;
     font-size:min(3.1vw,12px) !important;line-height:1.35 !important;letter-spacing:.01em;
     white-space:normal !important;max-width:min(92vw,420px);text-align:center;
   }
+
+  /* описания и подписи — тоньше */
+  [id$="Lbl"],.cathdr{font-weight:400 !important;}
 
   /* ---- анти-наезд: каждый экран живёт строго между заголовком и нижними кнопками ---- */
   :root{--padT:112px;--padB:140px;--padX:18px;}
@@ -922,7 +926,7 @@
 <body>
   <div class="titlewrap">
     <h1 class="title" id="title">СЛУЧАЙНАЯ НОТА</h1>
-    <div class="byline">by RAIM TRIGER</div>
+    <div class="byline">by raim triger</div>
   </div>
 
   <button id="menuBtn" aria-label="Меню"><span></span><span></span><span></span></button>

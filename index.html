@@ -259,8 +259,9 @@
     color:var(--muted);letter-spacing:.04em;margin-bottom:16px;
   }
   #numValue{
-    font-family:var(--fd);font-weight:700;line-height:1;margin:.12em 0;
-    font-size:min(46vw,36vh);letter-spacing:-.02em;color:var(--ink);text-align:center;
+    --numH:min(46vw,36vh);
+    font-family:var(--fd);font-weight:700;height:var(--numH);line-height:var(--numH);margin:calc(var(--numH)*.12) 0;
+    font-size:var(--numH);letter-spacing:-.02em;color:var(--ink);text-align:center;
     font-variant-numeric:lining-nums tabular-nums;font-feature-settings:"lnum" 1,"tnum" 1;
     white-space:nowrap;max-width:100%;
     transition:opacity .08s ease,transform .12s ease;
@@ -354,7 +355,7 @@
     border-radius:999px;cursor:pointer;white-space:nowrap;
   }
   .rouletteDot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
-  #rouletteInputRow{flex:0 0 auto;display:flex;gap:8px;align-items:center;margin-top:12px;}
+  #rouletteInputRow{flex:0 0 auto;display:flex;gap:8px;align-items:center;margin-top:16px;}
   #rouletteInput{
     -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
     font:600 15px/1 var(--fu);text-align:center;
@@ -445,10 +446,19 @@
   /* ---- voice changer ---- */
   #voiceStage{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    position:relative;cursor:pointer;gap:0;padding:0 18px;touch-action:none;user-select:none;
+    position:relative;gap:0;padding:0 18px;user-select:none;-webkit-user-select:none;
   }
+  #voiceDot{cursor:pointer;touch-action:none;-webkit-touch-callout:none;}
+  #voiceTiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(100%,360px);margin-top:26px;}
+  #voiceTiles button{
+    font:700 min(3.5vw,13px)/1 var(--fu);color:var(--ink);background:var(--chip);
+    border:0;border-radius:16px;padding:16px 4px;cursor:pointer;white-space:nowrap;
+    transition:background .15s ease,color .15s ease,transform .1s ease;-webkit-tap-highlight-color:transparent;
+  }
+  #voiceTiles button:active{transform:scale(.96);}
+  #voiceTiles button.on{background:var(--accent);color:#fff;}
   #voiceDot{
-    width:min(40vw,32vh);height:min(40vw,32vh);border-radius:50%;
+    width:min(38vw,26vh);height:min(38vw,26vh);border-radius:50%;
     display:flex;align-items:center;justify-content:center;
     background:var(--chip);color:var(--ink);
     transition:background .15s ease,transform .15s ease;
@@ -1140,13 +1150,13 @@
       <div id="roulettePointer"></div>
       <div id="rouletteEmpty">Добавь хотя бы 2 варианта</div>
     </div>
-    <div id="rouletteResult"></div>
-    <div id="rouletteHint">Добавь варианты и крути рулетку</div>
-    <div id="rouletteChips"></div>
     <div id="rouletteInputRow">
       <input id="rouletteInput" type="text" placeholder="Вариант" aria-label="Вариант" maxlength="24" />
       <button id="rouletteOk" aria-label="Добавить">+</button>
     </div>
+    <div id="rouletteResult"></div>
+    <div id="rouletteHint">Добавь варианты и крути рулетку</div>
+    <div id="rouletteChips"></div>
   </div>
 
   <div id="sbStage" style="display:none">
@@ -1220,6 +1230,14 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5v3M9 20.5h6"/></svg>
     </div>
     <div id="voiceHint">Зажми и говори</div>
+    <div id="voiceTiles">
+      <button data-vp="bass">Бас</button>
+      <button data-vp="monster">Монстр</button>
+      <button data-vp="chip">Бурундук</button>
+      <button data-vp="robot">Робот</button>
+      <button data-vp="echo">Эхо</button>
+      <button data-vp="space">Космос</button>
+    </div>
   </div>
 
   <div id="revStage" style="display:none">
@@ -1319,10 +1337,6 @@
     <div class="seg" id="numModeSeg" style="display:none">
       <button data-nm="simple" class="on">Классика</button>
       <button data-nm="draw">Розыгрыш</button>
-    </div>
-    <div class="seg" id="voicePitchSeg" style="display:none">
-      <button data-vp="down" class="on">Ниже</button>
-      <button data-vp="up">Выше</button>
     </div>
     <div class="seg" id="metroSigSeg" style="display:none">
       <button data-sig="2">2/4</button>
@@ -1655,7 +1669,6 @@
     document.getElementById('wordModeSeg').style.display = a==='word'?'flex':'none';
     document.getElementById('diceSeg').style.display = a==='dice'?'flex':'none';
     document.getElementById('numModeSeg').style.display = a==='num'?'flex':'none';
-    document.getElementById('voicePitchSeg').style.display = a==='voice'?'flex':'none';
     document.getElementById('metroSigSeg').style.display = a==='metro'?'flex':'none';
     document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='morse'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
     document.getElementById('autoBtn').style.display = a==='note'?'':'none';
@@ -2597,7 +2610,7 @@
   var voiceStage=document.getElementById('voiceStage');
   var voiceHint=document.getElementById('voiceHint');
   var voiceMicStream=null, voiceRecorder=null, voiceChunks=[], voiceRecording=false, voiceBusy=false;
-  var voicePitch='down', voiceMaxT=null, voiceRecStartT=0, voiceDenied=false, voiceShifter=null;
+  var voicePitch='chip', voiceMaxT=null, voiceRecStartT=0, voiceDenied=false, voiceShifter=null;
   var VOICE_MAX_MS=6000, VOICE_MIN_MS=250;
   var pitchShifterLoading=null;
   function loadPitchShifter(cb){
@@ -2614,9 +2627,14 @@
     s.onerror=function(){ var cbs=pitchShifterLoading; pitchShifterLoading=null; if(cbs) cbs.forEach(function(f){f();}); };
     document.body.appendChild(s);
   }
+  var VOICE_FX={
+    bass:{semi:-5}, monster:{semi:-11,fx:'dist'}, chip:{semi:8},
+    robot:{semi:0,fx:'ring'}, echo:{semi:0,fx:'echo',d:.28,fb:.45}, space:{semi:4,fx:'echo',d:.38,fb:.6}
+  };
+  var voiceLast=null, voiceStopCur=null, voiceTok=0;
   function setVoicePitch(p){
     voicePitch=p;
-    document.querySelectorAll('#voicePitchSeg button').forEach(function(b){ b.classList.toggle('on',b.dataset.vp===p); });
+    document.querySelectorAll('#voiceTiles button').forEach(function(b){ b.classList.toggle('on',b.dataset.vp===p); });
   }
   function voiceStopMic(){
     if(voiceMicStream){ voiceMicStream.getTracks().forEach(function(t){t.stop();}); voiceMicStream=null; }
@@ -2625,6 +2643,7 @@
     if(voiceMaxT){ clearTimeout(voiceMaxT); voiceMaxT=null; }
     if(voiceRecorder && voiceRecording){ try{ voiceRecorder.stop(); }catch(e){} }
     if(voiceShifter){ try{ voiceShifter.disconnect(); }catch(e){} voiceShifter=null; }
+    voiceHalt(); voiceLast=null; voiceHeld=false;
     voiceRecording=false; voiceBusy=false;
     voiceStopMic();
     voiceStage.classList.remove('recording','playing');
@@ -2639,49 +2658,75 @@
       voiceHint.textContent='Нет доступа к микрофону';
     });
   }
+  function voiceHalt(){
+    voiceTok++;
+    if(voiceStopCur){ try{ voiceStopCur(); }catch(e){} voiceStopCur=null; }
+    voiceStage.classList.remove('playing');
+  }
   function voicePlay(buf){
-    if(!soundOn){
-      voiceHint.textContent='Звук выключен';
-      voiceStage.classList.remove('recording');
-      voiceBusy=false;
-      return;
-    }
+    voiceLast=buf;
     voiceStage.classList.remove('recording');
+    if(!soundOn){ voiceHint.textContent='Звук выключен'; voiceBusy=false; return; }
+    voiceHalt();
+    var tok=voiceTok, pr=VOICE_FX[voicePitch]||VOICE_FX.chip;
+    ensureAC();
     voiceStage.classList.add('playing');
     voiceHint.textContent='Слушай…';
-    function finish(){
-      if(voiceShifter){ try{ voiceShifter.disconnect(); }catch(e){} voiceShifter=null; }
-      voiceStage.classList.remove('playing');
-      voiceHint.textContent='Зажми и говори';
-      voiceBusy=false;
+    var out=AC.createGain(); out.gain.value=1.7; out.connect(AC.destination);
+    var inp=out, tail=0, extra=[];
+    if(pr.fx==='dist'){
+      var ws=AC.createWaveShaper(), c=new Float32Array(256);
+      for(var i=0;i<256;i++){ var x=i/128-1; c[i]=Math.tanh(x*6)*0.8; }
+      ws.curve=c; var lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2400;
+      ws.connect(lp); lp.connect(out); inp=ws;
+    } else if(pr.fx==='ring'){
+      var rg=AC.createGain(); rg.gain.value=0;
+      var osc=AC.createOscillator(); osc.frequency.value=55; osc.connect(rg.gain); osc.start();
+      rg.connect(out); inp=rg; extra.push(osc);
+      out.gain.value=2.2;
+    } else if(pr.fx==='echo'){
+      var dry=AC.createGain(), dl=AC.createDelay(1), fb=AC.createGain(), wet=AC.createGain();
+      dl.delayTime.value=pr.d; fb.gain.value=pr.fb; wet.gain.value=.65;
+      dry.connect(out); dry.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(out);
+      inp=dry; tail=2.2;
     }
-    function fallbackPlaybackRate(){               // запасной план, если библиотека вдруг не загрузилась
-      var rate = voicePitch==='up' ? 2.0 : 0.5;
+    function done(){
+      if(tok!==voiceTok) return;
+      setTimeout(function(){
+        if(tok!==voiceTok) return;
+        extra.forEach(function(o){ try{o.stop();}catch(e){} });
+        voiceStage.classList.remove('playing');
+        voiceHint.textContent='Зажми и говори';
+        voiceStopCur=null; voiceBusy=false;
+      }, tail*1000);
+    }
+    function stopAll(){ extra.forEach(function(o){ try{o.stop();}catch(e){} }); try{ out.disconnect(); }catch(e){} }
+    function viaSource(rate){
       var src=AC.createBufferSource(); src.buffer=buf; src.playbackRate.value=rate;
-      src.connect(AC.destination);
-      src.onended=finish;
-      try{ src.start(); }catch(e){ finish(); }
+      src.connect(inp); src.onended=done;
+      voiceStopCur=function(){ try{src.onended=null; src.stop();}catch(e){} stopAll(); };
+      try{ src.start(); }catch(e){ done(); }
     }
+    if(!pr.semi){ viaSource(1); return; }
     loadPitchShifter(function(){
-      if(!window.PitchShifter){ fallbackPlaybackRate(); return; }
+      if(tok!==voiceTok) return;
+      if(!window.PitchShifter){ viaSource(Math.pow(2,pr.semi/12)); return; }
       try{
-        var semis = voicePitch==='up' ? 12 : -12;
-        var shifter=new window.PitchShifter(AC, buf, 4096, finish);
-        shifter.tempo=1;                 // темп голоса — без изменений
-        shifter.pitchSemitones=semis;    // меняется только высота, на октаву
-        shifter.connect(AC.destination);
-        voiceShifter=shifter;
-      }catch(e){
-        fallbackPlaybackRate();
-      }
+        var sh=new window.PitchShifter(AC, buf, 4096, done);
+        sh.tempo=1; sh.pitchSemitones=pr.semi; sh.connect(inp);
+        voiceShifter=sh;
+        voiceStopCur=function(){ try{ sh.disconnect(); }catch(e){} voiceShifter=null; stopAll(); };
+      }catch(e){ viaSource(Math.pow(2,pr.semi/12)); }
     });
   }
+  var voiceHeld=false;
   function voiceStartRecording(){
     if(voiceBusy) return;
-    ensureAC();
-    voiceBusy=true;
+    ensureAC(); voiceHalt();
+    voiceBusy=true; voiceHeld=true;
     voiceEnsureMic(function(){
       if(!voiceMicStream){ voiceBusy=false; return; }
+      if(!voiceHeld){ voiceBusy=false; voiceHint.textContent='Зажми и говори'; return; }
       voiceChunks=[];
       try{ voiceRecorder=new MediaRecorder(voiceMicStream); }
       catch(e){ voiceHint.textContent='Запись не поддерживается'; voiceBusy=false; return; }
@@ -2713,14 +2758,26 @@
     });
   }
   function voiceStopRecording(){
+    voiceHeld=false;
     if(voiceRecorder && voiceRecording){ try{ voiceRecorder.stop(); }catch(e){} }
   }
-  voiceStage.addEventListener('pointerdown',function(e){ e.stopPropagation(); voiceStartRecording(); });
-  voiceStage.addEventListener('pointerup',function(e){ e.stopPropagation(); voiceStopRecording(); });
-  voiceStage.addEventListener('pointercancel',function(e){ e.stopPropagation(); voiceStopRecording(); });
-  document.querySelectorAll('#voicePitchSeg button').forEach(function(b){
-    b.addEventListener('click',function(e){ e.stopPropagation(); setVoicePitch(b.dataset.vp); });
+  var voiceDot=document.getElementById('voiceDot');
+  voiceDot.addEventListener('contextmenu',function(e){ e.preventDefault(); });
+  voiceDot.addEventListener('pointerdown',function(e){
+    e.stopPropagation(); e.preventDefault();
+    try{ voiceDot.setPointerCapture(e.pointerId); }catch(err){}
+    voiceStartRecording();
   });
+  voiceDot.addEventListener('pointerup',function(e){ e.stopPropagation(); voiceStopRecording(); });
+  voiceDot.addEventListener('pointercancel',function(e){ e.stopPropagation(); voiceStopRecording(); });
+  voiceStage.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
+  document.querySelectorAll('#voiceTiles button').forEach(function(b){
+    b.addEventListener('click',function(e){
+      e.stopPropagation(); setVoicePitch(b.dataset.vp);
+      if(voiceLast && !voiceRecording && soundOn){ voiceBusy=true; voicePlay(voiceLast); }
+    });
+  });
+  setVoicePitch('chip');
 
   // ---- reverse audio ----
   var revStage=document.getElementById('revStage');
@@ -2734,7 +2791,7 @@
     navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
       revMicPrimed=true;
       stream.getTracks().forEach(function(t){ t.stop(); });     // просим разрешение заранее, сам поток не держим
-    }).catch(function(){ revDenied=true; });
+    }).catch(function(){ /* не фиксируем отказ навсегда */ });
   }
   var revBuffer=null, revReversedBuffer=null, revSrc=null;
   var REV_MAX_MS=30000, REV_MIN_MS=250;
@@ -2783,7 +2840,10 @@
     revWantStop=false;
     revStopPlayback();
     navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
-      revDenied=false; revMicStream=stream;
+      revDenied=false; revMicStream=stream; revMicPrimed=true;
+      if(revWantStop){            // палец отпустили, пока висел запрос разрешения — запись не начинаем
+        revWantStop=false; revBusy=false; revStopMic(); return;
+      }
       revChunks=[];
       try{ revRecorder=new MediaRecorder(stream); }
       catch(e){ revBusy=false; revStopMic(); revFlashDenied(); return; }
@@ -2829,7 +2889,7 @@
   }
   function revEndHold(){
     revStage.classList.remove('holding');
-    if(revRecording){ revStopRecording(); } else { revWantStop=true; }
+    if(revRecording){ revStopRecording(); } else if(revBusy){ revWantStop=true; }
   }
   function revPlayBuffer(buf, btn){
     if(!buf) return;

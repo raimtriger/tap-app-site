@@ -259,8 +259,8 @@
     color:var(--muted);letter-spacing:.04em;margin-bottom:16px;
   }
   #numValue{
-    font-family:var(--fd);font-weight:700;line-height:.8;
-    font-size:min(46vw,40vh);letter-spacing:-.02em;color:var(--ink);text-align:center;
+    font-family:var(--fd);font-weight:700;line-height:1;margin:.12em 0;
+    font-size:min(46vw,36vh);letter-spacing:-.02em;color:var(--ink);text-align:center;
     font-variant-numeric:lining-nums tabular-nums;font-feature-settings:"lnum" 1,"tnum" 1;
     white-space:nowrap;max-width:100%;
     transition:opacity .08s ease,transform .12s ease;
@@ -308,18 +308,53 @@
 
   /* ---- roulette ---- */
   #rouletteStage{
-    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
     position:relative;cursor:pointer;gap:0;padding:0 18px;
   }
   #rouletteStage.editing #rouletteInputRow{position:relative;z-index:61;}
   #rouletteStage.spinning #rouletteWheelBox,#rouletteStage.spinning #rouletteResult{position:relative;z-index:61;}
-  #rouletteStage.tight #rouletteHint{display:none;}
-  #rouletteStage.tight #rouletteChips{max-height:68px;overflow-y:auto;margin-top:8px;}
-  #rouletteStage.tight #rouletteWheelBox{margin-top:16px;}
-  #rouletteStage.tight #rouletteResult{margin-top:10px;min-height:34px;}
   .rouletteSlice{transition:opacity .5s ease,filter .5s ease;opacity:1;filter:blur(0);}
   .rouletteSlice.enter{opacity:0;filter:blur(7px);}
-  #rouletteInputRow{display:flex;gap:8px;align-items:center;}
+  /* порядок сверху вниз: круг → результат → подсказка → слова → поле ввода (прижато вниз) */
+  #rouletteWheelBox{position:relative;flex:0 0 auto;margin-top:14px;width:var(--rlSize,200px);height:var(--rlSize,200px);}
+  #rouletteWheelBox::before{content:"";position:absolute;inset:0;border-radius:50%;background:var(--chip);}
+  #rouletteWheelWrap{width:100%;height:100%;will-change:transform;}
+  #rouletteWheelWrap svg{width:100%;height:100%;display:block;}
+  #roulettePointer{
+    position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;
+    border-left:10px solid transparent;border-right:10px solid transparent;border-top:15px solid var(--ink);
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,.25));
+  }
+  #rouletteEmpty{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;
+    color:var(--muted);font:600 12px/1.4 var(--fu);padding:0 22px;
+  }
+  #rouletteResult{
+    flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px;min-height:40px;
+    max-width:min(92vw,420px);
+  }
+  #rouletteResult .rouletteDot{width:14px;height:14px;}
+  #rouletteResultWord{
+    font-family:var(--fu);font-weight:700;line-height:1.1;text-align:center;overflow-wrap:anywhere;
+    font-size:min(8vw,30px);color:var(--ink);
+  }
+  #rouletteHint{
+    flex:0 0 auto;font:600 min(4vw,15px)/1 var(--fu);
+    color:var(--muted);margin-top:10px;min-height:1.2em;text-align:center;
+  }
+  #rouletteChips{
+    flex:1 1 0;min-height:0;width:100%;max-width:320px;overflow-y:auto;
+    display:flex;flex-wrap:wrap;gap:7px;justify-content:center;align-content:flex-start;
+    margin-top:14px;scrollbar-width:none;
+  }
+  #rouletteChips::-webkit-scrollbar{width:0;height:0;}
+  .rouletteChip{
+    display:flex;align-items:center;gap:6px;background:var(--chip);color:var(--ink);
+    font:600 12px/1 var(--fu);padding:8px 10px 8px 9px;
+    border-radius:999px;cursor:pointer;white-space:nowrap;
+  }
+  .rouletteDot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
+  #rouletteInputRow{flex:0 0 auto;display:flex;gap:8px;align-items:center;margin-top:12px;}
   #rouletteInput{
     -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
     font:600 15px/1 var(--fu);text-align:center;
@@ -330,40 +365,6 @@
     font:700 20px/1 var(--fu);cursor:pointer;
     display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
   #rouletteOk:disabled,#rouletteInput:disabled{opacity:.4;}
-  #rouletteChips{
-    display:flex;flex-wrap:wrap;gap:7px;justify-content:center;max-width:320px;
-    margin-top:12px;min-height:0;
-  }
-  .rouletteChip{
-    display:flex;align-items:center;gap:6px;background:var(--chip);color:var(--ink);
-    font:600 12px/1 var(--fu);padding:8px 10px 8px 9px;
-    border-radius:999px;cursor:pointer;white-space:nowrap;
-  }
-  .rouletteDot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
-  #rouletteWheelBox{position:relative;margin-top:24px;width:min(58vw,230px);height:min(58vw,230px);}
-  #rouletteWheelWrap{width:100%;height:100%;will-change:transform;}
-  #rouletteWheelWrap svg{width:100%;height:100%;display:block;}
-  #roulettePointer{
-    position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;
-    border-left:10px solid transparent;border-right:10px solid transparent;border-top:15px solid var(--ink);
-    filter:drop-shadow(0 2px 3px rgba(0,0,0,.25));
-  }
-  #rouletteEmpty{
-    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;
-    color:var(--muted);font:600 13px/1.4 var(--fu);padding:0 20px;
-  }
-  #rouletteResult{
-    display:flex;align-items:center;gap:10px;margin-top:22px;min-height:40px;
-  }
-  #rouletteResult .rouletteDot{width:14px;height:14px;}
-  #rouletteResultWord{
-    font-family:var(--fu);font-weight:700;
-    font-size:min(9vw,34px);color:var(--ink);
-  }
-  #rouletteHint{
-    font:600 min(4vw,15px)/1 var(--fu);
-    color:var(--muted);margin-top:16px;min-height:1.2em;text-align:center;
-  }
 
   /* ---- soundboard ---- */
   #sbStage{
@@ -705,7 +706,7 @@
   #qrHint{font:600 min(4vw,15px)/1 var(--fu);color:var(--muted);}
   #qrStage.shown #qrInputRow,#qrStage.shown #qrHint{display:none;}
   #qrBox{
-    position:fixed;inset:0;z-index:62;display:none;flex-direction:column;
+    position:fixed;inset:0;z-index:66;display:none;flex-direction:column;
     align-items:center;justify-content:center;gap:22px;
     background:transparent;color:var(--ink);
     opacity:0;
@@ -727,7 +728,7 @@
   #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:70;}
   #bar{
     position:fixed;left:0;right:0;z-index:6;
-    bottom:calc(env(safe-area-inset-bottom) + 144px);
+    bottom:calc(env(safe-area-inset-bottom) + 62px);
     display:flex;gap:8px;justify-content:center;align-items:center;
     padding:0 12px;
     flex-wrap:wrap;
@@ -750,7 +751,7 @@
   .chip.acc.on{color:var(--accent);}
   /* hamburger button (top-right) */
   #menuBtn{position:fixed;top:calc(env(safe-area-inset-top) + 18px);
-    right:calc(env(safe-area-inset-right) + 16px);z-index:40;
+    right:calc(env(safe-area-inset-right) + 16px);z-index:64;
     width:44px;height:44px;border:0;border-radius:50%;background:var(--chip);
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:4.5px;cursor:pointer;transition:background .15s;}
@@ -761,12 +762,12 @@
   #menuBtn.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
 
   /* dim backdrop */
-  #menuOverlay{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.5);
+  #menuOverlay{position:fixed;inset:0;z-index:62;background:rgba(0,0,0,.5);
     opacity:0;visibility:hidden;transition:opacity .28s ease,visibility .28s;}
   #menuOverlay.open{opacity:1;visibility:visible;}
 
   /* slide-out drawer */
-  .appnav{position:fixed;top:0;right:0;height:100%;width:min(76vw,290px);z-index:35;
+  .appnav{position:fixed;top:0;right:0;height:100%;width:min(76vw,290px);z-index:63;
     background:var(--panel);box-shadow:-14px 0 44px rgba(0,0,0,.34);
     display:flex;flex-direction:column;gap:6px;
     padding:calc(env(safe-area-inset-top) + 78px) 16px calc(env(safe-area-inset-bottom) + 22px);
@@ -780,6 +781,7 @@
     letter-spacing:.14em;color:var(--accent);opacity:.85;padding:0 6px;
     margin-top:14px;margin-bottom:2px;flex-shrink:0;}
   .appnav .cathdr:first-of-type{margin-top:4px;}
+  a.appbtn{text-decoration:none;}
   .appbtn{width:100%;border:0;border-radius:14px;background:transparent;color:var(--muted);
     display:flex;flex-direction:row;align-items:center;gap:14px;justify-content:flex-start;
     padding:13px 14px;cursor:pointer;transition:background .15s,color .15s,transform .3s ease,opacity .3s ease;
@@ -836,12 +838,12 @@
   :root.light body::before{background:none;}
 
   /* utility row: socials + theme toggle, centered above the controls */
-  .utilbar{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 86px);
+  .utilbar{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 6px);
     display:flex;justify-content:center;align-items:center;gap:10px;z-index:6;}
-  .sbtn,.themebtn{width:44px;height:44px;border-radius:50%;border:0;
+  .sbtn,.themebtn{width:40px;height:40px;border-radius:50%;border:0;
     display:flex;align-items:center;justify-content:center;
     background:var(--chip);color:var(--ink);text-decoration:none;cursor:pointer;}
-  .sbtn svg{width:23px;height:23px;}
+  .sbtn svg{width:21px;height:21px;}
   .themebtn{line-height:1;}
   .themebtn svg{width:21px;height:21px;display:block;}
   #soundBtn{color:var(--ink);display:flex;align-items:center;justify-content:center;}
@@ -879,6 +881,11 @@
     font-family:var(--fd) !important;font-weight:800 !important;
     font-size:min(3.1vw,12px) !important;line-height:1.35 !important;letter-spacing:.01em;
     white-space:normal !important;max-width:min(92vw,420px);text-align:center;
+  }
+
+  /* крупные символы: без отрицательного интервала и с запасом по бокам — Safari иначе обрезает край глифа */
+  #letter,#numValue,#bpmNum,#counterNum,#metroBpmNum,#ynValue,#tunNote,#noiseValue,#colorHex{
+    letter-spacing:0 !important;padding-left:.08em;padding-right:.08em;
   }
 
   /* ---- анти-наезд: каждый экран живёт строго между заголовком и нижними кнопками ---- */
@@ -1023,15 +1030,18 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
       <span>Точное время</span>
     </button>
+    <div class="cathdr">СОЦСЕТИ</div>
+    <a class="appbtn" href="https://instagram.com/raimtriger" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" stroke="none"/></svg>
+      <span>Instagram</span>
+    </a>
+    <a class="appbtn" href="https://t.me/raimtrigeroff" target="_blank" rel="noopener" aria-label="Telegram">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.1 4.6 1.9 12.4c-.8.3-.8 1.4 0 1.7l5.3 1.7 2 6.3c.2.5.9.6 1.3.2l2.8-2.7 5.2 3.8c.5.3 1.2.1 1.3-.5l3.9-17.5c.2-.7-.5-1.3-1.1-1z"/></svg>
+      <span>Telegram</span>
+    </a>
   </nav>
 
   <div class="utilbar">
-    <a class="sbtn" href="https://instagram.com/raimtriger" target="_blank" rel="noopener" aria-label="Instagram">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" stroke="none"/></svg>
-    </a>
-    <a class="sbtn" href="https://t.me/raimtrigeroff" target="_blank" rel="noopener" aria-label="Telegram">
-      <svg viewBox="0 0 24 24" fill="currentColor" style="transform:translate(-1px,-1px)"><path d="M23.1 4.6 1.9 12.4c-.8.3-.8 1.4 0 1.7l5.3 1.7 2 6.3c.2.5.9.6 1.3.2l2.8-2.7 5.2 3.8c.5.3 1.2.1 1.3-.5l3.9-17.5c.2-.7-.5-1.3-1.1-1z"/></svg>
-    </a>
     <button class="themebtn" id="themeBtn" aria-label="Сменить тему"></button>
     <button class="themebtn" id="soundBtn" aria-label="Звук"></button>
   </div>
@@ -1125,11 +1135,6 @@
   </div>
 
   <div id="rouletteStage" style="display:none">
-    <div id="rouletteInputRow">
-      <input id="rouletteInput" type="text" placeholder="Вариант" aria-label="Вариант" maxlength="24" />
-      <button id="rouletteOk" aria-label="Добавить">+</button>
-    </div>
-    <div id="rouletteChips"></div>
     <div id="rouletteWheelBox">
       <div id="rouletteWheelWrap"><svg id="rouletteWheel" viewBox="0 0 220 220"></svg></div>
       <div id="roulettePointer"></div>
@@ -1137,6 +1142,11 @@
     </div>
     <div id="rouletteResult"></div>
     <div id="rouletteHint">Добавь варианты и крути рулетку</div>
+    <div id="rouletteChips"></div>
+    <div id="rouletteInputRow">
+      <input id="rouletteInput" type="text" placeholder="Вариант" aria-label="Вариант" maxlength="24" />
+      <button id="rouletteOk" aria-label="Добавить">+</button>
+    </div>
   </div>
 
   <div id="sbStage" style="display:none">
@@ -3926,20 +3936,12 @@
   var fitRaf=0;
   function fitRoulette(){
     if(!rouletteStage || rouletteStage.style.display==='none') return;
-    var box=document.getElementById('rouletteWheelBox'), row=document.getElementById('rouletteInputRow'), res=document.getElementById('rouletteResult'), hint=document.getElementById('rouletteHint');
     var cs=getComputedStyle(rouletteStage);
     var avail=rouletteStage.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
-    function other(){
-      var m=function(e){ var c=getComputedStyle(e); return (parseFloat(c.marginTop)||0)+(parseFloat(c.marginBottom)||0); };
-      var h=row.offsetHeight+rouletteChips.offsetHeight+m(rouletteChips)+m(box)+res.offsetHeight+m(res);
-      if(getComputedStyle(hint).display!=='none') h+=hint.offsetHeight+m(hint);
-      return h;
-    }
-    rouletteStage.classList.remove('tight');
-    var size=avail-other()-4;
-    if(size<150){ rouletteStage.classList.add('tight'); size=avail-other()-4; }
-    size=Math.max(84,Math.min(230,innerWidth*0.58,size));
-    box.style.width=size+'px'; box.style.height=size+'px';
+    // под кругом резервируем: результат + подсказка + слова (мин. 2 ряда) + поле ввода
+    var reserve=14+16+40+10+16+14+68+12+44+6;
+    var size=Math.max(110,Math.min(230,innerWidth*0.58,avail-reserve));
+    document.documentElement.style.setProperty('--rlSize',Math.round(size)+'px');
   }
   function layoutFit(){
     var H=window.innerHeight, W=window.innerWidth, root=document.documentElement;
@@ -3957,8 +3959,8 @@
     }
     var top=tw.getBoundingClientRect().bottom+8;
     var ur=ub.getBoundingClientRect();
-    var side=(ur.width<120 && ur.height>120);        // короткий экран: utilbar стоит столбиком справа
-    var bot = side ? 10 : (H-ur.top+8);
+    var side=(getComputedStyle(ub).flexDirection==='column');        // короткий экран: utilbar стоит столбиком справа
+    var bot = side ? 10 : (H-ur.top+18);
     var bt=null;
     Array.prototype.forEach.call(bar.children,function(c){
       if(getComputedStyle(c).display==='none') return;
@@ -3979,7 +3981,6 @@
   if(window.ResizeObserver){
     var lro=new ResizeObserver(layoutSoon);
     lro.observe(document.querySelector('.titlewrap')); lro.observe(document.getElementById('bar')); lro.observe(document.querySelector('.utilbar'));
-    lro.observe(rouletteChips); lro.observe(document.getElementById('rouletteResult'));
   }
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(layoutSoon);
   layoutFit();

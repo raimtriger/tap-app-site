@@ -25,15 +25,18 @@
 <meta name="yandex-verification" content="2c2a689113551869">
 
 <style>
-@font-face{font-family:"Dancing Script";font-style:normal;font-weight:600;font-display:swap;src:url(assets/dancing-script-600.woff2) format("woff2");}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:600;font-display:swap;src:url(assets/montserrat-600-cyr.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:600;font-display:swap;src:url(assets/montserrat-600-lat.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:700;font-display:swap;src:url(assets/montserrat-700-cyr.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}
+@font-face{font-family:"Montserrat";font-style:normal;font-weight:700;font-display:swap;src:url(assets/montserrat-700-lat.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
 @font-face{font-family:"Benzin";font-style:normal;font-weight:800;font-display:swap;src:url(assets/Benzin-ExtraBold.woff2) format("woff2"),url(assets/Benzin-ExtraBold.woff) format("woff"),url(assets/Benzin-ExtraBold.ttf) format("truetype"),url(assets/Benzin-ExtraBold.otf) format("opentype");}
 @font-face{font-family:"Yellowtail";font-style:normal;font-weight:400;font-display:swap;src:url(assets/yellowtail.woff2) format("woff2");}
-@font-face{font-family:"Playfair Display";font-style:normal;font-weight:700;font-display:swap;src:url(assets/playfair-display-700.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}
-@font-face{font-family:"Playfair Display";font-style:normal;font-weight:700;font-display:swap;src:url(assets/playfair-display-700-2.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
 </style>
 
 <style>
   :root{
+    --fd:"Benzin","Arial Black",system-ui,sans-serif;   /* display: заголовки, подсказки, крупные цифры */
+    --fu:"Montserrat","Futura","Avenir Next",system-ui,sans-serif; /* интерфейс: кнопки, поля, меню, слова */
     color-scheme:dark;
     --bg:#0d0d0f;
     --ink:#f3efe6;
@@ -49,7 +52,7 @@
   body{
     background:var(--bg);
     color:var(--ink);
-    font-family:"Futura","Avenir Next",system-ui,sans-serif;
+    font-family:var(--fu);
     overflow:hidden;
     user-select:none;-webkit-user-select:none;
     display:flex;flex-direction:column;
@@ -66,11 +69,11 @@
   }
   #noteHint{
     margin-top:30px;text-align:center;pointer-events:none;
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);
+    font:600 min(4vw,15px)/1 var(--fu);color:var(--muted);
   }
   /* ---- letters mode ---- */
   #letter{
-    font-family:"Georgia","Times New Roman",serif;
+    font-family:var(--fd);
     font-weight:700;line-height:.8;
     font-size:min(54vw,44vh);
     letter-spacing:-.02em;
@@ -98,18 +101,18 @@
     position:relative;cursor:pointer;gap:0;
   }
   #bpmNum{
-    font-family:"Georgia","Times New Roman",serif;font-weight:700;
+    font-family:var(--fd);font-weight:700;
     font-size:min(30vw,24vh);line-height:1;letter-spacing:-.02em;
     color:var(--ink);font-variant-numeric:lining-nums tabular-nums;
     font-feature-settings:"lnum" 1,"tnum" 1;
     transition:opacity .08s ease,transform .08s ease;
   }
   #bpmLbl{
-    font:700 min(6vw,22px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:700 min(6vw,22px)/1 var(--fu);
     letter-spacing:.08em;color:var(--accent);margin-top:6px;
   }
   #bpmHint{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:14px;
   }
   #bpmStage.tapped #bpmNum{opacity:.55;transform:scale(.97);}
@@ -120,13 +123,13 @@
     position:relative;cursor:pointer;gap:0;padding:0 18px;
   }
   #counterNum{
-    font-family:"Georgia","Times New Roman",serif;font-weight:700;
+    font-family:var(--fd);font-weight:700;
     font-size:min(34vw,28vh);line-height:1;letter-spacing:-.02em;
     color:var(--ink);font-variant-numeric:lining-nums tabular-nums;
     font-feature-settings:"lnum" 1,"tnum" 1;
   }
   #counterHint{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:26px;
   }
 
@@ -136,27 +139,27 @@
     position:relative;cursor:pointer;gap:6px;
   }
   #tmTime{
-    font-family:"SF Mono","ui-monospace","Menlo","Consolas",monospace;font-weight:700;
+    font-family:var(--fu);font-variant-numeric:tabular-nums;font-weight:700;
     font-size:min(14vw,10vh);line-height:.95;letter-spacing:0;
     color:var(--ink);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;
     white-space:nowrap;contain:layout paint style;
   }
   #tmTarget{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:6px;letter-spacing:.05em;
   }
   #tmDiff{
-    font:700 min(7vw,28px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:700 min(7vw,28px)/1 var(--fu);
     color:var(--accent);margin-top:14px;min-height:1.2em;
     font-variant-numeric:tabular-nums;
   }
   #tmBest{
-    font:600 min(3.6vw,14px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(3.6vw,14px)/1 var(--fu);
     color:var(--muted);margin-top:6px;min-height:1.2em;
     font-variant-numeric:tabular-nums;
   }
   #tmHint{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:14px;
   }
 
@@ -174,27 +177,27 @@
   #timeCities::-webkit-scrollbar{display:none;}
   .timeCityBtn{
     flex:0 0 auto;border:0;border-radius:999px;background:var(--chip);color:var(--muted);
-    font:600 13px/1 "Futura","Avenir Next",system-ui,sans-serif;padding:10px 15px;
+    font:600 13px/1 var(--fu);padding:10px 15px;
     cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:.15s;
     touch-action:pan-x;
   }
   .timeCityBtn.on{background:var(--chip-on);color:var(--ink);}
   #timeClock{
-    font-family:"SF Mono","ui-monospace","Menlo","Consolas",monospace;font-weight:700;
+    font-family:var(--fu);font-variant-numeric:tabular-nums;font-weight:700;
     font-size:min(15vw,11vh);line-height:1;letter-spacing:0;
     color:var(--ink);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;
     white-space:nowrap;
   }
   #timeDate{
-    font:700 min(5vw,20px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:700 min(5vw,20px)/1 var(--fu);
     color:var(--accent);margin-top:16px;text-transform:capitalize;text-align:center;
   }
   #timeZoneLbl{
-    font:600 min(3.8vw,14px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(3.8vw,14px)/1 var(--fu);
     color:var(--muted);margin-top:8px;letter-spacing:.03em;
   }
   #timeSyncHint{
-    font:600 min(3.6vw,13px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(3.6vw,13px)/1 var(--fu);
     color:var(--muted);margin-top:22px;opacity:.7;
   }
 
@@ -204,20 +207,20 @@
     position:relative;cursor:pointer;gap:0;padding:0 16px;
   }
   #tunNote{
-    font-family:"Georgia","Times New Roman",serif;font-weight:700;
+    font-family:var(--fd);font-weight:700;
     font-size:min(34vw,26vh);line-height:1;color:var(--ink);
     font-variant-numeric:lining-nums;transition:color .15s;
   }
   #tunNote .oct{font-size:.36em;color:var(--muted);vertical-align:.5em;margin-left:.03em;font-weight:400;}
   #tunNote sup{font-size:.5em;vertical-align:.7em;}
-  #tunFreq{font:600 min(4.5vw,16px)/1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums;}
+  #tunFreq{font:600 min(4.5vw,16px)/1 var(--fu);color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums;}
   #tunGauge{position:relative;width:min(70vw,320px);height:4px;border-radius:3px;background:var(--chip);margin-top:26px;}
   #tunZero{position:absolute;left:50%;top:-7px;width:2px;height:18px;background:var(--muted);transform:translateX(-50%);border-radius:1px;}
   #tunNeedle{position:absolute;top:50%;left:50%;width:14px;height:14px;border-radius:50%;
     background:var(--accent);transform:translate(-50%,-50%);box-shadow:0 0 0 4px rgba(180,83,9,.18);}
-  #tunCents{font:700 min(6vw,22px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+  #tunCents{font:700 min(6vw,22px)/1 var(--fu);
     color:var(--accent);font-variant-numeric:tabular-nums;margin-top:20px;min-height:1.1em;}
-  #tunHint{font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+  #tunHint{font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:8px;text-align:center;}
 
   /* ---- word generator ---- */
@@ -226,13 +229,13 @@
     position:relative;cursor:pointer;gap:0;padding:0 22px;
   }
   #wordText{
-    font-family:"Playfair Display","Georgia",serif;font-weight:700;
+    font-family:var(--fu);font-weight:700;
     font-size:min(13vw,52px);color:var(--ink);text-align:center;
     transition:opacity .08s ease,transform .08s ease;text-transform:lowercase;
     white-space:nowrap;max-width:100%;height:66px;line-height:66px;
   }
   #wordHint{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:22px;
   }
   #wordStage.pop #wordText{opacity:.55;transform:scale(.98);}
@@ -246,17 +249,17 @@
   #numMax{
     -webkit-appearance:none;appearance:none;
     background:var(--chip);color:var(--ink);border:0;border-radius:999px;
-    font:600 16px/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 16px/1 var(--fu);
     text-align:center;width:140px;max-width:54vw;padding:12px 14px;outline:none;
   }
   #numMax::-webkit-outer-spin-button,#numMax::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
   #numMax::placeholder{color:var(--muted);}
   #numLbl{
-    font:600 min(3.6vw,13px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(3.6vw,13px)/1 var(--fu);
     color:var(--muted);letter-spacing:.04em;margin-bottom:16px;
   }
   #numValue{
-    font-family:"Georgia","Times New Roman",serif;font-weight:700;line-height:.8;
+    font-family:var(--fd);font-weight:700;line-height:.8;
     font-size:min(46vw,40vh);letter-spacing:-.02em;color:var(--ink);text-align:center;
     font-variant-numeric:lining-nums tabular-nums;font-feature-settings:"lnum" 1,"tnum" 1;
     white-space:nowrap;max-width:100%;
@@ -272,7 +275,7 @@
   #numStage.editing #numInputRow{position:relative;z-index:61;}
   #numStage.rolling #numValue,#numStage.land #numValue,#numStage.holding #numValue{position:relative;z-index:61;}
   #numHint{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:24px;min-height:1.2em;white-space:nowrap;
   }
 
@@ -284,14 +287,14 @@
   #ynInputRow{display:flex;gap:8px;align-items:center;margin-bottom:14px;}
   #ynInput{
     -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
-    font:600 16px/1 "Futura","Avenir Next",system-ui,sans-serif;text-align:center;
+    font:600 16px/1 var(--fu);text-align:center;
     width:220px;max-width:62vw;padding:13px 16px;outline:none;
   }
   #ynInput::placeholder{color:var(--muted);}
   #ynOk{border:0;border-radius:999px;background:var(--accent);color:#fff;
-    font:700 15px/1 "Futura","Avenir Next",system-ui,sans-serif;padding:13px 18px;cursor:pointer;}
+    font:700 15px/1 var(--fu);padding:13px 18px;cursor:pointer;}
   #ynValue{
-    font-family:"Georgia","Times New Roman",serif;font-weight:700;line-height:.85;
+    font-family:var(--fd);font-weight:700;line-height:.85;
     font-size:min(28vw,22vh);letter-spacing:-.01em;color:var(--ink);text-align:center;
     transition:opacity .08s ease,transform .12s ease;
   }
@@ -299,7 +302,7 @@
   #ynStage.editing #ynInputRow{position:relative;z-index:61;}
   #ynStage.rolling #ynValue,#ynStage.land #ynValue,#ynStage.holding #ynValue{position:relative;z-index:61;}
   #ynHint{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:24px;min-height:1.2em;white-space:nowrap;
   }
 
@@ -319,12 +322,12 @@
   #rouletteInputRow{display:flex;gap:8px;align-items:center;}
   #rouletteInput{
     -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
-    font:600 15px/1 "Futura","Avenir Next",system-ui,sans-serif;text-align:center;
+    font:600 15px/1 var(--fu);text-align:center;
     width:160px;max-width:52vw;padding:12px 15px;outline:none;
   }
   #rouletteInput::placeholder{color:var(--muted);}
   #rouletteOk{border:0;border-radius:50%;background:var(--accent);color:#fff;width:42px;height:42px;
-    font:700 20px/1 "Futura","Avenir Next",system-ui,sans-serif;cursor:pointer;
+    font:700 20px/1 var(--fu);cursor:pointer;
     display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
   #rouletteOk:disabled,#rouletteInput:disabled{opacity:.4;}
   #rouletteChips{
@@ -333,7 +336,7 @@
   }
   .rouletteChip{
     display:flex;align-items:center;gap:6px;background:var(--chip);color:var(--ink);
-    font:600 12px/1 "Futura","Avenir Next",system-ui,sans-serif;padding:8px 10px 8px 9px;
+    font:600 12px/1 var(--fu);padding:8px 10px 8px 9px;
     border-radius:999px;cursor:pointer;white-space:nowrap;
   }
   .rouletteDot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
@@ -347,18 +350,18 @@
   }
   #rouletteEmpty{
     position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;
-    color:var(--muted);font:600 13px/1.4 "Futura","Avenir Next",system-ui,sans-serif;padding:0 20px;
+    color:var(--muted);font:600 13px/1.4 var(--fu);padding:0 20px;
   }
   #rouletteResult{
     display:flex;align-items:center;gap:10px;margin-top:22px;min-height:40px;
   }
   #rouletteResult .rouletteDot{width:14px;height:14px;}
   #rouletteResultWord{
-    font-family:"Georgia","Times New Roman",serif;font-weight:700;
+    font-family:var(--fu);font-weight:700;
     font-size:min(9vw,34px);color:var(--ink);
   }
   #rouletteHint{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:16px;min-height:1.2em;text-align:center;
   }
 
@@ -379,7 +382,7 @@
     padding:4px 2px;
   }
   .sbBtn svg{width:19px;height:19px;flex:0 0 auto;}
-  .sbBtn .sbLabel{font:600 min(2.5vw,9.5px)/1.1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);text-align:center;}
+  .sbBtn .sbLabel{font:600 min(2.5vw,9.5px)/1.1 var(--fu);color:var(--muted);text-align:center;}
   .sbBtn.active{transform:scale(.92);background:var(--chip-on);}
   .sbBtn.empty{background:transparent;border:1.5px dashed var(--chip);cursor:default;}
   .sbBtn.empty:active{transform:none;}
@@ -394,7 +397,7 @@
     will-change:transform;filter:drop-shadow(0 14px 26px rgba(0,0,0,.28));
   }
   #bottleHint{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:28px;
   }
 
@@ -404,21 +407,21 @@
     position:relative;cursor:pointer;gap:0;padding:0 18px;
   }
   #noiseValue{
-    font-family:"Georgia","Times New Roman",serif;font-weight:700;line-height:1;
+    font-family:var(--fd);font-weight:700;line-height:1;
     font-size:min(30vw,24vh);letter-spacing:-.01em;color:var(--ink);
     font-variant-numeric:lining-nums tabular-nums;font-feature-settings:"lnum" 1,"tnum" 1;
     transition:transform .15s cubic-bezier(.34,1.56,.64,1);
   }
   #noiseUnit{
-    font-family:"Futura","Avenir Next",system-ui,sans-serif;font-weight:700;
+    font-family:var(--fu);font-weight:700;
     font-size:min(7vw,5.5vh);color:var(--muted);margin-left:6px;
   }
   #noiseLabel{
-    font:700 min(5vw,20px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:700 min(5vw,20px)/1 var(--fu);
     margin-top:16px;color:var(--accent);min-height:1.3em;
   }
   #noiseHint{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:22px;
   }
 
@@ -434,7 +437,7 @@
   }
   #rmDot.hit{transform:scale(1.15);background:var(--accent);}
   #rmHint{
-    font:600 min(4.2vw,16px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4.2vw,16px)/1 var(--fu);
     color:var(--muted);margin-top:26px;text-align:center;
   }
 
@@ -454,7 +457,7 @@
   #voiceStage.playing #voiceDot{background:var(--accent);color:#fff;transform:scale(1.06);}
   @keyframes voicePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
   #voiceHint{
-    font:600 min(4.2vw,16px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4.2vw,16px)/1 var(--fu);
     color:var(--muted);margin-top:26px;text-align:center;
   }
 
@@ -473,18 +476,18 @@
   #metroBpmWrap{display:flex;align-items:center;justify-content:center;gap:min(5vw,22px);}
   .metroStep{
     width:min(13vw,52px);height:min(13vw,52px);border-radius:50%;border:0;
-    background:var(--chip);color:var(--ink);font:700 24px/1 "Futura","Avenir Next",system-ui,sans-serif;
+    background:var(--chip);color:var(--ink);font:700 24px/1 var(--fu);
     display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;
     -webkit-tap-highlight-color:transparent;
   }
   #metroBpmNum{
-    font-family:"Georgia","Times New Roman",serif;font-weight:700;
+    font-family:var(--fd);font-weight:700;
     font-size:min(20vw,17vh);line-height:1;letter-spacing:-.02em;min-width:min(38vw,150px);text-align:center;
     color:var(--ink);font-variant-numeric:lining-nums tabular-nums;
     font-feature-settings:"lnum" 1,"tnum" 1;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
   }
   #metroBpmLbl{
-    font:700 min(6vw,22px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:700 min(6vw,22px)/1 var(--fu);
     letter-spacing:.08em;color:var(--accent);margin-top:2px;
   }
   #metroPlayBtn{
@@ -496,7 +499,7 @@
   #metroPlayBtn svg{width:40%;height:40%;}
   #metroPlayBtn.on{transform:scale(1.05);}
   #metroHint{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:14px;
   }
 
@@ -552,11 +555,11 @@
   .die i b{display:block;width:min(6.5vw,26px);height:min(6.5vw,26px);border-radius:50%;
     background:var(--ink);opacity:0;transition:opacity .05s;}
   #diceSum{
-    font:700 min(5vw,20px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:700 min(5vw,20px)/1 var(--fu);
     color:var(--accent);margin-top:18px;min-height:1.2em;font-variant-numeric:tabular-nums;
   }
   #diceHint{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:14px;
   }
 
@@ -603,11 +606,11 @@
   .coinFace.back{transform:rotateY(180deg);}
   .coinEdge{position:absolute;inset:0;border-radius:50%;background:#9d9b8f;}
   #coinResult{
-    font:700 min(5.5vw,22px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:700 min(5.5vw,22px)/1 var(--fu);
     color:var(--accent);margin-top:26px;min-height:1.2em;letter-spacing:.05em;text-transform:uppercase;
   }
   #coinHint{
-    font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 min(4vw,15px)/1 var(--fu);
     color:var(--muted);margin-top:12px;
   }
 
@@ -616,9 +619,9 @@
     flex:1;display:flex;align-items:center;justify-content:center;
     cursor:pointer;text-align:center;padding:0 18px;
   }
-  #colorHex{font-family:"Georgia","Times New Roman",serif;font-weight:700;font-size:min(11vw,52px);letter-spacing:.02em;}
-  #colorRgb{font:600 min(4.4vw,16px)/1 "Futura","Avenir Next",system-ui,sans-serif;margin-top:9px;opacity:.85;letter-spacing:.02em;}
-  #colorHint{font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;margin-top:32px;opacity:.65;}
+  #colorHex{font-family:var(--fd);font-weight:700;font-size:min(11vw,52px);letter-spacing:.02em;}
+  #colorRgb{font:600 min(4.4vw,16px)/1 var(--fu);margin-top:9px;opacity:.85;letter-spacing:.02em;}
+  #colorHint{font:600 min(4vw,15px)/1 var(--fu);margin-top:32px;opacity:.65;}
 
   /* ---- running text ---- */
   #tickerStage{
@@ -629,13 +632,13 @@
   #tickerInputRow{display:flex;gap:8px;align-items:center;}
   #tickerInput{
     -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
-    font:600 16px/1 "Futura","Avenir Next",system-ui,sans-serif;text-align:center;
+    font:600 16px/1 var(--fu);text-align:center;
     width:200px;max-width:62vw;padding:13px 16px;outline:none;
   }
   #tickerInput::placeholder{color:var(--muted);}
   #tickerOk{border:0;border-radius:999px;background:var(--accent);color:#fff;
-    font:700 15px/1 "Futura","Avenir Next",system-ui,sans-serif;padding:13px 18px;cursor:pointer;}
-  #tickerHint{font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);}
+    font:700 15px/1 var(--fu);padding:13px 18px;cursor:pointer;}
+  #tickerHint{font:600 min(4vw,15px)/1 var(--fu);color:var(--muted);}
   #tickerFull{
     position:fixed;inset:0;z-index:80;background:#000;display:none;
     overflow:hidden;cursor:pointer;opacity:0;
@@ -655,7 +658,7 @@
   }
   #tickerRotateHint{
     position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;
-    color:#fff;font:700 min(4.5vw,16px)/1.3 "Futura","Avenir Next",system-ui,sans-serif;text-align:center;
+    color:#fff;font:700 min(4.5vw,16px)/1.3 var(--fu);text-align:center;
   }
   #tickerRotateHint svg{width:52px;height:52px;animation:tickerRotateIcon 1.6s ease-in-out infinite;}
   @keyframes tickerRotateIcon{0%,45%{transform:rotate(0deg);}55%,100%{transform:rotate(-90deg);}}
@@ -670,13 +673,13 @@
   #morseInputRow{display:flex;gap:8px;align-items:center;}
   #morseInput{
     -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
-    font:600 16px/1 "Futura","Avenir Next",system-ui,sans-serif;text-align:center;
+    font:600 16px/1 var(--fu);text-align:center;
     width:220px;max-width:64vw;padding:13px 16px;outline:none;
   }
   #morseInput::placeholder{color:var(--muted);}
   #morseOk{border:0;border-radius:999px;background:var(--accent);color:#fff;
-    font:700 15px/1 "Futura","Avenir Next",system-ui,sans-serif;padding:13px 18px;cursor:pointer;}
-  #morseHint{font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);}
+    font:700 15px/1 var(--fu);padding:13px 18px;cursor:pointer;}
+  #morseHint{font:600 min(4vw,15px)/1 var(--fu);color:var(--muted);}
   #morseFull{
     position:fixed;inset:0;z-index:80;background:#000;display:none;
     cursor:pointer;opacity:0;
@@ -693,13 +696,13 @@
   #qrInputRow{display:flex;gap:8px;align-items:center;}
   #qrInput{
     -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
-    font:600 16px/1 "Futura","Avenir Next",system-ui,sans-serif;text-align:center;
+    font:600 16px/1 var(--fu);text-align:center;
     width:230px;max-width:64vw;padding:13px 16px;outline:none;
   }
   #qrInput::placeholder{color:var(--muted);}
   #qrOk{border:0;border-radius:999px;background:var(--accent);color:#fff;
-    font:700 15px/1 "Futura","Avenir Next",system-ui,sans-serif;padding:13px 18px;cursor:pointer;}
-  #qrHint{font:600 min(4vw,15px)/1 "Futura","Avenir Next",system-ui,sans-serif;color:var(--muted);}
+    font:700 15px/1 var(--fu);padding:13px 18px;cursor:pointer;}
+  #qrHint{font:600 min(4vw,15px)/1 var(--fu);color:var(--muted);}
   #qrStage.shown #qrInputRow,#qrStage.shown #qrHint{display:none;}
   #qrBox{
     position:fixed;inset:0;z-index:62;display:none;flex-direction:column;
@@ -713,7 +716,7 @@
   .qrDlBtn{
     display:flex;align-items:center;gap:8px;border:0;border-radius:999px;
     background:rgba(128,128,128,.16);color:var(--ink);
-    font:600 12.5px/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 12.5px/1 var(--fu);
     padding:11px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;
   }
   .qrSwatch{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--muted);flex:0 0 auto;}
@@ -734,13 +737,13 @@
   .seg{display:flex;background:var(--chip);border-radius:999px;padding:3px;}
   .seg button{
     border:0;background:transparent;color:var(--muted);
-    font:600 14px/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 14px/1 var(--fu);
     padding:9px 16px;border-radius:999px;cursor:pointer;transition:.15s;
   }
   .seg button.on{background:var(--chip-on);color:var(--ink);}
   .chip{
     border:0;border-radius:999px;background:var(--chip);color:var(--muted);
-    font:600 14px/1 "Futura","Avenir Next",system-ui,sans-serif;
+    font:600 14px/1 var(--fu);
     padding:11px 16px;cursor:pointer;transition:.15s;min-width:64px;
   }
   .chip.on{color:var(--ink);}
@@ -771,9 +774,9 @@
     transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);}
   .appnav::-webkit-scrollbar{width:0;height:0;}
   .appnav.open{transform:translateX(0);}
-  .appnav .menuhdr{font:700 11px/1 "Futura","Avenir Next",system-ui,sans-serif;
+  .appnav .menuhdr{font:700 11px/1 var(--fu);
     letter-spacing:.16em;color:var(--muted);padding:0 6px 10px;flex-shrink:0;}
-  .appnav .cathdr{font:700 10.5px/1 "Futura","Avenir Next",system-ui,sans-serif;
+  .appnav .cathdr{font:700 10.5px/1 var(--fu);
     letter-spacing:.14em;color:var(--accent);opacity:.85;padding:0 6px;
     margin-top:14px;margin-bottom:2px;flex-shrink:0;}
   .appnav .cathdr:first-of-type{margin-top:4px;}
@@ -813,16 +816,16 @@
   .appnav.open .appbtn:nth-of-type(30){transition-delay:1.17s;}
   .appnav.open .appbtn:nth-of-type(31){transition-delay:1.21s;}
   .appbtn svg{width:23px;height:23px;display:block;flex:0 0 auto;}
-  .appbtn span{font:600 16px/1 "Futura","Avenir Next",system-ui,sans-serif;letter-spacing:.01em;}
+  .appbtn span{font:600 16px/1 var(--fu);letter-spacing:.01em;}
   .appbtn.on{background:var(--chip-on);color:var(--ink);}
   .titlewrap{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top) + 18px);
     text-align:center;pointer-events:none;padding:0 68px;}
-  .title{margin:0;font-family:"Playfair Display","Georgia",serif;font-style:normal;
-    font-weight:700;font-size:min(7vw,30px);line-height:1.12;text-transform:uppercase;
-    color:var(--ink);letter-spacing:.03em;opacity:.95;
+  .title{margin:0;font-family:var(--fd);font-style:normal;
+    font-weight:800;font-size:26px;line-height:1.15;text-transform:uppercase;
+    color:var(--ink);letter-spacing:.01em;opacity:.95;
     font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1;}
-  .byline{font-family:"Dancing Script","Segoe Script",cursive;font-style:normal;
-    font-weight:600;font-size:min(5.2vw,21px);color:var(--muted);letter-spacing:.01em;margin-top:3px;}
+  .byline{font-family:"Yellowtail","Segoe Script",cursive;font-style:normal;
+    font-weight:400;font-size:min(5.8vw,22px);color:var(--muted);letter-spacing:.02em;margin-top:4px;}
   .titlewrap.oncolor .title,.titlewrap.oncolor .byline{color:var(--ink);opacity:1;}
   .hint{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 84px);
     text-align:center;color:var(--muted);font-size:11px;letter-spacing:.18em;
@@ -870,8 +873,8 @@
   @keyframes dotPop{0%{opacity:0;transform:scale(0);}100%{opacity:1;transform:scale(1);}}
   @keyframes dotRing{0%{opacity:.8;transform:scale(1);}100%{opacity:0;transform:scale(3);}}
   .titlewrap.home .byline{
-    font-family:"Yellowtail","Dancing Script",cursive;font-weight:400;text-align:left;
-    font-size:min(6.2vw,25px);color:var(--ink);letter-spacing:.02em;margin-top:8px;
+    font-family:"Yellowtail","Segoe Script",cursive;font-weight:400;text-align:left;
+    color:var(--ink);margin-top:8px;
     animation:bylineIn 1.2s ease-out 1.15s backwards;
   }
   @keyframes bylineIn{0%{opacity:0;filter:blur(14px);transform:translateY(6px);}100%{opacity:1;filter:blur(0);transform:none;}}
@@ -3957,6 +3960,10 @@
       var te=document.getElementById('title'); te.style.fontSize='24px';
       var cw=te.getBoundingClientRect().width||1, avail=Math.max(120,W-100);
       te.style.fontSize=Math.max(14,Math.min(36,24*avail/cw))+'px';
+    }
+    else{
+      var tt=document.getElementById('title'), sz=28; tt.style.fontSize=sz+'px';
+      while(sz>13 && (tt.scrollWidth>tt.clientWidth+1 || tt.offsetHeight>sz*2.5)){ sz--; tt.style.fontSize=sz+'px'; }
     }
     var top=tw.getBoundingClientRect().bottom+8;
     var ur=ub.getBoundingClientRect();

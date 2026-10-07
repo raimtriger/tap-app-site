@@ -1,6 +1,6 @@
 // TAP APP — service worker: офлайн-кэш + быстрые повторные заходы
 // Если захочешь сбросить весь кэш у всех пользователей — просто поменяй 'v1' на 'v2' и т.д.
-const CACHE_NAME = 'tapapp-v1';
+const CACHE_NAME = 'tapapp-v3';
 const CORE_ASSETS = ['/', '/index.html'];
 
 self.addEventListener('install', function(event){

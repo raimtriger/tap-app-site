@@ -285,7 +285,7 @@
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
     position:relative;cursor:pointer;gap:0;padding:0 18px;
   }
-  #ynInputRow{display:flex;gap:8px;align-items:center;margin-bottom:14px;}
+  #ynInputRow{display:flex;gap:8px;align-items:center;margin-bottom:0;}
   #ynInput{
     -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
     font:600 16px/1 var(--fu);text-align:center;
@@ -299,12 +299,13 @@
     font-size:min(28vw,22vh);letter-spacing:-.01em;color:var(--ink);text-align:center;
     transition:opacity .08s ease,transform .12s ease;
   }
+  #ynValue{position:relative;white-space:nowrap;}
   #ynStage.rolling #ynValue{opacity:.9;}
   #ynStage.editing #ynInputRow{position:relative;z-index:61;}
   #ynStage.rolling #ynValue,#ynStage.land #ynValue,#ynStage.holding #ynValue{position:relative;z-index:61;}
   #ynHint{
     font:600 min(4vw,15px)/1 var(--fu);
-    color:var(--muted);margin-top:24px;min-height:1.2em;white-space:nowrap;
+    color:var(--muted);margin-top:0;min-height:1.2em;white-space:nowrap;
   }
 
   /* ---- roulette ---- */
@@ -317,7 +318,7 @@
   .rouletteSlice{transition:opacity .5s ease,filter .5s ease;opacity:1;filter:blur(0);}
   .rouletteSlice.enter{opacity:0;filter:blur(7px);}
   /* порядок сверху вниз: круг → результат → подсказка → слова → поле ввода (прижато вниз) */
-  #rouletteWheelBox{position:relative;flex:0 0 auto;margin-top:14px;width:var(--rlSize,200px);height:var(--rlSize,200px);}
+  #rouletteWheelBox{position:relative;flex:0 0 auto;margin-top:40px;width:var(--rlSize,200px);height:var(--rlSize,200px);}
   #rouletteWheelBox::before{content:"";position:absolute;inset:0;border-radius:50%;background:var(--chip);}
   #rouletteWheelWrap{width:100%;height:100%;will-change:transform;}
   #rouletteWheelWrap svg{width:100%;height:100%;display:block;}
@@ -355,7 +356,8 @@
     border-radius:999px;cursor:pointer;white-space:nowrap;
   }
   .rouletteDot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
-  #rouletteInputRow{flex:0 0 auto;display:flex;gap:8px;align-items:center;margin-top:16px;}
+  #rouletteInputRow{flex:0 0 auto;display:flex;gap:8px;align-items:center;margin-top:37px;}
+  @media (max-height:520px){#rouletteWheelBox{margin-top:14px;}#rouletteInputRow{margin-top:16px;}}
   #rouletteInput{
     -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
     font:600 15px/1 var(--fu);text-align:center;
@@ -671,7 +673,7 @@
     position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;
     color:#fff;font:700 min(4.5vw,16px)/1.3 var(--fu);text-align:center;
   }
-  #tickerRotateHint svg{width:52px;height:52px;animation:tickerRotateIcon 1.6s ease-in-out infinite;}
+  #tickerRotateHint svg{width:22px;height:42px;animation:tickerRotateIcon 1.6s ease-in-out infinite;}
   @keyframes tickerRotateIcon{0%,45%{transform:rotate(0deg);}55%,100%{transform:rotate(-90deg);}}
   #editLock.strong{backdrop-filter:blur(16px) saturate(.82);-webkit-backdrop-filter:blur(16px) saturate(.82);}
 
@@ -760,13 +762,14 @@
   .chip.on{color:var(--ink);}
   .chip.acc.on{color:var(--accent);}
   /* hamburger button (top-right) */
-  #menuBtn{position:fixed;top:calc(env(safe-area-inset-top) + 18px);
+  #menuBtn{position:fixed;top:calc(env(safe-area-inset-top) + 10px);
     right:calc(env(safe-area-inset-right) + 16px);z-index:64;
     width:44px;height:44px;border:0;border-radius:50%;background:var(--chip);
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:4.5px;cursor:pointer;transition:background .15s;}
   #menuBtn span{display:block;width:18px;height:2px;border-radius:2px;background:var(--ink);
     transition:transform .28s cubic-bezier(.4,0,.2,1),opacity .2s ease;}
+  #menuBtn.locked{pointer-events:none;opacity:.3;}
   #menuBtn.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
   #menuBtn.open span:nth-child(2){opacity:0;}
   #menuBtn.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
@@ -835,6 +838,7 @@
   .title{margin:0;font-family:var(--fd);font-style:normal;
     font-weight:800;font-size:26px;line-height:1.15;text-transform:uppercase;
     color:var(--ink);letter-spacing:.01em;opacity:.95;
+    padding:.3em 0 .12em;margin:-.3em 0 -.12em;
     font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1;}
   .titlewrap.oncolor .title{color:var(--ink);opacity:1;}
   .hint{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 84px);
@@ -906,7 +910,7 @@
   @media (max-height:520px){
       .titlewrap{top:calc(env(safe-area-inset-top) + 8px);}
     .title{font-size:20px;}
-    #menuBtn{top:calc(env(safe-area-inset-top) + 6px);}
+    #menuBtn{top:calc(env(safe-area-inset-top) + 0px);}
     .utilbar{left:auto;right:calc(env(safe-area-inset-right) + 14px);top:50%;bottom:auto;
       transform:translateY(-50%);flex-direction:column;}
     #bar{bottom:calc(env(safe-area-inset-bottom) + 10px);}
@@ -960,7 +964,7 @@
       <span>Орёл или решка</span>
     </button>
     <button class="appbtn" data-app="roulette" aria-label="Рулетка выбора">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6.2 3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 12V3M12 12l7.8-4.5M12 12l7.8 4.5M12 12v9M12 12l-7.8 4.5M12 12L4.2 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>Рулетка выбора</span>
     </button>
     <button class="appbtn" data-app="sb" aria-label="Саундборд">
@@ -1040,7 +1044,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
       <span>Точное время</span>
     </button>
-    <div class="cathdr">СОЦСЕТИ</div>
+    <div class="cathdr">СОЦСЕТИ АВТОРА</div>
     <a class="appbtn" href="https://instagram.com/raimtriger" target="_blank" rel="noopener" aria-label="Instagram">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" stroke="none"/></svg>
       <span>Instagram</span>
@@ -1287,7 +1291,7 @@
 
   <div id="tickerFull">
     <div id="tickerRotateHint">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+      <svg viewBox="0 0 1034 2000" fill="currentColor" fill-rule="evenodd"><path d="M150 0H884Q1034 0 1034 150V1850Q1034 2000 884 2000H150Q0 2000 0 1850V150Q0 0 150 0ZM145 67Q67 67 67 146V1854Q67 1933 146 1933H888Q967 1933 967 1854V146Q967 67 888 67H777Q751 67 746 92L740 122Q733 160 693 160H347Q307 160 300 122L293 92Q288 67 263 67Z"/></svg>
       <div>Поверни телефон</div>
     </div>
     <div id="tickerRotate">
@@ -1799,7 +1803,7 @@
   function stopTimer(){
     tmRunning=false;
     if(tmRaf) cancelAnimationFrame(tmRaf);
-    var el=performance.now()-tmStart;
+    var el=Math.floor((performance.now()-tmStart)/10)*10;   // как на экране: сотые без округления вверх
     tmTime.textContent=fmtTime(el);
     var diff=el-TARGET;
     tmDiff.textContent=(diff>=0?'+':'−')+(Math.abs(diff)/1000).toFixed(2)+' с';
@@ -1969,7 +1973,7 @@
     numValue.style.transition='';
     numValue.style.transform='scale(1)';
     numHint.textContent='Крутим…';
-    var DUR=3500;
+    var DUR=7000;
     if(numSpinSrc){ try{numSpinSrc.stop();}catch(e){} numSpinSrc=null; }
     if(prizBuf) numSpinSrc=playBufNode(prizBuf); else playDrumRoll(DUR/1000);
     var start=performance.now();
@@ -2045,7 +2049,7 @@
     editLock.classList.add('on');
     ynValue.style.transition=''; ynValue.style.transform='scale(1)';
     ynHint.textContent='Спрашиваем…';
-    var DUR=5000;
+    var DUR=7000;
     if(ynSpinSrc){ try{ynSpinSrc.stop();}catch(e){} ynSpinSrc=null; }
     if(yesnoBuf) ynSpinSrc=playBufNode(yesnoBuf); else if(prizBuf) ynSpinSrc=playBufNode(prizBuf); else playDrumRoll(DUR/1000);
     var start=performance.now();
@@ -2107,13 +2111,14 @@
   var rouletteOk=document.getElementById('rouletteOk');
   var rouletteChips=document.getElementById('rouletteChips');
   var rouletteWheelWrap=document.getElementById('rouletteWheelWrap');
+  var rouletteWheelBox=document.getElementById('rouletteWheelBox');
   var rouletteWheelSvg=document.getElementById('rouletteWheel');
   var rouletteEmpty=document.getElementById('rouletteEmpty');
   var rouletteResult=document.getElementById('rouletteResult');
   var rouletteHint=document.getElementById('rouletteHint');
   var ROULETTE_PAL=['#e0a85e','#3d9e6f','#4a86c9','#c9574a','#9a5ac9','#4ac9b8','#c94a94','#8a8f3f'];
   var rouletteWords=[], rouletteEditing=false, rouletteSpinning=false, rouletteRotation=0, rouletteLastN=0;
-  var ROULETTE_DUR=3600;
+  var ROULETTE_DUR=7000;
 
   function setRouletteEditing(on){
     rouletteEditing=on;
@@ -2230,8 +2235,11 @@
     if(!prizBuf) playDrumRoll(ROULETTE_DUR/1000);
     rouletteWheelWrap.style.transition='transform '+(ROULETTE_DUR/1000)+'s cubic-bezier(.17,.67,.2,1)';
     rouletteWheelWrap.style.transform='rotate('+rouletteRotation+'deg)';
+    rouletteWheelBox.style.transition='transform '+(ROULETTE_DUR/1000)+'s cubic-bezier(.3,.1,.3,1)';
+    rouletteWheelBox.style.transform='scale(1.07)';
     setTimeout(function(){
       rouletteSpinning=false;
+      rouletteWheelBox.style.transition='transform .8s ease'; rouletteWheelBox.style.transform='scale(1)';
       if(spinSrc){ try{spinSrc.stop();}catch(e){} }
       if(prizEndBuf) playBuf(prizEndBuf); else numAccent();
       celebrate(true);
@@ -2248,6 +2256,7 @@
     rouletteStage.classList.remove('spinning');
     editLock.classList.remove('on'); editLock.style.transition='';
     rouletteWheelWrap.style.transition='';
+    rouletteWheelBox.style.transition=''; rouletteWheelBox.style.transform='';
     rouletteUpdateHint();
   }
   rouletteRenderChips(); rouletteBuildWheel(); rouletteUpdateOkState(); rouletteUpdateHint();
@@ -3836,7 +3845,9 @@
     menuOverlay.classList.toggle('open',open);
     appnav.classList.toggle('open',open);
   }
-  menuBtn.addEventListener('click',function(e){e.stopPropagation();setMenu(!appnav.classList.contains('open'));});
+  function menuLocked(){ return !!(numRolling||ynRolling||rouletteSpinning); }
+  setInterval(function(){ var l=menuLocked(); if(menuBtn.classList.contains('locked')!==l) menuBtn.classList.toggle('locked',l); },80);
+  menuBtn.addEventListener('click',function(e){e.stopPropagation(); if(menuLocked()) return; setMenu(!appnav.classList.contains('open'));});
   menuOverlay.addEventListener('click',function(e){e.stopPropagation();setMenu(false);});
 
   document.querySelectorAll('#appnav button').forEach(function(b){
@@ -3999,7 +4010,7 @@
     var cs=getComputedStyle(rouletteStage);
     var avail=rouletteStage.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
     // под кругом резервируем: результат + подсказка + слова (мин. 2 ряда) + поле ввода
-    var reserve=14+16+40+10+16+14+68+12+44+6;
+    var reserve=(innerHeight<=520?14+16:40+37)+40+10+16+14+68+12+44+6;
     var size=Math.max(110,Math.min(230,innerWidth*0.58,avail-reserve));
     document.documentElement.style.setProperty('--rlSize',Math.round(size)+'px');
   }
@@ -4033,7 +4044,22 @@
     root.style.setProperty('--padT',Math.round(padT)+'px');
     root.style.setProperty('--padB',Math.round(padB)+'px');
     root.style.setProperty('--padX',Math.round(padX)+'px');
-    fitRoulette();
+    fitRoulette(); ynCenter();
+  }
+  function ynCenter(){
+    try{
+      var el=document.getElementById('ynValue'); if(!el||el.offsetParent===null&&getComputedStyle(el).display==='none'){ if(!el) return; }
+      var cs=getComputedStyle(el), fs=parseFloat(cs.fontSize)||60;
+      var c=document.createElement('canvas').getContext('2d');
+      c.font=cs.fontWeight+' '+fs+'px '+cs.fontFamily;
+      var m=c.measureText('НЕТ');
+      var fa=m.fontBoundingBoxAscent, fd=m.fontBoundingBoxDescent, cap=m.actualBoundingBoxAscent;
+      if(!(fa>0&&cap>0)) return;
+      var G=Math.max(22,Math.round(fs*0.30));
+      var h=Math.round(cap+2*G);
+      el.style.height=h+'px'; el.style.lineHeight=h+'px';
+      el.style.top=((fd-fa)/2+cap/2).toFixed(1)+'px';
+    }catch(e){}
   }
   function layoutSoon(){ if(fitRaf) return; fitRaf=requestAnimationFrame(function(){ fitRaf=0; layoutFit(); }); }
   window.addEventListener('resize',layoutSoon);

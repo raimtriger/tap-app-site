@@ -4026,7 +4026,7 @@
     }
     else{
       var tt=document.getElementById('title'), sz=28; tt.style.fontSize=sz+'px';
-      while(sz>13 && (tt.scrollWidth>tt.clientWidth+1 || tt.offsetHeight>sz*2.5)){ sz--; tt.style.fontSize=sz+'px'; }
+      while(sz>13 && (tt.scrollWidth>tt.clientWidth+1 || tt.offsetHeight-sz*0.42>sz*2.5)){ sz--; tt.style.fontSize=sz+'px'; }
     }
     var top=tw.getBoundingClientRect().bottom+8;
     var ur=ub.getBoundingClientRect();

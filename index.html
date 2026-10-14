@@ -51,7 +51,7 @@
   'слово':'word','Тапни — новое слово':'Tap for a new word','Максимум':'Maximum','от 1 до …':'from 1 to …','Тапни — крутить':'Tap to spin','Тапни — число':'Tap for a number','Тапни — новое число':'Tap for a new number','Тапни — дальше':'Tap to continue','Крутим…':'Spinning…',
   'Задай вопрос':'Ask a question','Вопрос':'Question','ОК':'OK','Впиши вопрос и жми ОК':'Type a question and press OK','Спрашиваем…':'Asking…','Тапни — спросить снова':'Tap to ask again','ДА':'YES','НЕТ':'NO',
   'Добавь хотя бы 2 варианта':'Add at least 2 options','Вариант':'Option','Добавить':'Add','Добавь варианты и крути рулетку':'Add options and spin the roulette','Тапни колесо — крутить':'Tap the wheel to spin','Максимум 8 — тапни колесо':'Max 8 — tap the wheel',
-  'Барабанная дробь':'Drum roll','Дробь':'Drum roll','Победа':'Victory','Смех':'Laugh','Ууууу':'Boooo','Облом':'Fail','Овация':'Applause','Верно':'Correct','Ошибка':'Wrong','Восторг':'Cheer','Мяу':'Meow','Испуг':'Scare',
+  'Барабанная дробь':'Drum roll','Дробь':'Drum roll','Победа':'Victory','Смех':'Laugh','Ууууу':'Boooo','Облом':'Fail','Овация':'Applause','Верно':'Correct','Ошибка':'Wrong','Восторг':'Cheer','Мяу':'Meow','Пук':'Toot','Испуг':'Scare',
   'Бутылка':'Bottle','Крути, а не тапай':"Spin, don't tap",'Тапни — измерить шум':'Tap to measure noise','Тапни — измерить снова':'Tap to measure again','дБ':'dB','Тихо':'Quiet','Тишина':'Silence','Нормально':'Normal','Шумно':'Loud','Очень шумно':'Very loud','Оглушительно':'Deafening',
   'Тапни 4 раза, чтобы задать ритм':'Tap 4 times to set the rhythm','Зажми и говори':'Hold and speak','Говори…':'Speak…','Слушай…':'Listen…','Обрабатываю…':'Processing…','Не получилось, попробуй ещё раз':"Didn't work, try again",'Запись не поддерживается':'Recording is not supported','Звук выключен':'Sound is off',
   'Бас':'Bass','Монстр':'Monster','Бурундук':'Chipmunk','Робот':'Robot','Эхо':'Echo','Космос':'Space',
@@ -1307,7 +1307,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5" stroke-width="2.2"/><circle cx="12" cy="16.3" r="1.1" fill="currentColor" stroke="none"/></svg>
         <span class="sbLabel">Испуг</span>
       </button>
-      <button class="sbBtn empty" aria-hidden="true" tabindex="-1"></button>
+      <button class="sbBtn" data-snd="fart" aria-label="Пук">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20.5c-1.7-.4-2.5-1.4-2.5-2.7 0-1.6 1.7-2.5 3-2.5h10c1.3 0 3 .9 3 2.5 0 1.3-.8 2.3-2.5 2.7z"/><path d="M7.8 15.3c-.2-1.7 1.2-3.2 3-3.2h2.4c1.8 0 3.2 1.5 3 3.2"/><path d="M10 12.1c-.1-1.3.8-2.2 1.8-2.9.9-.6 1-1.5.5-2.4 1.9.2 3.2 1.7 2.6 3.2-.3.7-.8 1.2-.8 2.1"/><path d="M5 7.5c1-1 0-1.8.8-2.8M19 8c1-.9 0-1.7.8-2.6" stroke-width="1.5"/></svg>
+        <span class="sbLabel">Пук</span>
+      </button>
     </div>
   </div>
 
@@ -1631,6 +1634,7 @@
         loadClip('assets/SB_AIRHORN.mp3',function(b){sbBuf.airhorn=b;});
         loadClip('assets/UUUUU.mp3',function(b){sbBuf.crowd=b;});
         loadClip('assets/CAT.mp3',function(b){sbBuf.cat=b;});
+        loadClip('assets/FART.mp3',function(b){sbBuf.fart=b;});
       }
     };
     if(jobs[group]) jobs[group]();
@@ -1654,8 +1658,16 @@
     }
     silentLoop=new Audio(silentWav()); silentLoop.loop=true; silentLoop.setAttribute('playsinline','');
   }
+  function audioReady(cb, rec){   // iOS: после записи микрофона звук уходит в «трубку»/глохнет — возвращаем режим воспроизведения
+    try{ if(navigator.audioSession) navigator.audioSession.type = rec ? 'play-and-record' : 'playback'; }catch(e){}
+    if(AC && AC.state!=='running'){
+      var done=false, go=function(){ if(done) return; done=true; cb(); };
+      try{ var pr=AC.resume(); if(pr&&pr.then) pr.then(go,go); else go(); }catch(e){ go(); }
+      setTimeout(go,300);
+    } else cb();
+  }
   function ensureAC(){            // first user gesture
-    if(AC && AC.state==='suspended') AC.resume();
+    if(AC && AC.state!=='running' && AC.state!=='closed') AC.resume();
     if(silentLoop && !started){ started=true; var p=silentLoop.play(); if(p&&p.catch) p.catch(function(){}); }
   }
   function play(n){
@@ -2773,10 +2785,10 @@
   function voicePlay(buf){
     voiceLast=buf;
     voiceStage.classList.remove('recording');
-    if(!soundOn){ voiceHint.textContent='Звук выключен'; voiceBusy=false; return; }
+    try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(e){}
     voiceHalt();
     var tok=voiceTok, pr=VOICE_FX[voicePitch]||VOICE_FX.chip;
-    ensureAC();
+    ensureAC(); if(AC&&AC.state!=='running'){ try{ AC.resume(); }catch(e){} }
     voiceStage.classList.add('playing');
     voiceHint.textContent='Слушай…';
     var out=AC.createGain(); out.gain.value=1.7; out.connect(AC.destination);
@@ -2831,6 +2843,7 @@
     if(voiceBusy) return;
     ensureAC(); voiceHalt();
     voiceBusy=true; voiceHeld=true;
+    try{ if(navigator.audioSession) navigator.audioSession.type='play-and-record'; }catch(e){}
     voiceEnsureMic(function(){
       if(!voiceMicStream){ voiceBusy=false; return; }
       if(!voiceHeld){ voiceBusy=false; voiceHint.textContent='Зажми и говори'; return; }
@@ -2881,7 +2894,7 @@
   document.querySelectorAll('#voiceTiles button').forEach(function(b){
     b.addEventListener('click',function(e){
       e.stopPropagation(); setVoicePitch(b.dataset.vp);
-      if(voiceLast && !voiceRecording && soundOn){ voiceBusy=true; voicePlay(voiceLast); }
+      if(voiceLast && !voiceRecording){ voiceBusy=true; voicePlay(voiceLast); }
     });
   });
   setVoicePitch('chip');
@@ -2907,6 +2920,7 @@
     if(revMicStream){ revMicStream.getTracks().forEach(function(t){t.stop();}); revMicStream=null; }
   }
   function revStopPlayback(){
+    revPlayTok++;
     if(revSrc){ try{ revSrc.stop(); }catch(e){} revSrc=null; }
     revPlayBtn.classList.remove('active');
     revReverseBtn.classList.remove('active');
@@ -2946,6 +2960,7 @@
     revBusy=true;
     revWantStop=false;
     revStopPlayback();
+    try{ if(navigator.audioSession) navigator.audioSession.type='play-and-record'; }catch(e){}
     navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
       revDenied=false; revMicStream=stream; revMicPrimed=true;
       if(revWantStop){            // палец отпустили, пока висел запрос разрешения — запись не начинаем
@@ -2959,6 +2974,7 @@
         revRecording=false;
         revRecordBtn.classList.remove('recording');
         revStopMic();
+        try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(e){}
         var dur=performance.now()-revRecStartT;
         if(dur<REV_MIN_MS || !revChunks.length){
           revBusy=false; return;
@@ -3000,9 +3016,17 @@
   }
   function revPlayBuffer(buf, btn){
     if(!buf) return;
-    if(!soundOn){ return; }
     ensureAC();
     revStopPlayback();
+    var tok=++revPlayTok;
+    btn.classList.add('active'); revStage.classList.add('focus');
+    audioReady(function(){
+      if(tok!==revPlayTok) return;                 // кнопку уже отпустили
+      revPlayNow(buf,btn);
+    });
+  }
+  var revPlayTok=0;
+  function revPlayNow(buf, btn){
     var src=AC.createBufferSource();
     src.buffer=buf;
     var revGain=AC.createGain();

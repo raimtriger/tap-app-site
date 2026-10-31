@@ -822,6 +822,7 @@
   #dlGo:disabled{opacity:.45;}
   #dlPaste{border:0;border-radius:999px;background:var(--chip);color:var(--ink);
     font:600 13px/1 var(--fu);padding:10px 16px;cursor:pointer;}
+  .igNote{font:500 10.5px/1.35 var(--fu);color:var(--muted);opacity:.8;text-align:center;max-width:420px;padding:8px 14px 0;}
   #dlHint{font:600 min(4vw,15px)/1.3 var(--fu);color:var(--muted);text-align:center;max-width:420px;min-height:1.3em;}
   #dlProg{width:min(100%,420px);height:4px;border-radius:2px;background:var(--chip);overflow:hidden;opacity:0;transition:opacity .25s;}
   #dlStage.busy #dlProg{opacity:1;}
@@ -1194,12 +1195,13 @@
     <div class="cathdr">СОЦСЕТИ АВТОРА</div>
     <a class="appbtn" href="https://instagram.com/raimtriger" target="_blank" rel="noopener" aria-label="Instagram">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" stroke="none"/></svg>
-      <span>Instagram</span>
+      <span>Instagram*</span>
     </a>
     <a class="appbtn" href="https://t.me/raimtrigeroff" target="_blank" rel="noopener" aria-label="Telegram">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.1 4.6 1.9 12.4c-.8.3-.8 1.4 0 1.7l5.3 1.7 2 6.3c.2.5.9.6 1.3.2l2.8-2.7 5.2 3.8c.5.3 1.2.1 1.3-.5l3.9-17.5c.2-.7-.5-1.3-1.1-1z"/></svg>
       <span>Telegram</span>
     </a>
+    <div class="igNote">* Instagram — запрещённая социальная сеть на территории Российской Федерации</div>
     <div class="cathdr">ЯЗЫК</div>
     <a class="appbtn" href="#" id="langToggle" aria-label="Language">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>
@@ -1487,7 +1489,8 @@
       <button id="dlGo">Найти</button>
     </div>
     <button id="dlPaste">Вставить из буфера</button>
-    <div id="dlHint">Instagram · TikTok · YouTube · VK</div>
+    <div id="dlHint">Instagram* · TikTok · YouTube · VK</div>
+    <div id="dlNote" class="igNote">* Instagram — запрещённая социальная сеть на территории Российской Федерации</div>
     <div id="dlProg"><i></i></div>
     <div id="dlResult">
       <div id="dlVideoWrap"><video id="dlVideo" controls playsinline preload="metadata"></video></div>
@@ -3935,7 +3938,7 @@
       dlResult=document.getElementById('dlResult'), dlVideo=document.getElementById('dlVideo'),
       dlSave=document.getElementById('dlSave'), dlSaveTxt=document.getElementById('dlSaveTxt'),
       dlAlt=document.getElementById('dlAlt'), dlNew=document.getElementById('dlNew');
-  var DL_HINT='Instagram · TikTok · YouTube · VK';
+  var DL_HINT='Instagram* · TikTok · YouTube · VK';
   var dlBusy=false, dlBlobUrl=null, dlFile=null, dlAbort=null;
   var dlIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   function dlCanShare(){ try{ return !!(dlFile&&navigator.canShare&&navigator.canShare({files:[dlFile]})); }catch(_){ return false; } }

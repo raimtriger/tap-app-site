@@ -39,12 +39,12 @@
   'Да / Нет':'Yes / No','Бутылочка':'Spin the bottle','Кубик':'Dice','Орёл или решка':'Heads or tails','Рулетка выбора':'Choice roulette','Саундборд':'Soundboard',
   'Случайное слово':'Random word','10 секунд':'10 seconds','Реверс аудио':'Reverse audio','Случайная нота':'Random note','Цвет':'Color','Случайный цвет':'Random color',
   'BPM кликер':'BPM clicker','Метроном':'Metronome','Прямая бочка':'Four on the floor','Изменитель голоса':'Voice changer','Тюнер':'Tuner','Счётчик':'Counter',
-  'Случайное число':'Random number','Генератор QR':'QR generator','Бегущая строка':'Scrolling text','Фонарик Морзе':'Morse flashlight','Уровень шума':'Noise meter','Точное время':'Exact time',
+  'Случайное число':'Random number','Генератор QR':'QR generator','Скачать видео':'Save video','Ссылка на видео':'Video link','Найти':'Find','Вставить из буфера':'Paste from clipboard','Сохранить в галерею':'Save to gallery','Скачать файлом':'Download file','Поделиться':'Share','Другая ссылка':'Another link','Ищу видео…':'Looking for the video…','Качаю…':'Downloading…','Нужна ссылка на видео':'A video link is needed','Сохранить в «Файлы»':'Save to Files','Готово! Нажми и выбери «Сохранить видео»':'Done! Tap and choose “Save Video”','Готово!':'Done!','Слишком часто — подожди минуту':'Too many requests — wait a minute','Ролик закрытый или нужен вход':'Private video or login required','Ролик недоступен или удалён':'Video unavailable or removed','Эта ссылка не поддерживается':'This link is not supported','Эта соцсеть пока не поддерживается':'This network is not supported yet','Соцсеть не отдала видео — попробуй позже':'The network did not return the video — try later','Не получилось скачать — попробуй другую ссылку':'Could not download — try another link','Не получилось скачать — попробуй позже':'Could not download — try later','Сервер не отвечает — попробуй позже':'Server is not responding — try later','В этом посте только фото':'This post has only photos','Это видео пока не поддерживается':'This video is not supported yet','Файл скачан — ищи в галерее или «Загрузках»':'File saved — check your gallery or Downloads','Буфер пустой':'Clipboard is empty','Вставь ссылку долгим нажатием в поле':'Long-press the field to paste the link','Бегущая строка':'Scrolling text','Фонарик Морзе':'Morse flashlight','Уровень шума':'Noise meter','Точное время':'Exact time',
   'Да или Нет':'Yes or No','Сменить тему':'Switch theme','Звук':'Sound',
   'ДА ИЛИ НЕТ':'YES OR NO','БУТЫЛОЧКА':'SPIN THE BOTTLE','КУБИК':'DICE','ОРЁЛ ИЛИ РЕШКА':'HEADS OR TAILS','РУЛЕТКА ВЫБОРА':'CHOICE ROULETTE','САУНДБОРД':'SOUNDBOARD',
   'СЛУЧАЙНОЕ СЛОВО':'RANDOM WORD','10 СЕКУНД':'10 SECONDS','РЕВЕРС АУДИО':'REVERSE AUDIO','СЛУЧАЙНАЯ НОТА':'RANDOM NOTE','СЛУЧАЙНЫЙ ЦВЕТ':'RANDOM COLOR','BPM КЛИКЕР':'BPM CLICKER',
   'МЕТРОНОМ':'METRONOME','РИТМ-МАШИНА':'DRUM MACHINE','ИЗМЕНИТЕЛЬ ГОЛОСА':'VOICE CHANGER','ТЮНЕР':'TUNER','СЧЁТЧИК':'COUNTER','СЛУЧАЙНОЕ ЧИСЛО':'RANDOM NUMBER',
-  'ГЕНЕРАТОР QR':'QR GENERATOR','БЕГУЩАЯ СТРОКА':'SCROLLING TEXT','ФОНАРИК МОРЗЕ':'MORSE FLASHLIGHT','УРОВЕНЬ ШУМА':'NOISE METER','ТОЧНОЕ ВРЕМЯ':'EXACT TIME',
+  'ГЕНЕРАТОР QR':'QR GENERATOR','СКАЧАТЬ ВИДЕО':'SAVE VIDEO','БЕГУЩАЯ СТРОКА':'SCROLLING TEXT','ФОНАРИК МОРЗЕ':'MORSE FLASHLIGHT','УРОВЕНЬ ШУМА':'NOISE METER','ТОЧНОЕ ВРЕМЯ':'EXACT TIME',
   'Тапни по мне 3 раза':'Tap me 3 times','Тапни — случайная нота':'Tap for a random note','Тапай в ритм':'Tap to the beat','Медленнее':'Slower','Быстрее':'Faster','Старт/стоп':'Start/stop',
   'Тапни — старт':'Tap to start','Тапни — стоп':'Tap to stop','Тапни +1':'Tap +1','цель: 10.00 с':'target: 10.00 s','Тапни — заново':'Tap to retry','Сброс рекорда':'Reset record','Сброс':'Reset',
   'Тапни — включить микрофон':'Tap to turn on the mic','Слушаю…':'Listening…','Запрашиваю доступ…':'Requesting access…','Разреши доступ к микрофону…':'Allow microphone access…','Микрофон недоступен':'Microphone unavailable','Нет доступа к микрофону':'No microphone access',
@@ -481,6 +481,10 @@
   .sbBtn svg{width:19px;height:19px;flex:0 0 auto;}
   .sbBtn .sbLabel{font:600 min(2.5vw,9.5px)/1.1 var(--fu);color:var(--muted);text-align:center;}
   .sbBtn.active{transform:scale(.92);background:var(--chip-on);}
+  /* полоса проигрывания звука: заполняется от начала до конца */
+  #sbBar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 66px);
+    width:min(420px,calc(100% - 32px));height:5px;border-radius:3px;background:var(--chip);overflow:hidden;pointer-events:none;}
+  #sbBar i{display:block;height:100%;background:var(--ink);border-radius:3px;transform:scaleX(0);transform-origin:left center;}
   .sbBtn.empty{background:transparent;border:1.5px dashed var(--chip);cursor:default;}
   .sbBtn.empty:active{transform:none;}
 
@@ -801,6 +805,39 @@
   }
   #morseFull.show{display:block;}
   #morseFull.on{background:#fff;}
+
+  /* ---- video downloader ---- */
+  #dlStage{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:14px;padding:0 18px;
+  }
+  #dlInputRow{display:flex;gap:8px;align-items:center;width:100%;max-width:420px;}
+  #dlInput{
+    -webkit-appearance:none;appearance:none;background:var(--chip);color:var(--ink);border:0;border-radius:999px;
+    font:600 16px/1 var(--fu);min-width:0;flex:1;padding:14px 16px;outline:none;text-overflow:ellipsis;
+  }
+  #dlInput::placeholder{color:var(--muted);}
+  #dlGo{border:0;border-radius:999px;background:var(--accent);color:#fff;
+    font:700 15px/1 var(--fu);padding:14px 18px;cursor:pointer;flex:0 0 auto;}
+  #dlGo:disabled{opacity:.45;}
+  #dlPaste{border:0;border-radius:999px;background:var(--chip);color:var(--ink);
+    font:600 13px/1 var(--fu);padding:10px 16px;cursor:pointer;}
+  #dlHint{font:600 min(4vw,15px)/1.3 var(--fu);color:var(--muted);text-align:center;max-width:420px;min-height:1.3em;}
+  #dlProg{width:min(100%,420px);height:4px;border-radius:2px;background:var(--chip);overflow:hidden;opacity:0;transition:opacity .25s;}
+  #dlStage.busy #dlProg{opacity:1;}
+  #dlProg i{display:block;height:100%;width:100%;background:var(--ink);transform:scaleX(0);transform-origin:left center;}
+  #dlStage.indet #dlProg i{width:35%;transform:none;animation:dlSlide 1.1s ease-in-out infinite;}
+  @keyframes dlSlide{0%{margin-left:-35%;}100%{margin-left:100%;}}
+  #dlResult{display:none;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:420px;}
+  #dlVideoWrap{border-radius:18px;overflow:hidden;background:var(--chip);display:flex;justify-content:center;max-width:100%;}
+  #dlVideo{display:block;max-width:100%;max-height:min(44vh,420px);background:#000;}
+  #dlSave{display:flex;align-items:center;gap:10px;border:0;border-radius:999px;background:var(--accent);color:#fff;
+    font:700 16px/1 var(--fu);padding:16px 28px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  #dlSave svg{width:20px;height:20px;}
+  #dlAlt{border:0;background:none;color:var(--muted);font:600 13px/1 var(--fu);padding:8px 12px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+  #dlStage.done #dlInputRow,#dlStage.done #dlPaste{display:none;}
+  #dlNew{display:none;}
+  #dlStage.done #dlNew{display:block;}
 
   /* ---- qr code ---- */
   #qrStage{
@@ -1134,6 +1171,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20v.01"/></svg>
       <span>Генератор QR</span>
     </button>
+    <button class="appbtn" data-app="dl" aria-label="Скачать видео">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 7.5v5M9.8 10.6l2.2 2.2 2.2-2.2M8 20h8"/></svg>
+      <span>Скачать видео</span>
+    </button>
     <button class="appbtn" data-app="ticker" aria-label="Бегущая строка">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 14V9.5L9 12l2-2.5V14M14 9.5V14M14 9.5h2.3a1.6 1.6 0 0 1 0 3.2H14"/></svg>
       <span>Бегущая строка</span>
@@ -1341,6 +1382,7 @@
         <span class="sbLabel">Сирена</span>
       </button>
     </div>
+    <div id="sbBar"><i></i></div>
   </div>
 
   <div id="bottleStage" style="display:none">
@@ -1438,6 +1480,22 @@
   </div>
 
   <div id="morseFull"></div>
+
+  <div id="dlStage" style="display:none">
+    <div id="dlInputRow">
+      <input id="dlInput" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Ссылка на видео" aria-label="Ссылка на видео" />
+      <button id="dlGo">Найти</button>
+    </div>
+    <button id="dlPaste">Вставить из буфера</button>
+    <div id="dlHint">Instagram · TikTok · YouTube · VK</div>
+    <div id="dlProg"><i></i></div>
+    <div id="dlResult">
+      <div id="dlVideoWrap"><video id="dlVideo" controls playsinline preload="metadata"></video></div>
+      <button id="dlSave"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg><span id="dlSaveTxt">Сохранить в галерею</span></button>
+      <button id="dlAlt">Скачать файлом</button>
+    </div>
+    <button id="dlNew" class="qrDlBtn">Другая ссылка</button>
+  </div>
 
   <div id="qrStage" style="display:none">
     <div id="qrInputRow">
@@ -1788,7 +1846,7 @@
     setTimeout(function(){ render(n); el.classList.remove('pop'); },80);
   }
 
-  var TITLES={home:'TAP APP',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
+  var TITLES={home:'TAP APP',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',dl:'СКАЧАТЬ ВИДЕО',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
   function setApp(a){
     app=a;
     if(LAZY_APP_MAP[a]) lazyLoad(LAZY_APP_MAP[a]);
@@ -1827,6 +1885,7 @@
     tickerStage.style.display = a==='ticker'?'flex':'none';
     morseStage.style.display = a==='morse'?'flex':'none';
     qrStage.style.display = a==='qr'?'flex':'none';
+    dlStage.style.display = a==='dl'?'flex':'none';
     revStage.style.display = a==='rev'?'flex':'none';
     document.getElementById('mode').style.display = a==='note'?'flex':'none';
     document.getElementById('wordModeSeg').style.display = a==='word'?'flex':'none';
@@ -1834,7 +1893,7 @@
     document.getElementById('numModeSeg').style.display = a==='num'?'flex':'none';
     document.getElementById('metroSigSeg').style.display = a==='metro'?'flex':'none';
     document.getElementById('metroSndSeg').style.display = a==='metro'?'flex':'none';
-    document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='morse'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
+    document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='dl'||a==='morse'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
     document.getElementById('autoBtn').style.display = a==='note'?'':'none';
     document.getElementById('resetBpmBtn').style.display = a==='bpm'?'':'none';
     document.getElementById('resetCounterBtn').style.display = a==='counter'?'':'none';
@@ -1870,6 +1929,7 @@
     resetMetro();
     if(a==='time') timeStart(); else timeStop();
     resetQr();
+    if(a!=='dl') resetDl();
     if(a==='home') resetHome();
     if(a==='note') render(pick());
     if(typeof fxc!=='undefined' && fxc){ fxParts.length=0; fxc.clearRect(0,0,fx.width,fx.height); }
@@ -2439,6 +2499,19 @@
   var sbStage=document.getElementById('sbStage');
   var sbActiveSrc=null, sbActiveGain=null;
   var SB_FADE=1;
+  var sbFill=document.querySelector('#sbBar i'), sbRaf=0, sbT0=0;
+  function sbBarReset(){ cancelAnimationFrame(sbRaf); sbT0=0; sbFill.style.transition='opacity .3s'; sbFill.style.transform='scaleX(0)'; sbFill.style.opacity='1'; }
+  function sbBarStart(dur){
+    cancelAnimationFrame(sbRaf); var t0=AC.currentTime; sbT0=t0;
+    sbFill.style.transition='none'; sbFill.style.opacity='1'; sbFill.style.transform='scaleX(0)';
+    (function loop(){
+      if(sbT0!==t0) return;
+      var p=(AC.currentTime-t0)/dur;
+      if(p>=1){ sbFill.style.transform='scaleX(1)'; setTimeout(function(){ if(sbT0===t0){ sbFill.style.transition='opacity .3s'; sbFill.style.opacity='0'; setTimeout(function(){ if(sbT0===t0) sbBarReset(); },320); } },250); return; }
+      sbFill.style.transform='scaleX('+Math.max(0,p).toFixed(4)+')';
+      sbRaf=requestAnimationFrame(loop);
+    })();
+  }
   function sbPlay(buf){
     if(!soundOn||!AC||!buf) return;
     var now=AC.currentTime;
@@ -2455,6 +2528,7 @@
     var g=AC.createGain(); g.gain.value=1;
     src.connect(g); g.connect(AC.destination);
     src.start(now);
+    sbBarStart(buf.duration);
     sbActiveSrc=src; sbActiveGain=g;
     src.onended=function(){ if(sbActiveSrc===src){ sbActiveSrc=null; sbActiveGain=null; } };
   }
@@ -2471,6 +2545,7 @@
   });
   function resetSb(){
     document.querySelectorAll('.sbBtn').forEach(function(b){ b.classList.remove('active'); });
+    sbBarReset();
     if(sbActiveSrc){ try{ sbActiveSrc.stop(); }catch(e){} sbActiveSrc=null; sbActiveGain=null; }
   }
 
@@ -3851,6 +3926,126 @@
     qrInput.focus();
   });
 
+
+  // ---- video downloader ----
+  var DL_API='https://dl.tap-app.ru:8443/';          // адрес твоего сервера cobalt
+  var dlStage=document.getElementById('dlStage'), dlInput=document.getElementById('dlInput'),
+      dlGo=document.getElementById('dlGo'), dlPaste=document.getElementById('dlPaste'),
+      dlHint=document.getElementById('dlHint'), dlProgFill=document.querySelector('#dlProg i'),
+      dlResult=document.getElementById('dlResult'), dlVideo=document.getElementById('dlVideo'),
+      dlSave=document.getElementById('dlSave'), dlSaveTxt=document.getElementById('dlSaveTxt'),
+      dlAlt=document.getElementById('dlAlt'), dlNew=document.getElementById('dlNew');
+  var DL_HINT='Instagram · TikTok · YouTube · VK';
+  var dlBusy=false, dlBlobUrl=null, dlFile=null, dlAbort=null;
+  var dlIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  function dlCanShare(){ try{ return !!(dlFile&&navigator.canShare&&navigator.canShare({files:[dlFile]})); }catch(_){ return false; } }
+  function dlProg(p){ dlStage.classList.toggle('indet',p==null); if(p!=null) dlProgFill.style.transform='scaleX('+Math.max(0,Math.min(1,p))+')'; }
+  function resetDl(){
+    if(dlAbort){ try{dlAbort.abort();}catch(_){} dlAbort=null; }
+    dlBusy=false; dlGo.disabled=false;
+    if(dlBlobUrl){ URL.revokeObjectURL(dlBlobUrl); dlBlobUrl=null; }
+    dlFile=null; dlResult.style.display='none';
+    try{ dlVideo.pause(); dlVideo.removeAttribute('src'); dlVideo.load(); }catch(_){}
+    dlStage.classList.remove('busy','done','indet'); dlProgFill.style.transform='scaleX(0)';
+    dlHint.textContent=DL_HINT;
+  }
+  function dlFail(msg){ dlBusy=false; dlGo.disabled=false; dlAbort=null; dlStage.classList.remove('busy','indet'); dlHint.textContent=msg; }
+  function dlErrText(code){
+    code=String(code||'');
+    if(/rate/.test(code)) return 'Слишком часто — подожди минуту';
+    if(/login|auth|private|age/.test(code)) return 'Ролик закрытый или нужен вход';
+    if(/unavailable|not.?found|empty|no.?video/.test(code)) return 'Ролик недоступен или удалён';
+    if(/link|url/.test(code)) return 'Эта ссылка не поддерживается';
+    if(/service/.test(code)) return 'Эта соцсеть пока не поддерживается';
+    if(/fetch|youtube|content/.test(code)) return 'Соцсеть не отдала видео — попробуй позже';
+    return 'Не получилось скачать — попробуй другую ссылку';
+  }
+  function dlExtractUrl(raw){
+    raw=(raw||'').trim();
+    var m=raw.match(/https?:\/\/[^\s]+/i); if(m) return m[0];
+    m=raw.match(/^(?:www\.)?[\w-]+(?:\.[\w-]+)+\/\S*/i); return m?'https://'+m[0]:null;
+  }
+  function dlStart(){
+    if(dlBusy) return;
+    var url=dlExtractUrl(dlInput.value);
+    if(!url){ dlHint.textContent='Нужна ссылка на видео'; return; }
+    dlInput.blur(); dlBusy=true; dlGo.disabled=true; dlAbort=('AbortController' in window)?new AbortController():null;
+    dlStage.classList.add('busy'); dlProg(null); dlHint.textContent='Ищу видео…';
+    var sig=dlAbort?{signal:dlAbort.signal}:{};
+    fetch(DL_API,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},
+      body:JSON.stringify({url:url,videoQuality:'1080',downloadMode:'auto',filenameStyle:'basic',youtubeVideoContainer:'mp4',alwaysProxy:true}),
+      signal:sig.signal})
+    .then(function(r){ return r.json().catch(function(){ return {status:'error',error:{code:'http.'+r.status}}; }); })
+    .then(function(d){
+      var link=null,name='video.mp4';
+      if(d.status==='tunnel'||d.status==='redirect'){ link=d.url; name=d.filename||name; }
+      else if(d.status==='picker'){
+        var v=(d.picker||[]).filter(function(x){ return x.type==='video'||x.type==='gif'; })[0];
+        if(!v){ dlFail('В этом посте только фото'); return; }
+        link=v.url;
+      }
+      else if(d.status==='error'){ dlFail(dlErrText(d.error&&d.error.code)); return; }
+      else { dlFail('Это видео пока не поддерживается'); return; }
+      return dlFetchFile(link,name);
+    })
+    .catch(function(e){ if(e&&e.name==='AbortError') return; dlFail('Сервер не отвечает — попробуй позже'); });
+  }
+  function dlFetchFile(link,name){
+    dlHint.textContent='Качаю…';
+    return fetch(link,dlAbort?{signal:dlAbort.signal}:{}).then(function(r){
+      if(!r.ok) throw new Error('http '+r.status);
+      var total=+r.headers.get('Content-Length')||+r.headers.get('Estimated-Content-Length')||0;
+      var type=(r.headers.get('Content-Type')||'');
+      if(type.indexOf('video/')!==0) type='video/mp4';
+      if(!r.body||!r.body.getReader||!total) return r.blob().then(function(b){ return new Blob([b],{type:type}); });
+      var reader=r.body.getReader(), chunks=[], got=0;
+      dlProg(0);
+      return (function pump(){
+        return reader.read().then(function(x){
+          if(x.done) return new Blob(chunks,{type:type});
+          chunks.push(x.value); got+=x.value.length;
+          var p=Math.min(1,got/total); dlProg(p); dlHint.textContent='Качаю… '+Math.round(p*100)+'%';
+          return pump();
+        });
+      })();
+    }).then(function(blob){
+      if(!blob||blob.size<2000) throw new Error('empty');
+      name=(name||'video.mp4').replace(/[\\/:*?"<>|]+/g,'_'); if(!/\.(mp4|mov|webm|mkv)$/i.test(name)) name+='.mp4';
+      dlFile=new File([blob],name,{type:blob.type});
+      if(dlBlobUrl) URL.revokeObjectURL(dlBlobUrl);
+      dlBlobUrl=URL.createObjectURL(blob); dlVideo.src=dlBlobUrl;
+      dlBusy=false; dlGo.disabled=false; dlAbort=null;
+      dlStage.classList.remove('busy','indet'); dlStage.classList.add('done');
+      dlResult.style.display='flex';
+      if(dlIOS){ dlSaveTxt.textContent='Сохранить в галерею'; dlAlt.textContent='Сохранить в «Файлы»'; dlHint.textContent='Готово! Нажми и выбери «Сохранить видео»'; }
+      else { dlSaveTxt.textContent='Сохранить в галерею'; dlAlt.textContent=dlCanShare()?'Поделиться':'Скачать файлом'; dlHint.textContent='Готово!'; }
+    }).catch(function(e){
+      if(e&&e.name==='AbortError') return;
+      dlFail('Не получилось скачать — попробуй позже');
+    });
+  }
+  function dlDownload(){
+    if(!dlFile||!dlBlobUrl) return;
+    var a=document.createElement('a'); a.href=dlBlobUrl; a.download=dlFile.name; document.body.appendChild(a); a.click(); a.remove();
+    dlHint.textContent='Файл скачан — ищи в галерее или «Загрузках»';
+  }
+  function dlShare(){
+    if(dlCanShare()){ navigator.share({files:[dlFile]}).catch(function(e){ if(e&&e.name!=='AbortError') dlDownload(); }); }
+    else dlDownload();
+  }
+  dlSave.addEventListener('click',function(e){ e.stopPropagation(); if(dlIOS) dlShare(); else dlDownload(); });   // iOS: меню «Сохранить видео» кладёт в Фото; Android: файл в Загрузки → галерея
+  dlAlt.addEventListener('click',function(e){ e.stopPropagation(); if(dlIOS) dlDownload(); else dlShare(); });
+  dlNew.addEventListener('click',function(e){ e.stopPropagation(); resetDl(); dlInput.value=''; dlInput.focus(); });
+  dlGo.addEventListener('click',function(e){ e.stopPropagation(); dlStart(); });
+  dlInput.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); dlStart(); } });
+  dlPaste.addEventListener('click',function(e){
+    e.stopPropagation();
+    if(navigator.clipboard&&navigator.clipboard.readText){
+      navigator.clipboard.readText().then(function(t){ if(t){ dlInput.value=t; dlStart(); } else dlHint.textContent='Буфер пустой'; })
+        .catch(function(){ dlInput.focus(); dlHint.textContent='Вставь ссылку долгим нажатием в поле'; });
+    } else { dlInput.focus(); dlHint.textContent='Вставь ссылку долгим нажатием в поле'; }
+  });
+  dlStage.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
 
   // ---- color ----
   var colorStage=document.getElementById('colorStage');

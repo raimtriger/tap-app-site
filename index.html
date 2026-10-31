@@ -3978,7 +3978,7 @@
     .then(function(r){ return r.json().catch(function(){ return {status:'error',error:{code:'http.'+r.status}}; }); })
     .then(function(d){
       var link=null,name='video.mp4';
-      if(d.status==='tunnel'||d.status==='redirect'){ link=d.url; name=d.filename||name; }
+      if(d.status==='tunnel'||d.status==='redirect'){ link=d.url; name=d.filename||name; if(/\.(jpe?g|png|webp|gif|heic)$/i.test(name)){ dlFail('В этой ссылке фото, а не видео'); return; } }
       else if(d.status==='picker'){
         var v=(d.picker||[]).filter(function(x){ return x.type==='video'||x.type==='gif'; })[0];
         if(!v){ dlFail('В этом посте только фото'); return; }
@@ -3996,6 +3996,7 @@
       if(!r.ok) throw new Error('http '+r.status);
       var total=+r.headers.get('Content-Length')||+r.headers.get('Estimated-Content-Length')||0;
       var type=(r.headers.get('Content-Type')||'');
+      if(/^image\//i.test(type)){ var er=new Error('photo'); er.photo=true; throw er; }
       if(type.indexOf('video/')!==0) type='video/mp4';
       if(!r.body||!r.body.getReader||!total) return r.blob().then(function(b){ return new Blob([b],{type:type}); });
       var reader=r.body.getReader(), chunks=[], got=0;
@@ -4021,7 +4022,7 @@
       else { dlSaveTxt.textContent='Сохранить в галерею'; dlAlt.textContent=dlCanShare()?'Поделиться':'Скачать файлом'; dlHint.textContent='Готово!'; }
     }).catch(function(e){
       if(e&&e.name==='AbortError') return;
-      dlFail('Не получилось скачать — попробуй позже');
+      dlFail(e&&e.photo?'В этой ссылке фото, а не видео':'Не получилось скачать — попробуй позже');
     });
   }
   function dlDownload(){

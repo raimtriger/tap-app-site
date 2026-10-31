@@ -3972,9 +3972,12 @@
     dlInput.blur(); dlBusy=true; dlGo.disabled=true; dlAbort=('AbortController' in window)?new AbortController():null;
     dlStage.classList.add('busy'); dlProg(null); dlHint.textContent='Ищу видео…';
     var sig=dlAbort?{signal:dlAbort.signal}:{};
-    fetch(DL_API,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},
+    var pre=/^https?:\/\/pin\.it\/[\w-]+/i.test(url)
+      ? fetch(DL_API+'resolve?u='+encodeURIComponent(url),sig).then(function(r){ return r.json(); }).then(function(j){ if(j&&j.url) url=j.url; }).catch(function(e){ if(e&&e.name==='AbortError') throw e; })
+      : Promise.resolve();
+    pre.then(function(){ return fetch(DL_API,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},
       body:JSON.stringify({url:url,videoQuality:'1080',downloadMode:'auto',filenameStyle:'basic',youtubeVideoContainer:'mp4',alwaysProxy:true}),
-      signal:sig.signal})
+      signal:sig.signal}); })
     .then(function(r){ return r.json().catch(function(){ return {status:'error',error:{code:'http.'+r.status}}; }); })
     .then(function(d){
       var link=null,name='video.mp4';

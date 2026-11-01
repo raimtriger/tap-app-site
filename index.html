@@ -4008,11 +4008,12 @@
       .then(function(d){
         var c=d&&d.status==='error'&&d.error&&String(d.error.code||'');
         if(c&&/fetch/.test(c)&&n>0) return wait(900).then(function(){ return ask(n-1); });
+        if(d&&(d.status==='tunnel'||d.status==='redirect')&&/\.(jpe?g|png|webp|gif|heic)$/i.test(d.filename||'')&&n>0) return wait(900).then(function(){ return ask(n-1); });
         return d;
       });
     }
     var pre=/^https?:\/\/pin\.it\/[\w-]+/i.test(url) ? resolveShort(2) : Promise.resolve();
-    pre.then(function(){ return ask(2); })
+    pre.then(function(){ return ask(3); })
     .then(function(d){
       var link=null,name='video.mp4';
       if(d.status==='tunnel'||d.status==='redirect'){ link=d.url; name=d.filename||name; if(/\.(jpe?g|png|webp|gif|heic)$/i.test(name)){ dlFail('В этой ссылке фото, а не видео'); return; } }

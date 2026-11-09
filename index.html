@@ -63,6 +63,7 @@
   'Мой город':'My city','Локальное время устройства':'Device local time','Синхронизация…':'Syncing…','Синхронизировано с сервером точного времени':'Synced with a time server',
   'Москва':'Moscow','Лондон':'London','Нью-Йорк':'New York','Париж':'Paris','Берлин':'Berlin','Стамбул':'Istanbul','Дубай':'Dubai','Алматы':'Almaty','Астана':'Astana','Бангкок':'Bangkok','Дели':'Delhi','Пекин':'Beijing','Токио':'Tokyo','Сидней':'Sydney','Лос-Анджелес':'Los Angeles',
   'Лучший: ±':'Best: ±','Стоп':'Stop','Сумма: ':'Sum: ','Ещё ':'Another ','Тапни ':'Tap ','Тапни ещё ':'Tap another ',
+  'Конвертер':'Converter','КОНВЕРТЕР':'CONVERTER','Картинки в PNG, JPEG, WebP, BMP или PDF. Всё считается на устройстве, файлы никуда не отправляются.':'Images to PNG, JPEG, WebP, BMP or PDF. Everything runs on your device, files are never uploaded.','Выбрать фото или файлы':'Choose photos or files','Во что преобразовать':'Convert to','Качество':'Quality','Максимальная сторона, px':'Max side, px','Оригинал':'Original','Страница PDF':'PDF page','По картинке':'Fit image','Все файлы в один PDF':'All files in one PDF','Сохранить все':'Save all','Очистить':'Clear',
   'Тапни — крутить':'Tap to spin'
   };
   var RULES=[
@@ -1051,7 +1052,7 @@
 
   /* ---- анти-наезд: каждый экран живёт строго между заголовком и нижними кнопками ---- */
   :root{--padT:112px;--padB:140px;--padX:18px;}
-  #stage,body>[id$="Stage"]:not(#sbStage):not(#revStage){
+  #stage,body>[id$="Stage"]:not(#sbStage):not(#revStage):not(#cvStage){
     padding:var(--padT) var(--padX) var(--padB) !important;min-height:0;
   }
   @media (max-height:520px){
@@ -1063,6 +1064,45 @@
     #bar{bottom:calc(env(safe-area-inset-bottom) + 10px);}
     #sbStage{padding-top:calc(env(safe-area-inset-top) + 48px);padding-bottom:calc(env(safe-area-inset-bottom) + 70px);}
   }
+  /* ---- converter ---- */
+  #cvStage{flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
+    padding:calc(var(--padT) + 8px) var(--padX) 100px;}
+/* === CONVERTER === */
+.cv-app{font-family:var(--fu);color:var(--ink);width:100%;max-width:560px;margin:0 auto;padding:0 0 8px}
+.cv-app *{box-sizing:border-box}
+.cv-app [hidden]{display:none!important}
+.cv-sub{color:var(--muted);font-size:13px;line-height:1.45;margin:0 0 16px}
+.cv-hide{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.cv-pick{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:96px;border:2px dashed var(--muted);border-radius:18px;background:var(--chip);color:var(--ink);font:600 15px var(--fu);cursor:pointer;padding:16px;text-align:center;-webkit-tap-highlight-color:transparent}
+.cv-pick.cv-drag{border-color:var(--accent);background:var(--chip-on)}
+.cv-pick svg{width:26px;height:26px;flex:none}
+.cv-note{min-height:0;margin:8px 0 0;font-size:12px;color:var(--muted)}
+.cv-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.cv-chips{display:flex;flex-wrap:wrap;gap:8px}
+.cv-chip{border:1.5px solid transparent;background:var(--chip);color:var(--ink);font:600 14px var(--fu);padding:10px 16px;border-radius:999px;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:transparent}
+.cv-chip[aria-pressed="true"]{background:var(--chip-on);border-color:var(--accent)}
+.cv-row{display:flex;align-items:center;gap:12px}
+.cv-range{flex:1;accent-color:var(--accent)}
+.cv-val{min-width:44px;text-align:right;font-weight:700;font-size:14px}
+.cv-check{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;margin-top:12px;min-height:44px;cursor:pointer}
+.cv-check input{width:20px;height:20px;accent-color:var(--accent)}
+.cv-list{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.cv-item{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--chip);border-radius:16px;padding:10px}
+.cv-thumb{width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--chip-on)}
+.cv-ph{display:grid;place-items:center;font:800 13px 'Benzin-ExtraBold',var(--fu);color:var(--ink)}
+.cv-meta{min-width:0}
+.cv-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cv-stat{font-size:12px;color:var(--muted);margin-top:3px}
+.cv-stat.cv-err{color:#d33}
+.cv-acts{display:flex;align-items:center;gap:4px}
+.cv-btn{border:0;border-radius:12px;background:var(--accent);color:var(--bg);font:700 13px var(--fu);min-height:40px;padding:0 14px;cursor:pointer}
+.cv-x{border:0;background:transparent;color:var(--muted);font-size:24px;line-height:1;width:36px;height:40px;cursor:pointer}
+.cv-ghost{border:0;background:transparent;color:var(--muted);font:600 13px var(--fu);min-height:44px;padding:0 14px;cursor:pointer}
+.cv-sum{margin:12px 0 0;font-size:13px;font-weight:600;color:var(--muted)}
+.cv-bar{display:flex;gap:10px;margin-top:12px}
+.cv-bar .cv-btn{flex:1;min-height:48px}
+.cv-app button:focus-visible,.cv-pick:focus-within{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
@@ -1174,6 +1214,10 @@
     <button class="appbtn" data-app="qr" aria-label="Генератор QR">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20v.01"/></svg>
       <span>Генератор QR</span>
+    </button>
+    <button class="appbtn" data-app="cv" aria-label="Конвертер">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3"/><path d="M17 17H6l3 3"/></svg>
+      <span>Конвертер</span>
     </button>
     <button class="appbtn" data-app="dl" aria-label="Скачать видео">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 7.5v5M9.8 10.6l2.2 2.2 2.2-2.2M8 20h8"/></svg>
@@ -1516,6 +1560,50 @@
       <button id="dlAlt">Скачать файлом</button>
     </div>
     <button id="dlNew" class="qrDlBtn">Другая ссылка</button>
+  </div>
+
+  <div id="cvStage" style="display:none">
+<section class="cv-app" id="cv-app">
+  <p class="cv-sub">Картинки в PNG, JPEG, WebP, BMP или PDF. Всё считается на устройстве, файлы никуда не отправляются.</p>
+
+  <label class="cv-pick" id="cv-pick" for="cv-input">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h11l-3-3"/><path d="M17 17H6l3 3"/></svg>
+    <span>Выбрать фото или файлы</span>
+  </label>
+  <input class="cv-hide" id="cv-input" type="file" accept="image/*" multiple>
+  <p class="cv-note" id="cv-note" role="status"></p>
+
+  <div class="cv-label">Во что преобразовать</div>
+  <div class="cv-chips" id="cv-fmt"></div>
+
+  <div id="cv-q-wrap" hidden>
+    <div class="cv-label">Качество</div>
+    <div class="cv-row">
+      <input class="cv-range" id="cv-q" type="range" min="50" max="100" step="1" value="90" aria-label="Качество">
+      <span class="cv-val" id="cv-qv">90%</span>
+    </div>
+  </div>
+
+  <div class="cv-label">Максимальная сторона, px</div>
+  <div class="cv-chips" id="cv-size"></div>
+
+  <div id="cv-page-wrap" hidden>
+    <div class="cv-label">Страница PDF</div>
+    <div class="cv-chips" id="cv-page"></div>
+  </div>
+
+  <label class="cv-check" id="cv-merge-wrap" hidden>
+    <input type="checkbox" id="cv-merge" checked>
+    <span>Все файлы в один PDF</span>
+  </label>
+
+  <ul class="cv-list" id="cv-list"></ul>
+  <p class="cv-sum" id="cv-sum"></p>
+  <div class="cv-bar" id="cv-bar" hidden>
+    <button class="cv-btn" id="cv-all" type="button" hidden>Сохранить все</button>
+    <button class="cv-ghost" id="cv-clear" type="button">Очистить</button>
+  </div>
+</section>
   </div>
 
   <div id="qrStage" style="display:none">
@@ -1867,7 +1955,7 @@
     setTimeout(function(){ render(n); el.classList.remove('pop'); },80);
   }
 
-  var TITLES={home:'TAP APP',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',dl:'СКАЧАТЬ ВИДЕО',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
+  var TITLES={home:'TAP APP',cv:'КОНВЕРТЕР',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',dl:'СКАЧАТЬ ВИДЕО',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
   function setApp(a){
     app=a;
     if(LAZY_APP_MAP[a]) lazyLoad(LAZY_APP_MAP[a]);
@@ -1906,6 +1994,7 @@
     tickerStage.style.display = a==='ticker'?'flex':'none';
     morseStage.style.display = a==='morse'?'flex':'none';
     qrStage.style.display = a==='qr'?'flex':'none';
+    document.getElementById('cvStage').style.display = a==='cv'?'flex':'none';
     dlStage.style.display = a==='dl'?'flex':'none';
     revStage.style.display = a==='rev'?'flex':'none';
     document.getElementById('mode').style.display = a==='note'?'flex':'none';
@@ -1914,7 +2003,7 @@
     document.getElementById('numModeSeg').style.display = a==='num'?'flex':'none';
     document.getElementById('metroSigSeg').style.display = a==='metro'?'flex':'none';
     document.getElementById('metroSndSeg').style.display = a==='metro'?'flex':'none';
-    document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='dl'||a==='morse'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
+    document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='cv'||a==='dl'||a==='morse'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
     document.getElementById('autoBtn').style.display = a==='note'?'':'none';
     document.getElementById('resetBpmBtn').style.display = a==='bpm'?'':'none';
     document.getElementById('resetCounterBtn').style.display = a==='counter'?'':'none';
@@ -4531,6 +4620,414 @@
 
   if('requestIdleCallback' in window) requestIdleCallback(function(){ lazyPreloadAll(); },{timeout:6000});
   else setTimeout(lazyPreloadAll,4000);
+})();
+</script>
+<script>
+(function(){
+'use strict';
+var root=document.getElementById('cv-app');
+if(!root)return;
+var EN=window.__LANG==='en';
+function T(r,e){return EN?e:r}
+function $(id){return document.getElementById(id)}
+function el(t,c){var e=document.createElement(t);if(c)e.className=c;return e}
+
+/*PURE*/
+function f2(n){return String(Math.round(n*100)/100)}
+function pad10(n){return ('0000000000'+n).slice(-10)}
+
+/* BMP 24 бит из canvas (Safari/Chrome не умеют кодировать BMP сами) */
+function bmpOf(c){
+  var w=c.width,h=c.height,d=c.getContext('2d').getImageData(0,0,w,h).data;
+  var row=(w*3+3)&~3,size=54+row*h,buf=new ArrayBuffer(size),v=new DataView(buf),u=new Uint8Array(buf);
+  u[0]=66;u[1]=77;
+  v.setUint32(2,size,true);v.setUint32(10,54,true);v.setUint32(14,40,true);
+  v.setInt32(18,w,true);v.setInt32(22,h,true);v.setUint16(26,1,true);v.setUint16(28,24,true);
+  v.setUint32(34,row*h,true);v.setInt32(38,2835,true);v.setInt32(42,2835,true);
+  var p=54;
+  for(var y=h-1;y>=0;y--){
+    var o=p,i=y*w*4;
+    for(var x=0;x<w;x++,i+=4){u[o++]=d[i+2];u[o++]=d[i+1];u[o++]=d[i]}
+    p+=row;
+  }
+  return new Blob([buf],{type:'image/bmp'});
+}
+
+/* PDF руками: каждая страница = один JPEG (DCTDecode) */
+function pdfOf(pages){
+  var enc=new TextEncoder(),chunks=[],len=0,offs=[];
+  function put(s){var b=typeof s==='string'?enc.encode(s):s;chunks.push(b);len+=b.length}
+  function obj(i,body){offs[i]=len;put(i+' 0 obj\n'+body+'\nendobj\n')}
+  var n=pages.length,total=2+n*3;
+  put('%PDF-1.4\n%âãÏÓ\n');
+  obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
+  var kids=[];
+  for(var i=0;i<n;i++)kids.push((3+i*3)+' 0 R');
+  obj(2,'<< /Type /Pages /Count '+n+' /Kids ['+kids.join(' ')+'] >>');
+  pages.forEach(function(p,i){
+    var po=3+i*3,co=po+1,io=po+2;
+    obj(po,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+f2(p.pw)+' '+f2(p.ph)+'] /Resources << /XObject << /Im0 '+io+' 0 R >> >> /Contents '+co+' 0 R >>');
+    var cs='q '+f2(p.dw)+' 0 0 '+f2(p.dh)+' '+f2(p.x)+' '+f2(p.y)+' cm /Im0 Do Q';
+    obj(co,'<< /Length '+cs.length+' >>\nstream\n'+cs+'\nendstream');
+    offs[io]=len;
+    put(io+' 0 obj\n<< /Type /XObject /Subtype /Image /Width '+p.w+' /Height '+p.h+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+p.jpg.length+' >>\nstream\n');
+    put(p.jpg);
+    put('\nendstream\nendobj\n');
+  });
+  var xr=len,x='xref\n0 '+(total+1)+'\n0000000000 65535 f \n';
+  for(var k=1;k<=total;k++)x+=pad10(offs[k])+' 00000 n \n';
+  put(x+'trailer\n<< /Size '+(total+1)+' /Root 1 0 R >>\nstartxref\n'+xr+'\n%%EOF');
+  return new Blob(chunks,{type:'application/pdf'});
+}
+
+/* размер страницы: по картинке (px*0.75 = pt) или A4 с полями */
+function pageLayout(p,mode){
+  var w=p.w,h=p.h;
+  if(mode==='a4'){
+    var pw=595.28,ph=841.89;
+    if(w>h){var t=pw;pw=ph;ph=t}
+    var m=24,k=Math.min((pw-2*m)/w,(ph-2*m)/h),dw=w*k,dh=h*k;
+    return {jpg:p.jpg,w:w,h:h,pw:pw,ph:ph,dw:dw,dh:dh,x:(pw-dw)/2,y:(ph-dh)/2};
+  }
+  var a=w*0.75,b=h*0.75;
+  return {jpg:p.jpg,w:w,h:h,pw:a,ph:b,dw:a,dh:b,x:0,y:0};
+}
+/*ENDPURE*/
+
+function canWebp(){
+  try{var c=document.createElement('canvas');c.width=c.height=1;return c.toDataURL('image/webp').indexOf('data:image/webp')===0}
+  catch(e){return false}
+}
+var WEBP=canWebp();
+var MAXFILES=50,PXLIM=16000000;
+var FMT={
+  png:{mime:'image/png',ext:'png',label:'PNG'},
+  jpeg:{mime:'image/jpeg',ext:'jpg',label:'JPEG'},
+  webp:{mime:'image/webp',ext:'webp',label:'WebP'},
+  bmp:{mime:'image/bmp',ext:'bmp',label:'BMP'},
+  pdf:{mime:'application/pdf',ext:'pdf',label:'PDF'}
+};
+var S={fmt:'png',q:0.9,max:0,page:'fit',merge:true,items:[],run:0,id:0,merged:null};
+
+var list=$('cv-list'),note=$('cv-note'),sum=$('cv-sum'),bar=$('cv-bar'),all=$('cv-all'),clear=$('cv-clear');
+var inp=$('cv-input'),pick=$('cv-pick'),q=$('cv-q'),qv=$('cv-qv');
+var qWrap=$('cv-q-wrap'),pageWrap=$('cv-page-wrap'),mergeWrap=$('cv-merge-wrap'),merge=$('cv-merge');
+
+/* ---------- настройки ---------- */
+var KEY='tapCv1';
+function load(){
+  try{
+    var j=JSON.parse(localStorage.getItem(KEY)||'{}');
+    if(FMT[j.fmt]&&(j.fmt!=='webp'||WEBP))S.fmt=j.fmt;
+    if(j.q>=0.5&&j.q<=1)S.q=j.q;
+    if([0,2048,1080].indexOf(j.max)>-1)S.max=j.max;
+    if(j.page==='a4'||j.page==='fit')S.page=j.page;
+    if(typeof j.merge==='boolean')S.merge=j.merge;
+  }catch(e){}
+}
+function persist(){
+  try{localStorage.setItem(KEY,JSON.stringify({fmt:S.fmt,q:S.q,max:S.max,page:S.page,merge:S.merge}))}catch(e){}
+}
+
+/* ---------- утилиты ---------- */
+function fs(n){
+  if(n<1024)return n+T(' Б',' B');
+  if(n<1048576)return Math.round(n/1024)+T(' КБ',' KB');
+  return (n/1048576).toFixed(1).replace('.',EN?'.':',')+T(' МБ',' MB');
+}
+function base(n){return n.replace(/\.[^.]+$/,'')||'image'}
+function uniq(n,u){
+  var d=n.lastIndexOf('.'),b=n.slice(0,d),e=n.slice(d),r=n,i=1;
+  while(u[r.toLowerCase()]){i++;r=b+' ('+i+')'+e}
+  u[r.toLowerCase()]=1;
+  return r;
+}
+function msg(e){
+  var m=e&&e.message;
+  if(m==='decode'||m==='size')return T('Не удалось прочитать этот формат','Can\'t read this format');
+  if(m==='webp')return T('Этот браузер не умеет WebP','This browser can\'t encode WebP');
+  if(m==='encode')return T('Не хватило памяти, попробуй размер 2048','Out of memory, try max side 2048');
+  return T('Ошибка конвертации','Conversion failed');
+}
+function outs(){
+  var a=[];
+  if(S.merged)a.push(S.merged);
+  else S.items.forEach(function(it){if(it.out)a.push(it.out)});
+  return a;
+}
+
+/* ---------- декодирование и канвас ---------- */
+function viaImg(file,svg){
+  return new Promise(function(res,rej){
+    var u=URL.createObjectURL(file),im=new Image();
+    im.onload=function(){
+      var w=im.naturalWidth,h=im.naturalHeight;
+      if(!w||!h){
+        if(svg){w=1024;h=1024}
+        else{URL.revokeObjectURL(u);rej(new Error('size'));return}
+      }
+      res({src:im,w:w,h:h,close:function(){URL.revokeObjectURL(u)}});
+    };
+    im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('decode'))};
+    im.src=u;
+  });
+}
+function decode(file){
+  var svg=/svg/i.test(file.type)||/\.svg$/i.test(file.name);
+  if(!svg&&window.createImageBitmap){
+    return createImageBitmap(file,{imageOrientation:'from-image'}).catch(function(){return createImageBitmap(file)}).then(function(b){
+      return {src:b,w:b.width,h:b.height,close:function(){if(b.close)b.close()}};
+    }).catch(function(){return viaImg(file,svg)});
+  }
+  return viaImg(file,svg);
+}
+function toCanvas(d,opaque){
+  var w=d.w,h=d.h,k=1,m=Math.max(w,h);
+  if(S.max&&m>S.max)k=S.max/m;
+  if(w*h*k*k>PXLIM)k=Math.sqrt(PXLIM/(w*h));
+  var cw=Math.max(1,Math.round(w*k)),ch=Math.max(1,Math.round(h*k));
+  var c=document.createElement('canvas');
+  c.width=cw;c.height=ch;
+  var x=c.getContext('2d');
+  if(opaque){x.fillStyle='#fff';x.fillRect(0,0,cw,ch)}
+  x.drawImage(d.src,0,0,cw,ch);
+  return c;
+}
+function free(c){c.width=c.height=0}
+function blobOf(c,mime,qv){
+  return new Promise(function(res,rej){
+    c.toBlob(function(b){b?res(b):rej(new Error('encode'))},mime,qv);
+  });
+}
+
+/* одна картинка → {blob} или {jpg,w,h} для PDF */
+function conv(it){
+  return decode(it.file).then(function(d){
+    var f=S.fmt,c;
+    try{c=toCanvas(d,f!=='png'&&f!=='webp')}finally{d.close()}
+    if(f==='bmp'){var bb=bmpOf(c);free(c);return {blob:bb}}
+    if(f==='pdf'){
+      var w=c.width,h=c.height;
+      return blobOf(c,'image/jpeg',S.q).then(function(b){
+        free(c);
+        return b.arrayBuffer().then(function(ab){return {jpg:new Uint8Array(ab),w:w,h:h}});
+      });
+    }
+    return blobOf(c,FMT[f].mime,S.q).then(function(b){
+      free(c);
+      if(f==='webp'&&b.type!=='image/webp')throw new Error('webp');
+      return {blob:b};
+    });
+  });
+}
+
+/* ---------- запуск конвертации ---------- */
+function run(){
+  var tok=++S.run,its=S.items.slice(),used={};
+  S.merged=null;
+  its.forEach(function(it){it.out=null;it.err=null;it.pg=null;it.busy=true});
+  render();
+  var chain=Promise.resolve();
+  its.forEach(function(it){
+    chain=chain.then(function(){
+      if(tok!==S.run)return;
+      return conv(it).then(function(r){
+        if(tok!==S.run)return;
+        if(r.blob)it.out={blob:r.blob,name:uniq(base(it.file.name)+'.'+FMT[S.fmt].ext,used)};
+        else it.pg=r;
+      }).catch(function(e){
+        if(tok===S.run)it.err=msg(e);
+      }).then(function(){
+        if(tok===S.run){it.busy=false;render()}
+      });
+    });
+  });
+  chain.then(function(){
+    if(tok!==S.run)return;
+    if(S.fmt==='pdf'){
+      var ok=its.filter(function(it){return it.pg});
+      if(S.merge&&its.length>1){
+        if(ok.length)S.merged={
+          blob:pdfOf(ok.map(function(it){return pageLayout(it.pg,S.page)})),
+          name:'tap-converted.pdf',pages:ok.length
+        };
+      }else{
+        ok.forEach(function(it){
+          it.out={blob:pdfOf([pageLayout(it.pg,S.page)]),name:uniq(base(it.file.name)+'.pdf',used)};
+        });
+      }
+      its.forEach(function(it){it.pg=null});
+    }
+    render();
+  });
+}
+
+/* ---------- сохранение ---------- */
+function dl(arr){
+  arr.forEach(function(o,i){
+    setTimeout(function(){
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(o.blob);a.download=o.name;
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(function(){URL.revokeObjectURL(a.href)},4000);
+    },i*350);
+  });
+}
+function save(arr){
+  var files=arr.map(function(o){return new File([o.blob],o.name,{type:o.blob.type})});
+  if(navigator.canShare&&navigator.share){
+    var ok=false;
+    try{ok=navigator.canShare({files:files})}catch(e){}
+    if(ok){
+      navigator.share({files:files}).catch(function(e){
+        if(!e||e.name!=='AbortError')dl(arr);
+      });
+      return;
+    }
+  }
+  dl(arr);
+}
+
+/* ---------- отрисовка ---------- */
+function render(){
+  list.textContent='';
+  S.items.forEach(function(it){
+    var li=el('li','cv-item'),im=el('img','cv-thumb');
+    im.src=it.url;im.alt='';im.loading='lazy';im.decoding='async';
+    im.onerror=function(){im.style.visibility='hidden'};
+    var m=el('div','cv-meta'),n=el('div','cv-name'),s=el('div','cv-stat'),sz=fs(it.file.size);
+    n.textContent=it.file.name;
+    if(it.err){s.className+=' cv-err';s.textContent=it.err}
+    else if(it.out)s.textContent=sz+' → '+fs(it.out.blob.size);
+    else if(it.busy)s.textContent=sz+T(' · обработка…',' · processing…');
+    else if(S.merged)s.textContent=sz+T(' · в общем PDF',' · in combined PDF');
+    else s.textContent=sz;
+    m.appendChild(n);m.appendChild(s);
+    var a=el('div','cv-acts');
+    if(it.out){
+      var b=el('button','cv-btn');b.type='button';b.textContent=T('Сохранить','Save');
+      b.onclick=function(){save([it.out])};
+      a.appendChild(b);
+    }
+    var x=el('button','cv-x');x.type='button';x.textContent='×';
+    x.setAttribute('aria-label',T('Убрать ','Remove ')+it.file.name);
+    x.onclick=function(){removeItem(it)};
+    a.appendChild(x);
+    li.appendChild(im);li.appendChild(m);li.appendChild(a);
+    list.appendChild(li);
+  });
+  if(S.merged){
+    var mi=el('li','cv-item'),ph=el('div','cv-thumb cv-ph');ph.textContent='PDF';
+    var mm=el('div','cv-meta'),mn=el('div','cv-name'),ms=el('div','cv-stat');
+    mn.textContent=S.merged.name;
+    ms.textContent=S.merged.pages+T(' стр. · ',' pages · ')+fs(S.merged.blob.size);
+    mm.appendChild(mn);mm.appendChild(ms);
+    var ma=el('div','cv-acts'),mb=el('button','cv-btn');
+    mb.type='button';mb.textContent=T('Сохранить','Save');
+    mb.onclick=function(){save([S.merged])};
+    ma.appendChild(mb);
+    mi.appendChild(ph);mi.appendChild(mm);mi.appendChild(ma);
+    list.appendChild(mi);
+  }
+  var o=outs(),busy=S.items.some(function(i){return i.busy});
+  bar.hidden=!S.items.length;
+  all.hidden=o.length<2;
+  if(!busy&&o.length){
+    var before=0,after=0;
+    S.items.forEach(function(i){if(!i.err)before+=i.file.size});
+    o.forEach(function(x){after+=x.blob.size});
+    sum.textContent=T('Было ','Was ')+fs(before)+T(' → стало ',' → now ')+fs(after);
+  }else sum.textContent='';
+}
+
+/* ---------- чипы и панели ---------- */
+var groups=[
+  {box:$('cv-fmt'),key:'fmt',list:Object.keys(FMT).filter(function(k){return k!=='webp'||WEBP}).map(function(k){return [k,FMT[k].label]})},
+  {box:$('cv-size'),key:'max',list:[[0,T('Оригинал','Original')],[2048,'2048'],[1080,'1080']]},
+  {box:$('cv-page'),key:'page',list:[['fit',T('По картинке','Fit image')],['a4','A4']]}
+];
+function sync(){
+  groups.forEach(function(g){
+    Array.prototype.forEach.call(g.box.children,function(b){
+      b.setAttribute('aria-pressed',String(S[g.key])===b.dataset.v?'true':'false');
+    });
+  });
+  qWrap.hidden=['jpeg','webp','pdf'].indexOf(S.fmt)<0;
+  pageWrap.hidden=S.fmt!=='pdf';
+  mergeWrap.hidden=!(S.fmt==='pdf'&&S.items.length>1);
+  q.value=Math.round(S.q*100);
+  qv.textContent=Math.round(S.q*100)+'%';
+  merge.checked=S.merge;
+}
+groups.forEach(function(g){
+  g.list.forEach(function(a){
+    var b=el('button','cv-chip');
+    b.type='button';b.textContent=a[1];b.dataset.v=String(a[0]);
+    b.onclick=function(){
+      S[g.key]=g.key==='max'?+a[0]:a[0];
+      persist();sync();
+      if(S.items.length)run();
+    };
+    g.box.appendChild(b);
+  });
+});
+
+/* ---------- файлы ---------- */
+var IMG=/\.(png|jpe?g|jfif|webp|gif|bmp|svg|avif|heic|heif|tiff?|ico)$/i;
+function isImg(f){return (f.type&&f.type.indexOf('image/')===0)||IMG.test(f.name)}
+function add(files){
+  var bad=0,pdf=0,over=0;
+  Array.prototype.forEach.call(files,function(f){
+    if(!isImg(f)){
+      if(/pdf/i.test(f.type)||/\.pdf$/i.test(f.name))pdf++;else bad++;
+      return;
+    }
+    if(S.items.length>=MAXFILES){over++;return}
+    S.items.push({id:++S.id,file:f,url:URL.createObjectURL(f)});
+  });
+  var t=[];
+  if(pdf)t.push(T('PDF в картинки появится следующим шагом','PDF to images is coming next'));
+  if(bad)t.push(T('Пропущено не-картинок: ','Skipped non-images: ')+bad);
+  if(over)t.push(T('Максимум '+MAXFILES+' файлов за раз','Max '+MAXFILES+' files at once'));
+  note.textContent=t.join('. ');
+  if(!S.items.length){render();return}
+  try{if(window.ym)window.ym(109713949,'reachGoal','converter_add')}catch(e){}
+  sync();run();
+}
+function removeItem(it){
+  URL.revokeObjectURL(it.url);
+  S.items=S.items.filter(function(x){return x!==it});
+  if(!S.items.length){S.run++;S.merged=null;sync();render();return}
+  sync();
+  if(S.fmt==='pdf'&&S.merge)run();else render();
+}
+
+inp.addEventListener('change',function(){add(inp.files);inp.value=''});
+pick.addEventListener('dragover',function(e){e.preventDefault();pick.classList.add('cv-drag')});
+pick.addEventListener('dragleave',function(){pick.classList.remove('cv-drag')});
+pick.addEventListener('drop',function(e){
+  e.preventDefault();pick.classList.remove('cv-drag');
+  if(e.dataTransfer&&e.dataTransfer.files)add(e.dataTransfer.files);
+});
+var qt;
+q.addEventListener('input',function(){
+  S.q=q.value/100;qv.textContent=q.value+'%';
+  clearTimeout(qt);
+  qt=setTimeout(function(){persist();if(S.items.length)run()},300);
+});
+merge.addEventListener('change',function(){
+  S.merge=merge.checked;persist();
+  if(S.items.length)run();
+});
+all.addEventListener('click',function(){save(outs())});
+clear.addEventListener('click',function(){
+  S.items.forEach(function(i){URL.revokeObjectURL(i.url)});
+  S.items=[];S.merged=null;S.run++;note.textContent='';
+  sync();render();
+});
+
+$('cvStage').addEventListener('pointerdown',function(e){e.stopPropagation()});
+load();sync();render();
 })();
 </script>
 <script>

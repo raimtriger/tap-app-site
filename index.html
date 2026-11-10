@@ -64,6 +64,7 @@
   'Москва':'Moscow','Лондон':'London','Нью-Йорк':'New York','Париж':'Paris','Берлин':'Berlin','Стамбул':'Istanbul','Дубай':'Dubai','Алматы':'Almaty','Астана':'Astana','Бангкок':'Bangkok','Дели':'Delhi','Пекин':'Beijing','Токио':'Tokyo','Сидней':'Sydney','Лос-Анджелес':'Los Angeles',
   'Лучший: ±':'Best: ±','Стоп':'Stop','Сумма: ':'Sum: ','Ещё ':'Another ','Тапни ':'Tap ','Тапни ещё ':'Tap another ',
   'Конвертер':'Converter','КОНВЕРТЕР':'CONVERTER','Картинки в PNG, JPEG, WebP, BMP или PDF. Всё считается на устройстве, файлы никуда не отправляются.':'Images to PNG, JPEG, WebP, BMP or PDF. Everything runs on your device, files are never uploaded.','Выбрать фото или файлы':'Choose photos or files','Во что преобразовать':'Convert to','Качество':'Quality','Максимальная сторона, px':'Max side, px','Оригинал':'Original','Страница PDF':'PDF page','По картинке':'Fit image','Все файлы в один PDF':'All files in one PDF','Сохранить все':'Save all','Очистить':'Clear',
+  'Калькулятор времени':'Time calculator','ТАЙМ-КАЛЬКУЛЯТОР':'TIME CALC',
   'Тапни — крутить':'Tap to spin'
   };
   var RULES=[
@@ -1052,7 +1053,7 @@
 
   /* ---- анти-наезд: каждый экран живёт строго между заголовком и нижними кнопками ---- */
   :root{--padT:112px;--padB:140px;--padX:18px;}
-  #stage,body>[id$="Stage"]:not(#sbStage):not(#revStage):not(#cvStage){
+  #stage,body>[id$="Stage"]:not(#sbStage):not(#revStage):not(#cvStage):not(#tcStage){
     padding:var(--padT) var(--padX) var(--padB) !important;min-height:0;
   }
   @media (max-height:520px){
@@ -1068,6 +1069,30 @@
   #cvStage{flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
     overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
     padding:calc(var(--padT) + 8px) var(--padX) 100px;}
+  /* ---- time calculator ---- */
+  #tcStage{flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
+    padding:calc(var(--padT) + 8px) var(--padX) 100px;}
+.tc-app{font-family:var(--fu);color:var(--ink);width:100%;max-width:560px;margin:0 auto}
+.tc-app *{box-sizing:border-box}
+.tc-lab{color:var(--muted);font:700 11px var(--fu);letter-spacing:.12em;text-transform:uppercase;margin:20px 0 8px}
+.tc-chips{display:flex;flex-wrap:wrap;gap:8px}
+.tc-chip{border:1.5px solid transparent;background:var(--chip);color:var(--ink);font:600 14px var(--fu);padding:10px 16px;border-radius:999px;cursor:pointer;min-height:44px;-webkit-tap-highlight-color:transparent}
+.tc-chip[aria-pressed="true"]{background:var(--chip-on);border-color:var(--accent)}
+.tc-grp{display:flex;justify-content:center;align-items:flex-start;gap:4px}
+.tc-col{width:84px;text-align:center}
+.tc-unit{color:var(--muted);font:700 11px var(--fu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.tc-wrap{position:relative;background:var(--chip);border-radius:16px;overflow:hidden}
+.tc-wrap::after{content:"";position:absolute;left:6px;right:6px;top:44px;height:44px;border:1.5px solid var(--accent);border-radius:12px;pointer-events:none}
+.tc-win{height:132px;overflow-y:auto;scroll-snap-type:y mandatory;scroll-padding:44px 0;padding:44px 0;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior:contain;touch-action:pan-y}
+.tc-win::-webkit-scrollbar{display:none}
+.tc-i{height:44px;line-height:44px;scroll-snap-align:start;font:700 22px var(--fu);font-variant-numeric:tabular-nums;color:var(--muted);cursor:pointer;user-select:none;-webkit-user-select:none}
+.tc-i.on{color:var(--ink)}
+.tc-sep{font:700 22px var(--fu);color:var(--muted);padding-top:34px;width:10px;text-align:center}
+.tc-res{margin-top:28px;background:var(--chip);border-radius:20px;padding:22px 16px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tc-big{font:800 clamp(34px,11vw,52px)/1.1 var(--fd);font-variant-numeric:tabular-nums;color:var(--ink);letter-spacing:.02em}
+.tc-cap{color:var(--accent);font:700 14px var(--fu);margin-top:8px;min-height:20px}
+.tc-sm{color:var(--muted);font:500 13px var(--fu);margin-top:4px;min-height:18px}
 /* === CONVERTER === */
 .cv-app{font-family:var(--fu);color:var(--ink);width:100%;max-width:560px;margin:0 auto;padding:0 0 8px}
 .cv-app *{box-sizing:border-box}
@@ -1238,6 +1263,10 @@
     <button class="appbtn" data-app="time" aria-label="Точное время">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
       <span>Точное время</span>
+    </button>
+    <button class="appbtn" data-app="tc" aria-label="Калькулятор времени">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4M9 3h6M12 13h3.5"/></svg>
+      <span>Калькулятор времени</span>
     </button>
     <div class="cathdr">СОЦСЕТИ АВТОРА</div>
     <a class="appbtn" href="https://instagram.com/raimtriger" target="_blank" rel="noopener" aria-label="Instagram">
@@ -1561,6 +1590,8 @@
     </div>
     <button id="dlNew" class="qrDlBtn">Другая ссылка</button>
   </div>
+
+  <div id="tcStage" style="display:none"></div>
 
   <div id="cvStage" style="display:none">
 <section class="cv-app" id="cv-app">
@@ -1955,7 +1986,7 @@
     setTimeout(function(){ render(n); el.classList.remove('pop'); },80);
   }
 
-  var TITLES={home:'TAP APP',cv:'КОНВЕРТЕР',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',dl:'СКАЧАТЬ ВИДЕО',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
+  var TITLES={home:'TAP APP',tc:'ТАЙМ-КАЛЬКУЛЯТОР',cv:'КОНВЕРТЕР',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',dl:'СКАЧАТЬ ВИДЕО',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
   function setApp(a){
     app=a;
     if(LAZY_APP_MAP[a]) lazyLoad(LAZY_APP_MAP[a]);
@@ -1995,6 +2026,8 @@
     morseStage.style.display = a==='morse'?'flex':'none';
     qrStage.style.display = a==='qr'?'flex':'none';
     document.getElementById('cvStage').style.display = a==='cv'?'flex':'none';
+    document.getElementById('tcStage').style.display = a==='tc'?'flex':'none';
+    if(a==='tc'&&window.tcShow)window.tcShow();
     dlStage.style.display = a==='dl'?'flex':'none';
     revStage.style.display = a==='rev'?'flex':'none';
     document.getElementById('mode').style.display = a==='note'?'flex':'none';
@@ -2003,7 +2036,7 @@
     document.getElementById('numModeSeg').style.display = a==='num'?'flex':'none';
     document.getElementById('metroSigSeg').style.display = a==='metro'?'flex':'none';
     document.getElementById('metroSndSeg').style.display = a==='metro'?'flex':'none';
-    document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='cv'||a==='dl'||a==='morse'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
+    document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='cv'||a==='tc'||a==='dl'||a==='morse'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
     document.getElementById('autoBtn').style.display = a==='note'?'':'none';
     document.getElementById('resetBpmBtn').style.display = a==='bpm'?'':'none';
     document.getElementById('resetCounterBtn').style.display = a==='counter'?'':'none';
@@ -5028,6 +5061,107 @@ clear.addEventListener('click',function(){
 
 $('cvStage').addEventListener('pointerdown',function(e){e.stopPropagation()});
 load();sync();render();
+})();
+</script>
+<script>
+(function(){
+var host=document.getElementById('tcStage');if(!host)return;
+var EN=window.__LANG==='en';function T(r,e){return EN?e:r}
+var RH=44,KEY='tc_state',used=false;
+var S={mode:'calc',sign:1,a:[1,30,5],d:[0,45,15],f:[9,0,0],t:[10,30,0]};
+try{var sv=JSON.parse(localStorage.getItem(KEY)||'null');
+ if(sv){S.mode=sv.mode==='diff'?'diff':'calc';S.sign=sv.sign===-1?-1:1;
+  ['a','d','f','t'].forEach(function(k){if(Array.isArray(sv[k])&&sv[k].length===3)S[k]=sv[k].map(function(n){return n|0})})}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function p2(n){return n<10?'0'+n:''+n}
+function hms(s){return p2(Math.floor(s/3600))+':'+p2(Math.floor(s%3600/60))+':'+p2(s%60)}
+function sec(a){return a[0]*3600+a[1]*60+a[2]}
+function dayWord(n){n=Math.abs(n);if(EN)return n===1?'day':'days';var m=n%100,k=n%10;return (m>10&&m<20)?'дней':k===1?'день':(k>1&&k<5)?'дня':'дней'}
+function nf(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ')}
+
+host.innerHTML=
+'<div class="tc-app">'+
+'<div class="tc-chips" id="tc-mode" role="group">'+
+ '<button type="button" class="tc-chip" data-m="calc"></button>'+
+ '<button type="button" class="tc-chip" data-m="diff"></button></div>'+
+'<div id="tc-calc">'+
+ '<div class="tc-lab" data-k="time"></div><div class="tc-grp" data-w="a"></div>'+
+ '<div class="tc-chips" id="tc-sign" style="margin-top:20px">'+
+  '<button type="button" class="tc-chip" data-s="1"></button>'+
+  '<button type="button" class="tc-chip" data-s="-1"></button></div>'+
+ '<div class="tc-grp" data-w="d" style="margin-top:12px"></div></div>'+
+'<div id="tc-diff" hidden>'+
+ '<div class="tc-lab" data-k="from"></div><div class="tc-grp" data-w="f"></div>'+
+ '<div class="tc-lab" data-k="to"></div><div class="tc-grp" data-w="t"></div></div>'+
+'<div class="tc-res" id="tc-res" role="button" tabindex="0">'+
+ '<div class="tc-big" id="tc-big">00:00:00</div>'+
+ '<div class="tc-cap" id="tc-cap" aria-live="polite"></div>'+
+ '<div class="tc-sm" id="tc-sm"></div></div></div>';
+function $(q){return host.querySelector(q)}
+var L={time:T('Начальное время','Start time'),from:T('От','From'),to:T('До','To')};
+host.querySelectorAll('[data-k]').forEach(function(e){e.textContent=L[e.getAttribute('data-k')]});
+var mb=host.querySelectorAll('#tc-mode .tc-chip');
+mb[0].textContent=T('Прибавить / вычесть','Add / subtract');mb[1].textContent=T('Разница','Difference');
+var sb=host.querySelectorAll('#tc-sign .tc-chip');
+sb[0].textContent=T('+ Прибавить','+ Add');sb[1].textContent=T('− Вычесть','− Subtract');
+
+var wins={};
+function build(g){
+ var key=g.getAttribute('data-w'),max=[key==='d'?99:23,59,59],un=[T('ч','h'),T('мин','min'),T('сек','sec')];
+ for(var c=0;c<3;c++){
+  if(c){var s=document.createElement('div');s.className='tc-sep';s.textContent=':';g.appendChild(s)}
+  var col=document.createElement('div');col.className='tc-col';
+  col.innerHTML='<div class="tc-unit">'+un[c]+'</div><div class="tc-wrap"><div class="tc-win" role="listbox" aria-label="'+un[c]+'"></div></div>';
+  var w=col.querySelector('.tc-win'),h='';
+  for(var i=0;i<=max[c];i++)h+='<div class="tc-i" data-v="'+i+'">'+p2(i)+'</div>';
+  w.innerHTML=h;g.appendChild(col);
+  (function(w,key,c){
+   w.addEventListener('scroll',function(){
+    var v=Math.max(0,Math.min(w.children.length-1,Math.round(w.scrollTop/RH)));
+    mark(w,v);
+    if(S[key][c]!==v){S[key][c]=v;update(true)}
+   },{passive:true});
+   w.addEventListener('click',function(e){var it=e.target.closest('.tc-i');if(it)w.scrollTo({top:(+it.getAttribute('data-v'))*RH,behavior:'smooth'})});
+   wins[key+c]=w;
+  })(w,key,c);
+ }
+}
+function mark(w,v){var o=w.querySelector('.on');if(o&&+o.getAttribute('data-v')===v)return;if(o)o.classList.remove('on');var n=w.children[v];if(n)n.classList.add('on')}
+host.querySelectorAll('[data-w]').forEach(build);
+function place(){for(var k in wins){var key=k.slice(0,-1),c=+k.slice(-1),v=S[key][c];wins[k].scrollTop=v*RH;mark(wins[k],v)}}
+
+function update(user){
+ var big=$('#tc-big'),cap=$('#tc-cap'),sm=$('#tc-sm');
+ $('#tc-calc').hidden=S.mode!=='calc';$('#tc-diff').hidden=S.mode!=='diff';
+ mb.forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-m')===S.mode))});
+ sb.forEach(function(b){b.setAttribute('aria-pressed',String(+b.getAttribute('data-s')===S.sign))});
+ if(S.mode==='calc'){
+  var tot=sec(S.a)+S.sign*sec(S.d),days=Math.floor(tot/86400),r=tot-days*86400;
+  big.textContent=hms(r);
+  cap.textContent=days===0?T('в тот же день','same day'):(days>0?'+':'−')+Math.abs(days)+' '+dayWord(days);
+  sm.textContent='';
+ }else{
+  var d=sec(S.t)-sec(S.f),wrap=false;if(d<0){d+=86400;wrap=true}
+  big.textContent=hms(d);
+  cap.textContent=wrap?T('через полночь','across midnight'):'';
+  sm.textContent='= '+nf(d)+T(' сек',' sec')+' · '+(Math.round(d/60*100)/100).toString().replace('.',EN?'.':',')+T(' мин',' min');
+ }
+ if(user){save();if(!used){used=true;try{if(window.ym)window.ym(109713949,'reachGoal','timecalc_use')}catch(e){}}}
+}
+mb.forEach(function(b){b.addEventListener('click',function(){S.mode=b.getAttribute('data-m');update(true);place()})});
+sb.forEach(function(b){b.addEventListener('click',function(){S.sign=+b.getAttribute('data-s');update(true)})});
+var res=$('#tc-res'),tm;
+function copy(){
+ var txt=$('#tc-big').textContent,cap=$('#tc-cap'),old=cap.textContent;
+ function ok(){cap.textContent=T('скопировано','copied');clearTimeout(tm);tm=setTimeout(function(){update(false)},1200)}
+ try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,function(){});return}}catch(e){}
+ try{var ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok()}catch(e){}
+}
+res.addEventListener('click',copy);
+res.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();copy()}});
+host.addEventListener('pointerdown',function(e){e.stopPropagation()});
+window.tcShow=function(){update(false);place()};
+update(false);
 })();
 </script>
 <script>

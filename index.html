@@ -64,7 +64,7 @@
   'Москва':'Moscow','Лондон':'London','Нью-Йорк':'New York','Париж':'Paris','Берлин':'Berlin','Стамбул':'Istanbul','Дубай':'Dubai','Алматы':'Almaty','Астана':'Astana','Бангкок':'Bangkok','Дели':'Delhi','Пекин':'Beijing','Токио':'Tokyo','Сидней':'Sydney','Лос-Анджелес':'Los Angeles',
   'Лучший: ±':'Best: ±','Стоп':'Stop','Сумма: ':'Sum: ','Ещё ':'Another ','Тапни ':'Tap ','Тапни ещё ':'Tap another ',
   'Конвертер':'Converter','КОНВЕРТЕР':'CONVERTER','Картинки в PNG, JPEG, WebP, BMP или PDF. Всё считается на устройстве, файлы никуда не отправляются.':'Images to PNG, JPEG, WebP, BMP or PDF. Everything runs on your device, files are never uploaded.','Выбрать фото или файлы':'Choose photos or files','Во что преобразовать':'Convert to','Качество':'Quality','Максимальная сторона, px':'Max side, px','Оригинал':'Original','Страница PDF':'PDF page','По картинке':'Fit image','Все файлы в один PDF':'All files in one PDF','Сохранить все':'Save all','Очистить':'Clear',
-  'Сжатие фото':'Photo compressor','СЖАТИЕ ФОТО':'COMPRESS PHOTO','Калькулятор времени':'Time calculator','ТАЙМ-КАЛЬКУЛЯТОР':'TIME CALC',
+  'Конвертер звука':'Audio converter','КОНВЕРТЕР ЗВУКА':'AUDIO CONVERTER','Сжатие фото':'Photo compressor','СЖАТИЕ ФОТО':'COMPRESS PHOTO','Калькулятор времени':'Time calculator','ТАЙМ-КАЛЬКУЛЯТОР':'TIME CALC',
   'Тапни — крутить':'Tap to spin'
   };
   var RULES=[
@@ -1053,7 +1053,7 @@
 
   /* ---- анти-наезд: каждый экран живёт строго между заголовком и нижними кнопками ---- */
   :root{--padT:112px;--padB:140px;--padX:18px;}
-  #stage,body>[id$="Stage"]:not(#sbStage):not(#revStage):not(#cvStage):not(#tcStage):not(#pcStage){
+  #stage,body>[id$="Stage"]:not(#sbStage):not(#revStage):not(#cvStage):not(#tcStage):not(#pcStage):not(#acStage){
     padding:var(--padT) var(--padX) var(--padB) !important;min-height:0;
   }
   @media (max-height:520px){
@@ -1069,6 +1069,23 @@
   #cvStage{flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
     overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
     padding:calc(var(--padT) + 8px) var(--padX) 100px;}
+  /* ---- audio converter ---- */
+  #acStage{flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
+    padding:calc(var(--padT) + 8px) var(--padX) 100px;}
+.ac-ph{display:grid;place-items:center;width:56px;height:56px;border-radius:10px;background:var(--chip-on);color:var(--ink)}
+.ac-ph svg{width:26px;height:26px}
+.ac-trim{grid-column:1/-1;padding-top:6px}
+.ac-item{grid-template-columns:56px minmax(0,1fr)!important}
+.ac-item .cv-acts{grid-column:1/-1;justify-content:flex-end;gap:8px}
+.ac-item .cv-stat{white-space:normal}
+.ac-wave{position:relative;border-radius:12px;background:var(--chip-on);overflow:hidden}
+.ac-wave canvas{display:block;width:100%;height:56px}
+.ac-rng{width:100%;accent-color:var(--accent);margin:6px 0 0;min-height:32px}
+.ac-tm{display:flex;justify-content:space-between;gap:8px;font:600 12px var(--fu);color:var(--muted);margin-top:2px}
+.ac-tools{display:flex;gap:8px;margin-top:6px}
+.ac-prog{height:3px;border-radius:2px;background:var(--chip-on);margin-top:6px;overflow:hidden}
+.ac-prog i{display:block;height:100%;width:0;background:var(--accent)}
   /* ---- photo compressor ---- */
   #pcStage{flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
     overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
@@ -1271,6 +1288,10 @@
     <button class="appbtn" data-app="pc" aria-label="Сжатие фото">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>
       <span>Сжатие фото</span>
+    </button>
+    <button class="appbtn" data-app="ac" aria-label="Конвертер звука">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+      <span>Конвертер звука</span>
     </button>
     <button class="appbtn" data-app="dl" aria-label="Скачать видео">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 7.5v5M9.8 10.6l2.2 2.2 2.2-2.2M8 20h8"/></svg>
@@ -1618,6 +1639,8 @@
     </div>
     <button id="dlNew" class="qrDlBtn">Другая ссылка</button>
   </div>
+
+  <div id="acStage" style="display:none"></div>
 
   <div id="pcStage" style="display:none"></div>
 
@@ -2016,7 +2039,7 @@
     setTimeout(function(){ render(n); el.classList.remove('pop'); },80);
   }
 
-  var TITLES={home:'TAP APP',pc:'СЖАТИЕ ФОТО',tc:'ТАЙМ-КАЛЬКУЛЯТОР',cv:'КОНВЕРТЕР',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',dl:'СКАЧАТЬ ВИДЕО',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
+  var TITLES={home:'TAP APP',ac:'КОНВЕРТЕР ЗВУКА',pc:'СЖАТИЕ ФОТО',tc:'ТАЙМ-КАЛЬКУЛЯТОР',cv:'КОНВЕРТЕР',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',dl:'СКАЧАТЬ ВИДЕО',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
   function setApp(a){
     app=a;
     if(LAZY_APP_MAP[a]) lazyLoad(LAZY_APP_MAP[a]);
@@ -2058,6 +2081,7 @@
     document.getElementById('cvStage').style.display = a==='cv'?'flex':'none';
     document.getElementById('tcStage').style.display = a==='tc'?'flex':'none';
     document.getElementById('pcStage').style.display = a==='pc'?'flex':'none';
+    document.getElementById('acStage').style.display = a==='ac'?'flex':'none';
     if(a==='tc'&&window.tcShow)window.tcShow();
     dlStage.style.display = a==='dl'?'flex':'none';
     revStage.style.display = a==='rev'?'flex':'none';
@@ -2067,7 +2091,7 @@
     document.getElementById('numModeSeg').style.display = a==='num'?'flex':'none';
     document.getElementById('metroSigSeg').style.display = a==='metro'?'flex':'none';
     document.getElementById('metroSndSeg').style.display = a==='metro'?'flex':'none';
-    document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='cv'||a==='tc'||a==='pc'||a==='dl'||a==='morse'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
+    document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='cv'||a==='tc'||a==='pc'||a==='ac'||a==='dl'||a==='morse'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
     document.getElementById('autoBtn').style.display = a==='note'?'':'none';
     document.getElementById('resetBpmBtn').style.display = a==='bpm'?'':'none';
     document.getElementById('resetCounterBtn').style.display = a==='counter'?'':'none';
@@ -5343,6 +5367,172 @@ function add(fl){
  if(!fresh.length)return;
  if(!used){used=true;try{if(window.ym)window.ym(109713949,'reachGoal','photo_compress')}catch(e){}}
  items=items.concat(fresh);render();var g=gen;fresh.forEach(function(it){Q=Q.then(function(){return work(it,g)})})}
+host.addEventListener('pointerdown',function(e){e.stopPropagation()});
+render();
+})();
+</script>
+<script>
+(function(){
+var host=document.getElementById('acStage');if(!host)return;
+var EN=window.__LANG==='en';function T(r,e){return EN?e:r}
+var KEY='ac_state',MAXFILES=20,MAXBYTES=120*1048576,used=false,LAME='assets/lame.min.js?v=1';
+var S={fmt:'mp3',kbps:192,rate:44100,mono:false},items=[],lamePromise=null,pctx=null,playing=null;
+try{var sv=JSON.parse(localStorage.getItem(KEY)||'null');if(sv){if(sv.fmt==='wav')S.fmt='wav';if([128,192,256,320].indexOf(sv.kbps)>=0)S.kbps=sv.kbps;if(sv.rate===48000)S.rate=48000;S.mono=!!sv.mono}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function fs(n){if(n<1024)return n+T(' Б',' B');if(n<1048576)return Math.round(n/1024)+T(' КБ',' KB');return (n/1048576).toFixed(1).replace('.',EN?'.':',')+T(' МБ',' MB')}
+function tm(s,d){s=Math.max(0,s);var m=Math.floor(s/60),x=s-m*60;return m+':'+(x<10?'0':'')+x.toFixed(d||0)}
+function el(t,c){var e=document.createElement(t);if(c)e.className=c;return e}
+function yld(){return new Promise(function(r){setTimeout(r,0)})}
+var ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>';
+
+host.innerHTML=
+'<div class="cv-app"><p class="cv-sub"></p>'+
+'<label class="cv-pick" for="ac-input">'+ICON+'<span></span></label>'+
+'<input class="cv-hide" id="ac-input" type="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.aif,.aiff,.caf" multiple>'+
+'<p class="cv-note" id="ac-note" role="status"></p>'+
+'<div class="cv-label" data-k="to"></div><div class="cv-chips" id="ac-fmt"></div>'+
+'<div id="ac-kw"><div class="cv-label" data-k="kb"></div><div class="cv-chips" id="ac-kbps"></div></div>'+
+'<div class="cv-label" data-k="rate"></div><div class="cv-chips" id="ac-rate"></div>'+
+'<div class="cv-label" data-k="ch"></div><div class="cv-chips" id="ac-ch"></div>'+
+'<ul class="cv-list" id="ac-list"></ul><p class="cv-sum" id="ac-sum"></p>'+
+'<div class="cv-bar" id="ac-bar" hidden><button type="button" class="cv-btn" id="ac-go"></button><button type="button" class="cv-btn" id="ac-all"></button><button type="button" class="cv-ghost" id="ac-clear"></button></div></div>';
+function $(q){return host.querySelector(q)}
+var L={to:T('Во что преобразовать','Convert to'),kb:T('Битрейт MP3','MP3 bitrate'),rate:T('Частота','Sample rate'),ch:T('Каналы','Channels')};
+host.querySelectorAll('[data-k]').forEach(function(e){e.textContent=L[e.getAttribute('data-k')]});
+$('.cv-sub').textContent=T('Аудио в MP3 или WAV, с обрезкой нужного куска. Всё считается на устройстве, файлы никуда не уходят.','Audio to MP3 or WAV with trimming. Everything runs on your device, files are never uploaded.');
+$('.cv-pick span').textContent=T('Выбрать аудио','Choose audio');
+$('#ac-go').textContent=T('Конвертировать все','Convert all');$('#ac-all').textContent=T('Сохранить все','Save all');$('#ac-clear').textContent=T('Очистить','Clear');
+var list=$('#ac-list'),note=$('#ac-note'),sum=$('#ac-sum'),bar=$('#ac-bar');
+
+function chips(id,arr,get,set){var box=$(id);arr.forEach(function(o){var b=el('button','cv-chip');b.type='button';b.textContent=o[1];b.setAttribute('data-v',o[0]);b.onclick=function(){set(o[0])};box.appendChild(b)});
+ return function(){box.querySelectorAll('.cv-chip').forEach(function(b){b.setAttribute('aria-pressed',String(String(get())===b.getAttribute('data-v')))})}}
+var rF=chips('#ac-fmt',[['mp3','MP3'],['wav','WAV']],function(){return S.fmt},function(v){S.fmt=v;changed()});
+var rK=chips('#ac-kbps',[[128,'128'],[192,'192'],[256,'256'],[320,'320']],function(){return S.kbps},function(v){S.kbps=+v;changed()});
+var rR=chips('#ac-rate',[[44100,T('44,1 кГц','44.1 kHz')],[48000,T('48 кГц','48 kHz')]],function(){return S.rate},function(v){var r=+v;if(r===S.rate)return;S.rate=r;save();sync();redecode()});
+var rC=chips('#ac-ch',[['st',T('Как в файле','As in file')],['mono',T('Моно','Mono')]],function(){return S.mono?'mono':'st'},function(v){S.mono=v==='mono';changed()});
+function sync(){rF();rK();rR();rC();$('#ac-kw').hidden=S.fmt!=='mp3'}
+function changed(){items.forEach(function(it){it.out=null});save();sync();render()}
+sync();
+
+/* decode */
+function decode(file,rate){return file.arrayBuffer().then(function(ab){return new Promise(function(res,rej){
+ var C=window.OfflineAudioContext||window.webkitOfflineAudioContext;if(!C)return rej(new Error('noapi'));
+ var oc=new C(2,1,rate);try{var p=oc.decodeAudioData(ab,res,rej);if(p&&p.catch)p.catch(rej)}catch(e){rej(e)}})})}
+function peaksOf(b){var n=320,l=b.getChannelData(0),r=b.numberOfChannels>1?b.getChannelData(1):l,step=Math.max(1,Math.floor(b.length/n)),out=new Float32Array(n);
+ for(var i=0;i<n;i++){var m=0,s=i*step,e=Math.min(b.length,s+step),k=Math.max(1,Math.floor((e-s)/200));for(var j=s;j<e;j+=k){var v=Math.max(Math.abs(l[j]),Math.abs(r[j]));if(v>m)m=v}out[i]=m}return out}
+function load(it){it.busy=true;it.err='';render();
+ return decode(it.file,S.rate).then(function(b){var old=it.dur;it.buf=b;it.dur=b.duration;it.peaks=peaksOf(b);
+  if(old==null){it.t0=0;it.t1=b.duration}else{it.t0=Math.min(it.t0,b.duration);it.t1=Math.min(Math.max(it.t1,it.t0+.05),b.duration)}
+  it.busy=false;render()},function(){it.busy=false;it.buf=null;it.err=T('Не удалось прочитать этот формат','Can\'t read this format');render()})}
+var DQ=Promise.resolve();function loadQ(it){DQ=DQ.then(function(){return load(it)})}
+function redecode(){items.forEach(function(it){it.out=null;if(it.buf)loadQ(it)});render()}
+
+/* encode */
+function loadLame(){if(window.lamejs&&window.lamejs.Mp3Encoder)return Promise.resolve();
+ if(lamePromise)return lamePromise;
+ lamePromise=new Promise(function(res,rej){var s=document.createElement('script');s.src=LAME;s.onload=function(){window.lamejs&&window.lamejs.Mp3Encoder?res():rej(new Error('lame'))};s.onerror=function(){rej(new Error('lame'))};document.head.appendChild(s)}).catch(function(e){lamePromise=null;throw e});
+ return lamePromise}
+function f16(x){return x<=-1?-32768:x>=1?32767:Math.round(x*32767)}
+async function encode(it){
+ var b=it.buf,sr=b.sampleRate,i0=Math.max(0,Math.floor(it.t0*sr)),i1=Math.min(b.length,Math.ceil(it.t1*sr)),n=i1-i0;
+ if(n<=0)throw new Error('empty');
+ var nch=(S.mono||b.numberOfChannels<2)?1:2,A=b.getChannelData(0),B=b.numberOfChannels>1?b.getChannelData(1):A,mono2=S.mono&&b.numberOfChannels>1;
+ var CH=1152*40,parts=[],base=it.file.name.replace(/\.[^.]+$/,'')||'audio';
+ function chunk(s,e,l,r){for(var i=s,k=0;i<e;i++,k++){var x=A[i],y=B[i];if(mono2){l[k]=f16((x+y)/2)}else{l[k]=f16(x);if(r)r[k]=f16(y)}}}
+ if(S.fmt==='wav'){
+  var data=n*nch*2,buf=new ArrayBuffer(44+data),v=new DataView(buf);
+  function str(o,s){for(var i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))}
+  str(0,'RIFF');v.setUint32(4,36+data,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,nch,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr*nch*2,true);v.setUint16(32,nch*2,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,data,true);
+  var o=44;
+  for(var s=i0;s<i1;){var e=Math.min(i1,s+65536);
+   for(var i=s;i<e;i++){var x=A[i],y=B[i];if(nch===1){v.setInt16(o,f16(mono2?(x+y)/2:x),true);o+=2}else{v.setInt16(o,f16(x),true);v.setInt16(o+2,f16(y),true);o+=4}}
+   s=e;it.prog=(s-i0)/n;prog(it);await yld()}
+  return {blob:new Blob([buf],{type:'audio/wav'}),name:base+'.wav'}
+ }
+ await loadLame();
+ var enc=new window.lamejs.Mp3Encoder(nch,sr,S.kbps);
+ for(var s2=i0;s2<i1;){var e2=Math.min(i1,s2+CH),len=e2-s2,l=new Int16Array(len),r=nch===2?new Int16Array(len):null;
+  chunk(s2,e2,l,r);var out=nch===2?enc.encodeBuffer(l,r):enc.encodeBuffer(l);if(out.length)parts.push(out);
+  s2=e2;it.prog=(s2-i0)/n;prog(it);await yld()}
+ var fin=enc.flush();if(fin.length)parts.push(fin);
+ return {blob:new Blob(parts,{type:'audio/mpeg'}),name:base+'.mp3'}
+}
+function prog(it){if(it.bar)it.bar.style.width=Math.round((it.prog||0)*100)+'%'}
+var EQ=Promise.resolve();
+function convert(it){if(it.busy||it.enc||!it.buf)return EQ;it.enc=true;it.prog=0;render();
+ EQ=EQ.then(function(){return encode(it)}).then(function(o){it.out=o;it.enc=false;render()},function(e){it.enc=false;it.err=(e&&e.message==='lame')?T('Не загрузился MP3-кодер, проверь интернет и попробуй ещё раз','MP3 encoder failed to load, check connection and retry'):(e&&e.message==='empty')?T('Пустой отрезок, поправь обрезку','Empty selection, fix the trim'):T('Не хватило памяти, обрежь файл','Out of memory, trim the file');render()});
+ if(!used){used=true;try{if(window.ym)window.ym(109713949,'reachGoal','audio_convert')}catch(e){}}
+ return EQ}
+
+/* save */
+function dl(arr){arr.forEach(function(o,i){setTimeout(function(){var a=document.createElement('a');a.href=URL.createObjectURL(o.blob);a.download=o.name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},4000)},i*350)})}
+function saveF(arr){var files=arr.map(function(o){return new File([o.blob],o.name,{type:o.blob.type})});
+ if(navigator.canShare&&navigator.share){var ok=false;try{ok=navigator.canShare({files:files})}catch(e){}
+  if(ok){navigator.share({files:files}).catch(function(e){if(!e||e.name!=='AbortError')dl(arr)});return}}
+ dl(arr)}
+
+/* preview */
+function stop(){if(playing){try{playing.src.stop()}catch(e){}playing.btn.textContent=playing.txt;playing=null}}
+function play(it,btn){if(playing&&playing.it===it){stop();return}stop();
+ try{var C=window.AudioContext||window.webkitAudioContext;if(!pctx)pctx=new C();if(pctx.resume)pctx.resume();
+  var src=pctx.createBufferSource();src.buffer=it.buf;src.connect(pctx.destination);var txt=btn.textContent;
+  src.onended=function(){if(playing&&playing.src===src){btn.textContent=txt;playing=null}};
+  src.start(0,it.t0,Math.max(.05,it.t1-it.t0));playing={it:it,src:src,btn:btn,txt:txt};btn.textContent='■ '+T('Стоп','Stop')}catch(e){}}
+function wave(it,cv){var c=cv.getContext('2d'),w=cv.width,h=cv.height,p=it.peaks;c.clearRect(0,0,w,h);if(!p)return;
+ var st=getComputedStyle(host),ink=st.getPropertyValue('--ink')||'#fff',ac=st.getPropertyValue('--accent')||'#e0a85e';
+ var a=Math.floor(it.t0/it.dur*w),b=Math.ceil(it.t1/it.dur*w),bw=w/p.length;
+ for(var i=0;i<p.length;i++){var x=i*bw,hh=Math.max(2,p[i]*h*.9),inside=x+bw>=a&&x<=b;c.fillStyle=inside?ac:ink;c.globalAlpha=inside?1:.25;c.fillRect(x,(h-hh)/2,Math.max(1,bw-1),hh)}c.globalAlpha=1}
+
+/* render */
+function render(){
+ list.textContent='';
+ items.forEach(function(it){
+  var li=el('li','cv-item ac-item'),ph=el('div','ac-ph');ph.innerHTML=ICON;
+  var m=el('div','cv-meta'),n=el('div','cv-name'),s=el('div','cv-stat');n.textContent=it.file.name;
+  var trimmed=it.buf&&(it.t0>0.005||it.t1<it.dur-0.005);
+  if(it.err){s.className+=' cv-err';s.textContent=it.err}
+  else if(it.busy)s.textContent=fs(it.file.size)+T(' · читаю…',' · decoding…');
+  else if(it.enc)s.textContent=T('Конвертирую…','Converting…');
+  else if(it.out)s.textContent=tm(it.t1-it.t0)+' · '+fs(it.file.size)+' → '+fs(it.out.blob.size);
+  else s.textContent=tm(it.dur)+' · '+fs(it.file.size)+(trimmed?' · ✂ '+tm(it.t0,1)+'–'+tm(it.t1,1):'');
+  m.appendChild(n);m.appendChild(s);
+  if(it.enc){var pb=el('div','ac-prog'),pi=document.createElement('i');pb.appendChild(pi);m.appendChild(pb);it.bar=pi;prog(it)}
+  var a=el('div','cv-acts');
+  if(it.buf&&!it.enc){
+   var tb=el('button','cv-x');tb.type='button';tb.textContent='✂';tb.style.fontSize='18px';tb.setAttribute('aria-label',T('Обрезать','Trim'));tb.onclick=function(){stop();it.open=!it.open;render()};a.appendChild(tb);
+   var b=el('button','cv-btn');b.type='button';
+   if(it.out){b.textContent=T('Сохранить','Save');b.onclick=function(){saveF([it.out])}}else{b.textContent=T('Конвертировать','Convert');b.onclick=function(){convert(it)}}
+   a.appendChild(b)}
+  var x=el('button','cv-x');x.type='button';x.textContent='×';x.setAttribute('aria-label',T('Убрать ','Remove ')+it.file.name);x.onclick=function(){stop();items.splice(items.indexOf(it),1);render()};a.appendChild(x);
+  li.appendChild(ph);li.appendChild(m);li.appendChild(a);
+  if(it.open&&it.buf){
+   var tp=el('div','ac-trim'),wv=el('div','ac-wave'),cv=document.createElement('canvas');cv.width=640;cv.height=112;wv.appendChild(cv);tp.appendChild(wv);
+   var r0=el('input','ac-rng'),r1=el('input','ac-rng');[r0,r1].forEach(function(r){r.type='range';r.min=0;r.max=it.dur;r.step=.01});
+   r0.value=it.t0;r1.value=it.t1;r0.setAttribute('aria-label',T('Начало','Start'));r1.setAttribute('aria-label',T('Конец','End'));
+   var lt=el('div','ac-tm'),sa=document.createElement('span'),sb=document.createElement('span'),sc=document.createElement('span');lt.appendChild(sa);lt.appendChild(sc);lt.appendChild(sb);
+   function upd(){sa.textContent=T('От ','From ')+tm(it.t0,1);sb.textContent=T('До ','To ')+tm(it.t1,1);sc.textContent=T('длина ','len ')+tm(it.t1-it.t0,1);wave(it,cv)}
+   r0.oninput=function(){var v=Math.min(+r0.value,it.t1-.05);r0.value=v;it.t0=v;it.out=null;upd()};
+   r1.oninput=function(){var v=Math.max(+r1.value,it.t0+.05);r1.value=v;it.t1=v;it.out=null;upd()};
+   [r0,r1].forEach(function(r){r.onchange=function(){render()}});
+   tp.appendChild(r0);tp.appendChild(r1);tp.appendChild(lt);
+   var tl=el('div','ac-tools'),pb2=el('button','cv-btn');pb2.type='button';pb2.textContent='▶ '+T('Послушать','Preview');pb2.onclick=function(){play(it,pb2)};
+   var rs=el('button','cv-ghost');rs.type='button';rs.textContent=T('Сброс','Reset');rs.onclick=function(){stop();it.t0=0;it.t1=it.dur;it.out=null;render()};
+   tl.appendChild(pb2);tl.appendChild(rs);tp.appendChild(tl);li.appendChild(tp);upd()}
+  list.appendChild(li)});
+ var ok=items.filter(function(i){return i.out}),todo=items.filter(function(i){return i.buf&&!i.out&&!i.enc&&!i.busy}),busy=items.some(function(i){return i.enc||i.busy});
+ bar.hidden=!items.length;$('#ac-go').hidden=todo.length<2;$('#ac-all').hidden=ok.length<2;
+ sum.textContent=''}
+$('#ac-go').onclick=function(){items.filter(function(i){return i.buf&&!i.out}).forEach(convert)};
+$('#ac-all').onclick=function(){saveF(items.filter(function(i){return i.out}).map(function(i){return i.out}))};
+$('#ac-clear').onclick=function(){stop();items=[];render()};
+$('#ac-input').addEventListener('change',function(e){add(e.target.files);e.target.value=''});
+function add(fl){var arr=Array.prototype.slice.call(fl||[]),bad=0,big=0,fresh=[];
+ arr.forEach(function(f){if(!/^(audio|video)\//.test(f.type)&&!/\.(mp3|wav|m4a|aac|ogg|oga|opus|flac|aif|aiff|caf|mp4|mov|3gp)$/i.test(f.name)){bad++;return}
+  if(f.size>MAXBYTES){big++;return}if(items.length+fresh.length>=MAXFILES)return;
+  fresh.push({file:f,busy:true,out:null,err:'',open:false})});
+ var msg=[];if(bad)msg.push(T('Пропущено не-аудио: ','Skipped non-audio: ')+bad);if(big)msg.push(T('Слишком большие (>120 МБ): ','Too large (>120 MB): ')+big);note.textContent=msg.join(' · ');
+ if(!fresh.length)return;items=items.concat(fresh);fresh.forEach(function(it){loadQ(it)});render()}
 host.addEventListener('pointerdown',function(e){e.stopPropagation()});
 render();
 })();

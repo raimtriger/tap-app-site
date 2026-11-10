@@ -64,7 +64,7 @@
   'Москва':'Moscow','Лондон':'London','Нью-Йорк':'New York','Париж':'Paris','Берлин':'Berlin','Стамбул':'Istanbul','Дубай':'Dubai','Алматы':'Almaty','Астана':'Astana','Бангкок':'Bangkok','Дели':'Delhi','Пекин':'Beijing','Токио':'Tokyo','Сидней':'Sydney','Лос-Анджелес':'Los Angeles',
   'Лучший: ±':'Best: ±','Стоп':'Stop','Сумма: ':'Sum: ','Ещё ':'Another ','Тапни ':'Tap ','Тапни ещё ':'Tap another ',
   'Конвертер':'Converter','КОНВЕРТЕР':'CONVERTER','Картинки в PNG, JPEG, WebP, BMP или PDF. Всё считается на устройстве, файлы никуда не отправляются.':'Images to PNG, JPEG, WebP, BMP or PDF. Everything runs on your device, files are never uploaded.','Выбрать фото или файлы':'Choose photos or files','Во что преобразовать':'Convert to','Качество':'Quality','Максимальная сторона, px':'Max side, px','Оригинал':'Original','Страница PDF':'PDF page','По картинке':'Fit image','Все файлы в один PDF':'All files in one PDF','Сохранить все':'Save all','Очистить':'Clear',
-  'Калькулятор времени':'Time calculator','ТАЙМ-КАЛЬКУЛЯТОР':'TIME CALC',
+  'Сжатие фото':'Photo compressor','СЖАТИЕ ФОТО':'COMPRESS PHOTO','Калькулятор времени':'Time calculator','ТАЙМ-КАЛЬКУЛЯТОР':'TIME CALC',
   'Тапни — крутить':'Tap to spin'
   };
   var RULES=[
@@ -1053,7 +1053,7 @@
 
   /* ---- анти-наезд: каждый экран живёт строго между заголовком и нижними кнопками ---- */
   :root{--padT:112px;--padB:140px;--padX:18px;}
-  #stage,body>[id$="Stage"]:not(#sbStage):not(#revStage):not(#cvStage):not(#tcStage){
+  #stage,body>[id$="Stage"]:not(#sbStage):not(#revStage):not(#cvStage):not(#tcStage):not(#pcStage){
     padding:var(--padT) var(--padX) var(--padB) !important;min-height:0;
   }
   @media (max-height:520px){
@@ -1069,6 +1069,28 @@
   #cvStage{flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
     overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
     padding:calc(var(--padT) + 8px) var(--padX) 100px;}
+  /* ---- photo compressor ---- */
+  #pcStage{flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
+    padding:calc(var(--padT) + 8px) var(--padX) 100px;}
+.pc-kb{display:flex;align-items:center;gap:8px;margin-top:10px}
+.pc-kb input{width:110px;min-height:44px;border:1.5px solid transparent;border-radius:999px;background:var(--chip);color:var(--ink);font:600 14px var(--fu);padding:0 16px;text-align:center}
+.pc-kb input:focus{outline:none;border-color:var(--accent)}
+.pc-kb span{color:var(--muted);font:600 13px var(--fu)}
+.pc-thumb{padding:0;border:0;background:none;cursor:pointer;display:block;position:relative;-webkit-tap-highlight-color:transparent}
+.pc-thumb[disabled]{cursor:default}
+.pc-cmp{position:fixed;inset:0;z-index:400;background:var(--bg);display:flex;flex-direction:column;font-family:var(--fu);color:var(--ink)}
+.pc-cmp[hidden]{display:none}
+.pc-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:max(14px,env(safe-area-inset-top)) 16px 10px}
+.pc-top b{font:700 13px var(--fu);color:var(--muted);letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pc-close{border:0;border-radius:50%;width:44px;height:44px;flex:none;background:var(--chip);color:var(--ink);font-size:24px;line-height:1;cursor:pointer}
+.pc-box{position:relative;flex:1;margin:0 12px max(24px,env(safe-area-inset-bottom));touch-action:none;overflow:hidden;border-radius:14px;background:var(--chip);-webkit-user-select:none;user-select:none;--p:50%}
+.pc-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;-webkit-user-drag:none}
+.pc-box .pc-a{clip-path:inset(0 0 0 var(--p))}
+.pc-line{position:absolute;top:0;bottom:0;left:var(--p);width:2px;margin-left:-1px;background:var(--accent);pointer-events:none}
+.pc-line::after{content:"";position:absolute;top:50%;left:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:var(--accent);box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.pc-tag{position:absolute;top:10px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font:700 12px var(--fu);pointer-events:none}
+.pc-tag.l{left:10px}.pc-tag.r{right:10px}
   /* ---- time calculator ---- */
   #tcStage{flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
     overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
@@ -1245,6 +1267,10 @@
     <button class="appbtn" data-app="cv" aria-label="Конвертер">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3"/><path d="M17 17H6l3 3"/></svg>
       <span>Конвертер</span>
+    </button>
+    <button class="appbtn" data-app="pc" aria-label="Сжатие фото">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>
+      <span>Сжатие фото</span>
     </button>
     <button class="appbtn" data-app="dl" aria-label="Скачать видео">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 7.5v5M9.8 10.6l2.2 2.2 2.2-2.2M8 20h8"/></svg>
@@ -1592,6 +1618,8 @@
     </div>
     <button id="dlNew" class="qrDlBtn">Другая ссылка</button>
   </div>
+
+  <div id="pcStage" style="display:none"></div>
 
   <div id="tcStage" style="display:none"></div>
 
@@ -1988,7 +2016,7 @@
     setTimeout(function(){ render(n); el.classList.remove('pop'); },80);
   }
 
-  var TITLES={home:'TAP APP',tc:'ТАЙМ-КАЛЬКУЛЯТОР',cv:'КОНВЕРТЕР',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',dl:'СКАЧАТЬ ВИДЕО',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
+  var TITLES={home:'TAP APP',pc:'СЖАТИЕ ФОТО',tc:'ТАЙМ-КАЛЬКУЛЯТОР',cv:'КОНВЕРТЕР',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',dl:'СКАЧАТЬ ВИДЕО',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
   function setApp(a){
     app=a;
     if(LAZY_APP_MAP[a]) lazyLoad(LAZY_APP_MAP[a]);
@@ -2029,6 +2057,7 @@
     qrStage.style.display = a==='qr'?'flex':'none';
     document.getElementById('cvStage').style.display = a==='cv'?'flex':'none';
     document.getElementById('tcStage').style.display = a==='tc'?'flex':'none';
+    document.getElementById('pcStage').style.display = a==='pc'?'flex':'none';
     if(a==='tc'&&window.tcShow)window.tcShow();
     dlStage.style.display = a==='dl'?'flex':'none';
     revStage.style.display = a==='rev'?'flex':'none';
@@ -2038,7 +2067,7 @@
     document.getElementById('numModeSeg').style.display = a==='num'?'flex':'none';
     document.getElementById('metroSigSeg').style.display = a==='metro'?'flex':'none';
     document.getElementById('metroSndSeg').style.display = a==='metro'?'flex':'none';
-    document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='cv'||a==='tc'||a==='dl'||a==='morse'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
+    document.getElementById('soundBtn').style.display = (a==='tuner'||a==='home'||a==='qr'||a==='cv'||a==='tc'||a==='pc'||a==='dl'||a==='morse'||a==='noise'||a==='voice'||a==='rev'||a==='time')?'none':'';
     document.getElementById('autoBtn').style.display = a==='note'?'':'none';
     document.getElementById('resetBpmBtn').style.display = a==='bpm'?'':'none';
     document.getElementById('resetCounterBtn').style.display = a==='counter'?'':'none';
@@ -5167,6 +5196,155 @@ function fz(){fade.classList.toggle('off',host.scrollTop+host.clientHeight>=host
 host.addEventListener('scroll',fz,{passive:true});window.addEventListener('resize',fz);
 window.tcShow=function(){update(false);place();fz()};
 update(false);
+})();
+</script>
+<script>
+(function(){
+var host=document.getElementById('pcStage');if(!host)return;
+var EN=window.__LANG==='en';function T(r,e){return EN?e:r}
+var KEY='pc_state',PXLIM=16000000,MAXFILES=30,used=false;
+var S={kb:200,fmt:'jpeg',max:0},items=[],gen=0,Q=Promise.resolve();
+try{var sv=JSON.parse(localStorage.getItem(KEY)||'null');if(sv){
+ if(sv.kb>=10&&sv.kb<=20000)S.kb=sv.kb|0;if(sv.fmt==='webp')S.fmt='webp';if(sv.max===2048||sv.max===1080)S.max=sv.max}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function webpOK(){try{var c=document.createElement('canvas');c.width=c.height=1;return c.toDataURL('image/webp').indexOf('data:image/webp')===0}catch(e){return false}}
+if(S.fmt==='webp'&&!webpOK())S.fmt='jpeg';
+function fs(n){if(n<1024)return n+T(' Б',' B');if(n<1048576)return Math.round(n/1024)+T(' КБ',' KB');return (n/1048576).toFixed(1).replace('.',EN?'.':',')+T(' МБ',' MB')}
+function el(t,c){var e=document.createElement(t);if(c)e.className=c;return e}
+
+host.innerHTML=
+'<div class="cv-app">'+
+'<p class="cv-sub"></p>'+
+'<label class="cv-pick" for="pc-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg><span></span></label>'+
+'<input class="cv-hide" id="pc-input" type="file" accept="image/*" multiple>'+
+'<p class="cv-note" id="pc-note" role="status"></p>'+
+'<div class="cv-label" data-k="to"></div><div class="cv-chips" id="pc-kb"></div>'+
+'<div class="pc-kb"><input id="pc-cus" type="number" inputmode="numeric" min="10" max="20000" step="10"><span data-k="kb"></span></div>'+
+'<div class="cv-label" data-k="fmt"></div><div class="cv-chips" id="pc-fmt"></div>'+
+'<div class="cv-label" data-k="max"></div><div class="cv-chips" id="pc-max"></div>'+
+'<ul class="cv-list" id="pc-list"></ul>'+
+'<p class="cv-sum" id="pc-sum"></p>'+
+'<div class="cv-bar" id="pc-bar" hidden><button type="button" class="cv-btn" id="pc-all"></button><button type="button" class="cv-ghost" id="pc-clear"></button></div>'+
+'</div>'+
+'<div class="pc-cmp" id="pc-cmp" hidden><div class="pc-top"><b id="pc-ct"></b><button type="button" class="pc-close" id="pc-cx" aria-label="Close">×</button></div>'+
+'<div class="pc-box" id="pc-box"><img id="pc-b" alt=""><img class="pc-a" id="pc-a" alt=""><div class="pc-line"></div><span class="pc-tag l" id="pc-tl"></span><span class="pc-tag r" id="pc-tr"></span></div></div>';
+function $(q){return host.querySelector(q)}
+var L={to:T('Сжать до','Compress to'),kb:T('КБ','KB'),fmt:T('Формат','Format'),max:T('Максимальная сторона, px','Max side, px')};
+host.querySelectorAll('[data-k]').forEach(function(e){e.textContent=L[e.getAttribute('data-k')]});
+$('.cv-sub').textContent=T('Ужимает фото до нужного веса и показывает, что стало с качеством. Всё на устройстве, файлы никуда не уходят. Тап по превью — сравнить до и после.','Shrinks photos to the size you need and shows what happened to quality. Everything runs on your device. Tap a preview to compare before and after.');
+$('.cv-pick span').textContent=T('Выбрать фото','Choose photos');
+$('#pc-all').textContent=T('Сохранить все','Save all');$('#pc-clear').textContent=T('Очистить','Clear');
+var list=$('#pc-list'),note=$('#pc-note'),sum=$('#pc-sum'),bar=$('#pc-bar'),cus=$('#pc-cus');
+
+function chips(id,arr,get,set){
+ var box=$(id);box.textContent='';
+ arr.forEach(function(o){var b=el('button','cv-chip');b.type='button';b.textContent=o[1];b.setAttribute('data-v',o[0]);
+  b.onclick=function(){set(o[0])};box.appendChild(b)});
+ return function(){box.querySelectorAll('.cv-chip').forEach(function(b){b.setAttribute('aria-pressed',String(String(get())===b.getAttribute('data-v')))})}
+}
+var rKB=chips('#pc-kb',[[100,'100 '+T('КБ','KB')],[200,'200 '+T('КБ','KB')],[500,'500 '+T('КБ','KB')],[1024,'1 '+T('МБ','MB')]],function(){return S.kb},function(v){S.kb=+v;cus.value='';sync();recompute()});
+var fm=[['jpeg','JPEG']];if(webpOK())fm.push(['webp','WebP']);
+var rFmt=chips('#pc-fmt',fm,function(){return S.fmt},function(v){S.fmt=v;sync();recompute()});
+var rMax=chips('#pc-max',[[0,T('Оригинал','Original')],[2048,'2048'],[1080,'1080']],function(){return S.max},function(v){S.max=+v;sync();recompute()});
+function sync(){rKB();rFmt();rMax();save()}
+var ct;cus.value=[100,200,500,1024].indexOf(S.kb)<0?S.kb:'';
+cus.addEventListener('input',function(){clearTimeout(ct);ct=setTimeout(function(){var v=Math.round(+cus.value);if(v>=10&&v<=20000){S.kb=v;sync();recompute()}},600)});
+sync();
+
+/* ---- decode / compress ---- */
+function viaImg(f){return new Promise(function(res,rej){var u=URL.createObjectURL(f),im=new Image();
+ im.onload=function(){if(!im.naturalWidth){URL.revokeObjectURL(u);rej(new Error('size'));return}res({src:im,w:im.naturalWidth,h:im.naturalHeight,close:function(){URL.revokeObjectURL(u)}})};
+ im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('decode'))};im.src=u})}
+function decode(f){
+ if(window.createImageBitmap)return createImageBitmap(f,{imageOrientation:'from-image'}).catch(function(){return createImageBitmap(f)}).then(function(b){return {src:b,w:b.width,h:b.height,close:function(){if(b.close)b.close()}}}).catch(function(){return viaImg(f)});
+ return viaImg(f)}
+function blobOf(c,mime,q){return new Promise(function(res,rej){c.toBlob(function(b){b?res(b):rej(new Error('enc'))},mime,q)})}
+function draw(d,k,jpeg){var w=Math.max(1,Math.round(d.w*k)),h=Math.max(1,Math.round(d.h*k)),c=document.createElement('canvas');c.width=w;c.height=h;
+ var x=c.getContext('2d');if(jpeg){x.fillStyle='#fff';x.fillRect(0,0,w,h)}x.drawImage(d.src,0,0,w,h);return c}
+function fit(d,k,target,mime,n){
+ var c=draw(d,k,mime==='image/jpeg'),w=c.width,h=c.height;
+ function done(b,q){c.width=c.height=0;return {blob:b,w:w,h:h,q:q}}
+ return blobOf(c,mime,0.95).then(function(b){
+  if(b.size<=target)return done(b,.95);
+  return blobOf(c,mime,0.35).then(function(bl){
+   if(bl.size>target){c.width=c.height=0;if(n>=10)return {blob:bl,w:w,h:h,q:.35,over:true};return fit(d,k*0.8,target,mime,n+1)}
+   var lo=.35,hi=.95,best=bl,bq=.35,i=0;
+   function step(){if(i++>=6)return done(best,bq);var m=(lo+hi)/2;
+    return blobOf(c,mime,m).then(function(x){if(x.size<=target){lo=m;best=x;bq=m}else hi=m;return step()})}
+   return step()})})}
+function comp(it){
+ var target=S.kb*1024,mime=S.fmt==='webp'?'image/webp':'image/jpeg',ext=S.fmt==='webp'?'webp':'jpg';
+ var base=it.file.name.replace(/\.[^.]+$/,'')||'photo';
+ return decode(it.file).then(function(d){
+  var k=1,m=Math.max(d.w,d.h);if(S.max&&m>S.max)k=S.max/m;if(d.w*d.h*k*k>PXLIM)k=Math.sqrt(PXLIM/(d.w*d.h));
+  return fit(d,k,target,mime,0).then(function(r){d.close();return r},function(e){d.close();throw e})
+ }).then(function(r){
+  var same=/jpe?g|webp/i.test(it.file.type)&&it.file.size<=r.blob.size&&it.file.size<=target;
+  if(same)return {blob:it.file,name:it.file.name,w:r.w,h:r.h,kept:true};
+  return {blob:r.blob,name:base+'-min.'+ext,w:r.w,h:r.h,over:r.over}})}
+
+function work(it,g){return g!==gen?0:comp(it).then(function(o){if(g!==gen)return;it.out=o;it.busy=false;it.err='';render()},
+ function(e){if(g!==gen)return;it.busy=false;it.out=null;it.err=(e&&e.message==='enc')?T('Не хватило памяти, попробуй размер 2048','Out of memory, try max side 2048'):T('Не удалось прочитать этот формат','Can\'t read this format');render()})}
+function recompute(){if(!items.length)return;gen++;var g=gen;items.forEach(function(it){it.busy=true;it.out=null;it.err=''});render();
+ items.slice().forEach(function(it){Q=Q.then(function(){return work(it,g)})})}
+
+/* ---- save ---- */
+function dl(arr){arr.forEach(function(o,i){setTimeout(function(){var a=document.createElement('a');a.href=URL.createObjectURL(o.blob);a.download=o.name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},4000)},i*350)})}
+function saveF(arr){var files=arr.map(function(o){return new File([o.blob],o.name,{type:o.blob.type})});
+ if(navigator.canShare&&navigator.share){var ok=false;try{ok=navigator.canShare({files:files})}catch(e){}
+  if(ok){navigator.share({files:files}).catch(function(e){if(!e||e.name!=='AbortError')dl(arr)});return}}
+ dl(arr)}
+
+/* ---- compare ---- */
+var cmp=$('#pc-cmp'),box=$('#pc-box'),ia=$('#pc-a'),ib=$('#pc-b'),cu=null;
+function openCmp(it){if(!it.out)return;cu=URL.createObjectURL(it.out.blob);ib.src=it.url;ia.src=cu;
+ $('#pc-ct').textContent=it.file.name;$('#pc-tl').textContent=T('ДО · ','BEFORE · ')+fs(it.file.size);$('#pc-tr').textContent=T('ПОСЛЕ · ','AFTER · ')+fs(it.out.blob.size);
+ box.style.setProperty('--p','50%');cmp.hidden=false}
+function closeCmp(){cmp.hidden=true;ia.removeAttribute('src');ib.removeAttribute('src');if(cu){URL.revokeObjectURL(cu);cu=null}}
+$('#pc-cx').onclick=closeCmp;
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!cmp.hidden)closeCmp()});
+function mv(e){var r=box.getBoundingClientRect(),p=Math.max(0,Math.min(100,(e.clientX-r.left)/r.width*100));box.style.setProperty('--p',p+'%')}
+box.addEventListener('pointerdown',function(e){try{box.setPointerCapture(e.pointerId)}catch(_){}mv(e);box.onpointermove=mv});
+box.addEventListener('pointerup',function(){box.onpointermove=null});box.addEventListener('pointercancel',function(){box.onpointermove=null});
+
+/* ---- render ---- */
+function render(){
+ list.textContent='';
+ items.forEach(function(it){
+  var li=el('li','cv-item'),tb=el('button','pc-thumb'),im=el('img','cv-thumb');tb.type='button';tb.disabled=!it.out;
+  im.src=it.url;im.alt='';im.decoding='async';im.onerror=function(){im.style.visibility='hidden'};tb.appendChild(im);
+  tb.setAttribute('aria-label',T('Сравнить до и после','Compare before and after'));tb.onclick=function(){openCmp(it)};
+  var m=el('div','cv-meta'),n=el('div','cv-name'),s=el('div','cv-stat');n.textContent=it.file.name;
+  if(it.err){s.className+=' cv-err';s.textContent=it.err}
+  else if(it.out){var o=it.out;
+   if(o.kept)s.textContent=fs(it.file.size)+T(' · уже меньше '+S.kb+' КБ',' · already under '+S.kb+' KB');
+   else if(o.over){s.className+=' cv-err';s.textContent=fs(it.file.size)+' → '+fs(o.blob.size)+T(' · меньше не получилось',' · can\'t go lower')}
+   else s.textContent=fs(it.file.size)+' → '+fs(o.blob.size)+' · '+o.w+'×'+o.h}
+  else s.textContent=fs(it.file.size)+T(' · обработка…',' · processing…');
+  m.appendChild(n);m.appendChild(s);
+  var a=el('div','cv-acts');
+  if(it.out){var b=el('button','cv-btn');b.type='button';b.textContent=T('Сохранить','Save');b.onclick=function(){saveF([it.out])};a.appendChild(b)}
+  var x=el('button','cv-x');x.type='button';x.textContent='×';x.setAttribute('aria-label',T('Убрать ','Remove ')+it.file.name);
+  x.onclick=function(){URL.revokeObjectURL(it.url);items.splice(items.indexOf(it),1);render()};a.appendChild(x);
+  li.appendChild(tb);li.appendChild(m);li.appendChild(a);list.appendChild(li)});
+ var ok=items.filter(function(i){return i.out}),busy=items.some(function(i){return i.busy});
+ bar.hidden=!items.length;$('#pc-all').hidden=ok.length<2;
+ if(!busy&&ok.length){var b0=0,a0=0;ok.forEach(function(i){b0+=i.file.size;a0+=i.out.blob.size});
+  sum.textContent=T('Было ','Was ')+fs(b0)+T(' → стало ',' → now ')+fs(a0)+' (−'+Math.max(0,Math.round((1-a0/b0)*100))+'%)'}else sum.textContent=''}
+$('#pc-all').onclick=function(){saveF(items.filter(function(i){return i.out}).map(function(i){return i.out}))};
+$('#pc-clear').onclick=function(){items.forEach(function(i){URL.revokeObjectURL(i.url)});items=[];gen++;render()};
+$('#pc-input').addEventListener('change',function(e){add(e.target.files);e.target.value=''});
+function add(fl){
+ var arr=Array.prototype.slice.call(fl||[]),bad=0,fresh=[];
+ arr.forEach(function(f){if(!/^image\//.test(f.type)&&!/\.(heic|heif|avif|webp|png|jpe?g|gif|bmp)$/i.test(f.name)){bad++;return}
+  if(items.length+fresh.length>=MAXFILES)return;
+  fresh.push({file:f,url:URL.createObjectURL(f),busy:true,out:null,err:''})});
+ note.textContent=bad?T('Пропущено не-картинок: ','Skipped non-images: ')+bad:'';
+ if(!fresh.length)return;
+ if(!used){used=true;try{if(window.ym)window.ym(109713949,'reachGoal','photo_compress')}catch(e){}}
+ items=items.concat(fresh);render();var g=gen;fresh.forEach(function(it){Q=Q.then(function(){return work(it,g)})})}
+host.addEventListener('pointerdown',function(e){e.stopPropagation()});
+render();
 })();
 </script>
 <script>

@@ -1220,6 +1220,7 @@
 .cv-bar{display:flex;gap:10px;margin-top:12px}
 .cv-bar .cv-btn{flex:1;min-height:48px}
 .cv-app button:focus-visible,.cv-pick:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.seo-nav,.seo{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 </style>
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
@@ -1266,6 +1267,8 @@
 
 </head>
 <body>
+<!--SEO-->
+<nav class="seo-nav" aria-label="Все инструменты"><!--NAV--><a href="/">TAP APP</a><a href="/sign/">ПОДПИСЬ</a><a href="/compress-photo/">СЖАТИЕ ФОТО</a><a href="/audio-converter/">КОНВЕРТЕР ЗВУКА</a><a href="/time-calculator/">ТАЙМ-КАЛЬКУЛЯТОР</a><a href="/image-converter/">КОНВЕРТЕР</a><a href="/random-note/">СЛУЧАЙНАЯ НОТА</a><a href="/bpm-tapper/">BPM КЛИКЕР</a><a href="/10-seconds/">10 СЕКУНД</a><a href="/tuner/">ТЮНЕР</a><a href="/random-word/">СЛУЧАЙНОЕ СЛОВО</a><a href="/random-number/">СЛУЧАЙНОЕ ЧИСЛО</a><a href="/dice/">КУБИК</a><a href="/coin-flip/">ОРЁЛ ИЛИ РЕШКА</a><a href="/random-color/">СЛУЧАЙНЫЙ ЦВЕТ</a><a href="/scrolling-text/">БЕГУЩАЯ СТРОКА</a><a href="/qr-generator/">ГЕНЕРАТОР QR</a><a href="/video-download/">СКАЧАТЬ ВИДЕО</a><a href="/counter/">СЧЁТЧИК</a><a href="/morse-flashlight/">ФОНАРИК МОРЗЕ</a><a href="/yes-or-no/">ДА ИЛИ НЕТ</a><a href="/spin-the-bottle/">БУТЫЛОЧКА</a><a href="/noise-meter/">УРОВЕНЬ ШУМА</a><a href="/kick-drum/">ПРЯМАЯ БОЧКА</a><a href="/voice-changer/">ИЗМЕНИТЕЛЬ ГОЛОСА</a><a href="/reverse-audio/">РЕВЕРС АУДИО</a><a href="/metronome/">МЕТРОНОМ</a><a href="/exact-time/">ТОЧНОЕ ВРЕМЯ</a><a href="/roulette/">РУЛЕТКА ВЫБОРА</a><a href="/soundboard/">САУНДБОРД</a><!--/NAV--></nav>
   <div class="titlewrap">
     <h1 class="title" id="title">СЛУЧАЙНАЯ НОТА</h1>
   </div>
@@ -2128,6 +2131,22 @@
   }
 
   var TITLES={home:'TAP APP',sg:'ПОДПИСЬ',ac:'КОНВЕРТЕР ЗВУКА',pc:'СЖАТИЕ ФОТО',tc:'ТАЙМ-КАЛЬКУЛЯТОР',cv:'КОНВЕРТЕР',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',dl:'СКАЧАТЬ ВИДЕО',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
+  var SLUG={sg:'sign',pc:'compress-photo',ac:'audio-converter',tc:'time-calculator',cv:'image-converter',note:'random-note',bpm:'bpm-tapper',timer:'10-seconds',tuner:'tuner',word:'random-word',num:'random-number',dice:'dice',coin:'coin-flip',color:'random-color',ticker:'scrolling-text',qr:'qr-generator',dl:'video-download',counter:'counter',morse:'morse-flashlight',yn:'yes-or-no',bottle:'spin-the-bottle',noise:'noise-meter',rhythm:'kick-drum',voice:'voice-changer',rev:'reverse-audio',metro:'metronome',time:'exact-time',roulette:'roulette',sb:'soundboard'};
+  var SLUG_R={};Object.keys(SLUG).forEach(function(k){SLUG_R[SLUG[k]]=k});
+  function appFromPath(){var m=location.pathname.replace(/index\.html$/,'').replace(/^\/+|\/+$/g,'');return SLUG_R[m]||'home'}
+  var urlFirst=true,fromPop=false;
+  var HOME_TITLE='TAP APP — мини-аппы для контента, розыгрышей и музыки';
+  window.__syncUrl=function(a){
+    try{
+      if(!window.__START_APP||urlFirst===false)document.title=a==='home'?HOME_TITLE:TITLES[a]+' — TAP APP';
+      if(location.protocol==='file:')return;
+      var want=a==='home'?'/':'/'+SLUG[a]+'/';
+      if(location.pathname===want){urlFirst=false;return}
+      if(urlFirst||fromPop){history.replaceState({a:a},'',want)}else{history.pushState({a:a},'',want)}
+      urlFirst=false;
+    }catch(_){}
+  };
+  window.addEventListener('popstate',function(){fromPop=true;try{setApp(appFromPath())}finally{fromPop=false}});
   function setApp(a){
     app=a;
     if(LAZY_APP_MAP[a]) lazyLoad(LAZY_APP_MAP[a]);
@@ -2172,7 +2191,7 @@
     document.getElementById('acStage').style.display = a==='ac'?'flex':'none';
     document.getElementById('sgStage').style.display = a==='sg'?'flex':'none';
     if(a==='tc'&&window.tcShow)window.tcShow();
-    window.__curApp=a;if(window.favSync)window.favSync(a);
+    window.__curApp=a;if(window.favSync)window.favSync(a);if(window.__syncUrl)window.__syncUrl(a);
     dlStage.style.display = a==='dl'?'flex':'none';
     revStage.style.display = a==='rev'?'flex':'none';
     document.getElementById('mode').style.display = a==='note'?'flex':'none';
@@ -4725,7 +4744,7 @@
 
   document.getElementById('soundBtn').innerHTML=IC_SPK_ON;
   initAudio();      // decode note samples ahead of time
-  setApp('home');
+  setApp(window.__START_APP||appFromPath());
   document.documentElement.classList.add('ready');
   render(pick());
   // ---- раскладка: считаем свободную зону между заголовком и нижними кнопками ----
@@ -5665,7 +5684,7 @@ host.querySelectorAll('.sg-ink').forEach(function(b){b.onclick=function(){S.ink=
 /* ---------- libs ---------- */
 function loadScript(src){return new Promise(function(res,rej){var s=document.createElement('script');s.src=src;s.onload=res;s.onerror=function(){rej(new Error('lib'))};document.head.appendChild(s)})}
 function needPdfjs(){if(pdfjs)return Promise.resolve(pdfjs);
- return import(new URL('assets/pdf.min.mjs?v='+V,location.href).href).then(function(m){m.GlobalWorkerOptions.workerSrc=new URL('assets/pdf.worker.min.mjs?v='+V,location.href).href;pdfjs=m;return m})}
+ return import(new URL('assets/pdf.min.mjs?v='+V,document.baseURI).href).then(function(m){m.GlobalWorkerOptions.workerSrc=new URL('assets/pdf.worker.min.mjs?v='+V,document.baseURI).href;pdfjs=m;return m})}
 function needPL(){if(window.PDFLib)return Promise.resolve(window.PDFLib);return loadScript('assets/pdf-lib.min.js?v='+V).then(function(){return window.PDFLib})}
 
 /* ---------- open document ---------- */

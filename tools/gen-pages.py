@@ -54,7 +54,6 @@ def main():
             s2,n=re.subn(pat,lambda m:rep,s,count=cnt,flags=flags)
             assert n==1,pat; s=s2
         url='%s/%s/'%(SITE,slug)
-        sub(r'<meta charset="UTF-8">','<meta charset="UTF-8">\n<base href="/">')
         sub(r'<title>.*?</title>','<title>%s</title>'%html.escape(full))
         sub(r'<meta name="description" content="[^"]*">','<meta name="description" content="%s">'%html.escape(desc,True))
         sub(r'<link rel="canonical" href="[^"]*">','<link rel="canonical" href="%s">'%url)

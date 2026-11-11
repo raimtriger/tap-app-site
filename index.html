@@ -65,7 +65,7 @@
   'Мой город':'My city','Локальное время устройства':'Device local time','Синхронизация…':'Syncing…','Синхронизировано с сервером точного времени':'Synced with a time server',
   'Москва':'Moscow','Лондон':'London','Нью-Йорк':'New York','Париж':'Paris','Берлин':'Berlin','Стамбул':'Istanbul','Дубай':'Dubai','Алматы':'Almaty','Астана':'Astana','Бангкок':'Bangkok','Дели':'Delhi','Пекин':'Beijing','Токио':'Tokyo','Сидней':'Sydney','Лос-Анджелес':'Los Angeles',
   'Лучший: ±':'Best: ±','Стоп':'Stop','Сумма: ':'Sum: ','Ещё ':'Another ','Тапни ':'Tap ','Тапни ещё ':'Tap another ',
-  'Конвертер':'Converter','КОНВЕРТЕР':'CONVERTER','Картинки в PNG, JPEG, WebP, BMP или PDF. Всё считается на устройстве, файлы никуда не отправляются.':'Images to PNG, JPEG, WebP, BMP or PDF. Everything runs on your device, files are never uploaded.','Выбрать фото или файлы':'Choose photos or files','Во что преобразовать':'Convert to','Качество':'Quality','Максимальная сторона, px':'Max side, px','Оригинал':'Original','Страница PDF':'PDF page','По картинке':'Fit image','Все файлы в один PDF':'All files in one PDF','Сохранить все':'Save all','Очистить':'Clear',
+  'Конвертер':'Converter','КОНВЕРТЕР':'CONVERTER','Картинки в PNG, JPEG, WebP, BMP или PDF, презентации PPTX — в PDF. Всё считается на устройстве, файлы никуда не отправляются.':'Images to PNG, JPEG, WebP, BMP or PDF, PPTX presentations to PDF. Everything runs on your device, files are never uploaded.','Выбрать фото или файлы':'Choose photos or files','Во что преобразовать':'Convert to','Качество':'Quality','Максимальная сторона, px':'Max side, px','Оригинал':'Original','Страница PDF':'PDF page','По картинке':'Fit image','Все файлы в один PDF':'All files in one PDF','Сохранить все':'Save all','Очистить':'Clear',
   'Подписать документ':'Sign document','ПОДПИСЬ':'SIGN','Конвертер звука':'Audio converter','КОНВЕРТЕР ЗВУКА':'AUDIO CONVERTER','Сжатие фото':'Photo compressor','СЖАТИЕ ФОТО':'COMPRESS PHOTO','Калькулятор времени':'Time calculator','ТАЙМ-КАЛЬКУЛЯТОР':'TIME CALC',
   'Тапни — крутить':'Tap to spin'
   };
@@ -1781,13 +1781,13 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
 
   <div id="cvStage" style="display:none">
 <section class="cv-app" id="cv-app">
-  <p class="cv-sub">Картинки в PNG, JPEG, WebP, BMP или PDF. Всё считается на устройстве, файлы никуда не отправляются.</p>
+  <p class="cv-sub">Картинки в PNG, JPEG, WebP, BMP или PDF, презентации PPTX — в PDF. Всё считается на устройстве, файлы никуда не отправляются.</p>
 
   <label class="cv-pick" id="cv-pick" for="cv-input">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h11l-3-3"/><path d="M17 17H6l3 3"/></svg>
     <span>Выбрать фото или файлы</span>
   </label>
-  <input class="cv-hide" id="cv-input" type="file" accept="image/*" multiple>
+  <input class="cv-hide" id="cv-input" type="file" accept="image/*,.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation" multiple>
   <p class="cv-note" id="cv-note" role="status"></p>
 
   <div class="cv-label">Во что преобразовать</div>
@@ -4993,13 +4993,15 @@ function msg(e){
   var m=e&&e.message;
   if(m==='decode'||m==='size')return T('Не удалось прочитать этот формат','Can\'t read this format');
   if(m==='webp')return T('Этот браузер не умеет WebP','This browser can\'t encode WebP');
+  if(m==='zip'||m==='notpptx'||m==='empty')return T('Не удалось открыть презентацию. Нужен файл .pptx','Can\'t open the presentation. A .pptx file is required');
+  if(m==='lib')return T('Не загрузился модуль PPTX, проверь интернет','PPTX module failed to load, check your connection');
   if(m==='encode')return T('Не хватило памяти, попробуй размер 2048','Out of memory, try max side 2048');
   return T('Ошибка конвертации','Conversion failed');
 }
 function outs(){
   var a=[];
   if(S.merged)a.push(S.merged);
-  else S.items.forEach(function(it){if(it.out)a.push(it.out)});
+  S.items.forEach(function(it){if(it.out)a.push(it.out)});
   return a;
 }
 
@@ -5068,19 +5070,43 @@ function conv(it){
   });
 }
 
+/* ---------- PPTX → PDF (слайды рисуются на канвас и кладутся в PDF картинками) ---------- */
+function loadS(src){return new Promise(function(res,rej){var s=document.createElement('script');s.src=src;s.onload=res;s.onerror=function(){rej(new Error('lib'))};document.head.appendChild(s)})}
+function needPptx(){
+  if(window.TapPptx&&window.JSZip)return Promise.resolve();
+  return (window.JSZip?Promise.resolve():loadS('assets/jszip.min.js?v=1')).then(function(){return loadS('assets/pptx-render.js?v=1')});
+}
+function convPptx(it,tok){
+  var pages=[];
+  return needPptx().then(function(){
+    return TapPptx.render(it.file,{
+      maxSide:S.max||1920,
+      cancel:function(){return tok!==S.run},
+      progress:function(i,n){if(tok===S.run&&n){it.prog=T('слайд ','slide ')+Math.min(i+1,n)+'/'+n;render()}},
+      onPage:function(cv,w,h){
+        return blobOf(cv,'image/jpeg',S.q).then(function(b){free(cv);return b.arrayBuffer()}).then(function(ab){pages.push({jpg:new Uint8Array(ab),w:w,h:h})});
+      }
+    });
+  }).then(function(r){
+    if(!pages.length)throw new Error('empty');
+    var pw=r.cx/12700,ph=r.cy/12700;
+    return {blob:pdfOf(pages.map(function(p){return {jpg:p.jpg,w:p.w,h:p.h,pw:pw,ph:ph,dw:pw,dh:ph,x:0,y:0}}))};
+  });
+}
+
 /* ---------- запуск конвертации ---------- */
 function run(){
   var tok=++S.run,its=S.items.slice(),used={};
   S.merged=null;
-  its.forEach(function(it){it.out=null;it.err=null;it.pg=null;it.busy=true});
+  its.forEach(function(it){it.out=null;it.err=null;it.pg=null;it.prog=null;it.busy=true});
   render();
   var chain=Promise.resolve();
   its.forEach(function(it){
     chain=chain.then(function(){
       if(tok!==S.run)return;
-      return conv(it).then(function(r){
+      return (it.kind==='pptx'?convPptx(it,tok):conv(it)).then(function(r){
         if(tok!==S.run)return;
-        if(r.blob)it.out={blob:r.blob,name:uniq(base(it.file.name)+'.'+FMT[S.fmt].ext,used)};
+        if(r.blob)it.out={blob:r.blob,name:uniq(base(it.file.name)+'.'+(it.kind==='pptx'?'pdf':FMT[S.fmt].ext),used)};
         else it.pg=r;
       }).catch(function(e){
         if(tok===S.run)it.err=msg(e);
@@ -5093,7 +5119,7 @@ function run(){
     if(tok!==S.run)return;
     if(S.fmt==='pdf'){
       var ok=its.filter(function(it){return it.pg});
-      if(S.merge&&its.length>1){
+      if(S.merge&&its.filter(function(i){return i.kind!=='pptx'}).length>1){
         if(ok.length)S.merged={
           blob:pdfOf(ok.map(function(it){return pageLayout(it.pg,S.page)})),
           name:'tap-converted.pdf',pages:ok.length
@@ -5139,15 +5165,16 @@ function save(arr){
 function render(){
   list.textContent='';
   S.items.forEach(function(it){
-    var li=el('li','cv-item'),im=el('img','cv-thumb');
-    im.src=it.url;im.alt='';im.loading='lazy';im.decoding='async';
-    im.onerror=function(){im.style.visibility='hidden'};
+    var li=el('li','cv-item'),im;
+    if(it.kind==='pptx'){im=el('div','cv-thumb cv-ph');im.textContent='PPTX'}
+    else{im=el('img','cv-thumb');im.src=it.url;im.alt='';im.loading='lazy';im.decoding='async';
+    im.onerror=function(){im.style.visibility='hidden'}}
     var m=el('div','cv-meta'),n=el('div','cv-name'),s=el('div','cv-stat'),sz=fs(it.file.size);
     n.textContent=it.file.name;
     if(it.err){s.className+=' cv-err';s.textContent=it.err}
     else if(it.out)s.textContent=sz+' → '+fs(it.out.blob.size);
-    else if(it.busy)s.textContent=sz+T(' · обработка…',' · processing…');
-    else if(S.merged)s.textContent=sz+T(' · в общем PDF',' · in combined PDF');
+    else if(it.busy)s.textContent=sz+' · '+(it.prog||T('обработка…','processing…'));
+    else if(S.merged&&it.kind!=='pptx')s.textContent=sz+T(' · в общем PDF',' · in combined PDF');
     else s.textContent=sz;
     m.appendChild(n);m.appendChild(s);
     var a=el('div','cv-acts');
@@ -5201,7 +5228,7 @@ function sync(){
   });
   qWrap.hidden=['jpeg','webp','pdf'].indexOf(S.fmt)<0;
   pageWrap.hidden=S.fmt!=='pdf';
-  mergeWrap.hidden=!(S.fmt==='pdf'&&S.items.length>1);
+  mergeWrap.hidden=!(S.fmt==='pdf'&&S.items.filter(function(i){return i.kind!=='pptx'}).length>1);
   q.value=Math.round(S.q*100);
   qv.textContent=Math.round(S.q*100)+'%';
   merge.checked=S.merge;
@@ -5222,9 +5249,15 @@ groups.forEach(function(g){
 /* ---------- файлы ---------- */
 var IMG=/\.(png|jpe?g|jfif|webp|gif|bmp|svg|avif|heic|heif|tiff?|ico)$/i;
 function isImg(f){return (f.type&&f.type.indexOf('image/')===0)||IMG.test(f.name)}
+function isPptx(f){return /\.pptx$/i.test(f.name)||/presentationml\.presentation/.test(f.type)}
 function add(files){
-  var bad=0,pdf=0,over=0;
+  var bad=0,pdf=0,over=0,ppt=0,px=0;
   Array.prototype.forEach.call(files,function(f){
+    if(isPptx(f)){
+      if(S.items.length>=MAXFILES){over++;return}
+      S.items.push({id:++S.id,file:f,kind:'pptx'});px++;return;
+    }
+    if(/\.ppt$/i.test(f.name)){ppt++;return}
     if(!isImg(f)){
       if(/pdf/i.test(f.type)||/\.pdf$/i.test(f.name))pdf++;else bad++;
       return;
@@ -5234,15 +5267,17 @@ function add(files){
   });
   var t=[];
   if(pdf)t.push(T('PDF в картинки появится следующим шагом','PDF to images is coming next'));
+  if(px)t.push(T('PPTX сохраняется в PDF','PPTX is saved as PDF'));
+  if(ppt)t.push(T('Старый .ppt не поддерживается: сохрани презентацию как .pptx','Old .ppt is not supported: save the deck as .pptx'));
   if(bad)t.push(T('Пропущено не-картинок: ','Skipped non-images: ')+bad);
   if(over)t.push(T('Максимум '+MAXFILES+' файлов за раз','Max '+MAXFILES+' files at once'));
   note.textContent=t.join('. ');
   if(!S.items.length){render();return}
-  try{if(window.ym)window.ym(109713949,'reachGoal','converter_add')}catch(e){}
+  try{if(window.ym){window.ym(109713949,'reachGoal','converter_add');if(S.items.some(function(i){return i.kind==='pptx'}))window.ym(109713949,'reachGoal','converter_pptx')}}catch(e){}
   sync();run();
 }
 function removeItem(it){
-  URL.revokeObjectURL(it.url);
+  if(it.url)URL.revokeObjectURL(it.url);
   S.items=S.items.filter(function(x){return x!==it});
   if(!S.items.length){S.run++;S.merged=null;sync();render();return}
   sync();
@@ -5268,7 +5303,7 @@ merge.addEventListener('change',function(){
 });
 all.addEventListener('click',function(){save(outs())});
 clear.addEventListener('click',function(){
-  S.items.forEach(function(i){URL.revokeObjectURL(i.url)});
+  S.items.forEach(function(i){if(i.url)URL.revokeObjectURL(i.url)});
   S.items=[];S.merged=null;S.run++;note.textContent='';
   sync();render();
 });

@@ -2139,14 +2139,21 @@
   function appFromPath(){var m=location.pathname.replace(/index\.html$/,'').replace(/^\/+|\/+$/g,'');return SLUG_R[m]||'home'}
   var urlFirst=true,fromPop=false;
   var HOME_TITLE='TAP APP — мини-аппы для контента, розыгрышей и музыки';
+  var urlTimer=0;
   window.__syncUrl=function(a){
     try{
-      if(!window.__START_APP||urlFirst===false)document.title=a==='home'?HOME_TITLE:TITLES[a]+' — TAP APP';
       if(location.protocol==='file:')return;
-      var want=a==='home'?'/':'/'+SLUG[a]+'/';
-      if(location.pathname===want){urlFirst=false;return}
-      if(urlFirst||fromPop){history.replaceState({a:a},'',want)}else{history.pushState({a:a},'',want)}
-      urlFirst=false;
+      if(!(urlFirst&&window.__START_APP))document.title=a==='home'?HOME_TITLE:TITLES[a]+' \u2014 TAP APP';
+      clearTimeout(urlTimer);
+      /* адрес меняем с задержкой, чтобы смена аппки отрисовалась первой (Метрика/вебвизор реагируют на history API) */
+      urlTimer=setTimeout(function(){
+        try{
+          var c=window.__curApp||'home',want=c==='home'?'/':'/'+SLUG[c]+'/';
+          if(location.pathname===want){urlFirst=false;return}
+          if(urlFirst){history.replaceState({a:c},'',want)}else{history.pushState({a:c},'',want)}
+          urlFirst=false;
+        }catch(_){}
+      },350);
     }catch(_){}
   };
   window.addEventListener('popstate',function(){fromPop=true;try{setApp(appFromPath())}finally{fromPop=false}});

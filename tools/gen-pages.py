@@ -64,6 +64,7 @@ def main():
         head='<script>window.__START_APP=%s;</script>\n<script type="application/ld+json">%s</script>\n'%(json.dumps(app),json.dumps(ld,ensure_ascii=False).replace('</','<\\/'))
         sub(r'<meta name="yandex-verification"',head+'<meta name="yandex-verification"')
         seo='<section class="seo"><h2>%s</h2><p>%s</p></section>'%(html.escape(title.split(' — ')[0]),html.escape(text))
+        sub(r'<!--HOMESEO-->.*?<!--/HOMESEO-->','',re.S)
         sub(r'<!--SEO-->',seo)
         sub(r'<h1 class="title" id="title">[^<]*</h1>','<h1 class="title" id="title">%s</h1>'%h1)
         os.makedirs(os.path.join(ROOT,slug),exist_ok=True)

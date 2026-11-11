@@ -16,16 +16,20 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <title>Счётчик онлайн — считать тапами | TAP APP</title>
 <meta name="description" content="Простой счётчик: тапай, чтобы прибавлять, и сбрасывай одним нажатием.">
-<meta name="keywords" content="tap app, генератор случайных нот, мини-приложения, мини апп, тюнер онлайн, bpm кликер, метроном онлайн, ритм машина, барабанная машина онлайн, бегущая строка онлайн, фонарик морзе, азбука морзе онлайн, изменитель голоса онлайн, счётчик онлайн, счетчик кликов, генератор qr кода, генератор qr онлайн, случайное число онлайн, генератор случайных чисел, случайное слово, случайный цвет, генератор цвета, кубик онлайн, бросить кубик, орёл или решка, монетка онлайн, да или нет онлайн, бутылочка игра, крутить бутылочку, уровень шума онлайн, измеритель шума, розыгрыш онлайн, игры для компании, инструменты для блогера, инструменты для музыканта">
+<meta name="keywords" content="tap app, тап апп, tap-app.ru, подписать pdf онлайн, сжать фото онлайн, конвертер изображений, pptx в pdf, конвертер аудио mp3 wav, тюнер онлайн, метроном онлайн, калькулятор времени, генератор qr кода, рулетка выбора, бегущая строка онлайн, bpm кликер, случайная нота, кубик онлайн, орёл или решка">
 <link rel="canonical" href="https://tap-app.ru/counter/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Счётчик онлайн — считать тапами | TAP APP">
+<meta property="og:site_name" content="TAP APP">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
 <meta property="og:description" content="Простой счётчик: тапай, чтобы прибавлять, и сбрасывай одним нажатием.">
 <meta property="og:url" content="https://tap-app.ru/counter/">
 <meta property="og:image" content="https://tap-app.ru/assets/og-image.png">
 <script>window.__START_APP="counter";</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Счётчик онлайн", "url": "https://tap-app.ru/counter/", "description": "Простой счётчик: тапай, чтобы прибавлять, и сбрасывай одним нажатием.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any", "inLanguage": "ru", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "RUB"}, "isPartOf": {"@type": "WebSite", "name": "TAP APP", "url": "https://tap-app.ru/"}}</script>
 <meta name="yandex-verification" content="2c2a689113551869">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://tap-app.ru/#site","url":"https://tap-app.ru/","name":"TAP APP","alternateName":["Тап апп","ТАП АПП","tap-app.ru","TAP APP онлайн"],"inLanguage":"ru"},{"@type":"Organization","@id":"https://tap-app.ru/#org","name":"TAP APP","url":"https://tap-app.ru/","logo":"https://tap-app.ru/assets/icon-512.png"}]}</script>
 <script>(function(){try{var d=document.documentElement;if(location.pathname!=="/")return;if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;if(localStorage.getItem("tap_intro_seen"))return;d.classList.add("intro")}catch(e){}})();</script>
 
 <script>
@@ -1285,6 +1289,8 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     if((m=u.match(/Version\/(\d+).*Safari/)))return 'Safari '+m[1];
     if((m=u.match(/(Chrome|Firefox)\/(\d+)/)))return m[1]+' '+m[2];return 'other'}
   function os(){var u=navigator.userAgent;return /iPhone|iPad/.test(u)?'iOS':/Android/.test(u)?'Android':/Windows/.test(u)?'Windows':/Mac/.test(u)?'macOS':/Linux/.test(u)?'Linux':'other'}
+  var opened={};
+  window.__trackOpen=function(a,slug){try{if(!slug||opened[a])return;opened[a]=1;if(window.ym){window.ym(ID,'reachGoal','app_open',{app_open:slug});window.ym(ID,'reachGoal','open_'+slug.replace(/-/g,'_'))}}catch(_){}};
   function rep(msg,src,line){
     try{
       msg=String(msg||'').replace(/\s+/g,' ').slice(0,140);
@@ -1311,6 +1317,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
 </head>
 <body>
 <section class="seo"><h2>Счётчик онлайн</h2><p>Онлайн счётчик для подсчёта повторений, людей и очков. Большая кнопка и сброс.</p></section>
+
 <nav class="seo-nav" aria-label="Все инструменты"><!--NAV--><a href="/">TAP APP</a><a href="/sign/">ПОДПИСЬ</a><a href="/compress-photo/">СЖАТИЕ ФОТО</a><a href="/audio-converter/">КОНВЕРТЕР ЗВУКА</a><a href="/time-calculator/">ТАЙМ-КАЛЬКУЛЯТОР</a><a href="/image-converter/">КОНВЕРТЕР</a><a href="/random-note/">СЛУЧАЙНАЯ НОТА</a><a href="/bpm-tapper/">BPM КЛИКЕР</a><a href="/10-seconds/">10 СЕКУНД</a><a href="/tuner/">ТЮНЕР</a><a href="/random-word/">СЛУЧАЙНОЕ СЛОВО</a><a href="/random-number/">СЛУЧАЙНОЕ ЧИСЛО</a><a href="/dice/">КУБИК</a><a href="/coin-flip/">ОРЁЛ ИЛИ РЕШКА</a><a href="/random-color/">СЛУЧАЙНЫЙ ЦВЕТ</a><a href="/scrolling-text/">БЕГУЩАЯ СТРОКА</a><a href="/qr-generator/">ГЕНЕРАТОР QR</a><a href="/video-download/">СКАЧАТЬ ВИДЕО</a><a href="/counter/">СЧЁТЧИК</a><a href="/morse-flashlight/">ФОНАРИК МОРЗЕ</a><a href="/yes-or-no/">ДА ИЛИ НЕТ</a><a href="/spin-the-bottle/">БУТЫЛОЧКА</a><a href="/noise-meter/">УРОВЕНЬ ШУМА</a><a href="/kick-drum/">ПРЯМАЯ БОЧКА</a><a href="/voice-changer/">ИЗМЕНИТЕЛЬ ГОЛОСА</a><a href="/reverse-audio/">РЕВЕРС АУДИО</a><a href="/metronome/">МЕТРОНОМ</a><a href="/exact-time/">ТОЧНОЕ ВРЕМЯ</a><a href="/roulette/">РУЛЕТКА ВЫБОРА</a><a href="/soundboard/">САУНДБОРД</a><!--/NAV--></nav>
   <div class="titlewrap">
     <h1 class="title" id="title">СЧЁТЧИК</h1>
@@ -2242,7 +2249,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     document.getElementById('acStage').style.display = a==='ac'?'flex':'none';
     document.getElementById('sgStage').style.display = a==='sg'?'flex':'none';
     if(a==='tc'&&window.tcShow)window.tcShow();
-    window.__curApp=a;if(window.favSync)window.favSync(a);if(window.__syncUrl)window.__syncUrl(a);
+    window.__curApp=a;if(window.favSync)window.favSync(a);if(window.__syncUrl)window.__syncUrl(a);if(window.__trackOpen)window.__trackOpen(a,SLUG[a]);
     dlStage.style.display = a==='dl'?'flex':'none';
     revStage.style.display = a==='rev'?'flex':'none';
     document.getElementById('mode').style.display = a==='note'?'flex':'none';

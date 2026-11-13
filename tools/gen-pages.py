@@ -71,6 +71,7 @@ def main():
         open(os.path.join(ROOT,slug,'index.html'),'w',encoding='utf-8').write(s)
     # sitemap
     sm='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>%s/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>\n'%SITE
+    sm+='  <url><loc>%s/legal/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>\n'%SITE
     for slug,*_ in P: sm+='  <url><loc>%s/%s/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>\n'%(SITE,slug)
     open(os.path.join(ROOT,'sitemap.xml'),'w',encoding='utf-8').write(sm+'</urlset>\n')
     open(os.path.join(ROOT,'robots.txt'),'w').write('User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n'%SITE)

@@ -41,12 +41,13 @@ nav.l{display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0 4px;font-size:14px}
 <a class="back" href="/">← TAP APP</a>
 <h1>TAP APP Pro</h1>
 <p class="sub">Без суточного ограничения на количество действий. Все инструменты и сейчас работают бесплатно в пределах дневного лимита.</p>
+<div class="box" id="st">Загрузка…</div>
+<div id="lg" class="box" hidden></div>
+<input id="em" type="email" inputmode="email" autocomplete="email" placeholder="Ваш email, на него придёт чек">
+<p id="msg" class="note" style="color:#e5484d" hidden></p>
 <div class="card"><h3>Pro на месяц</h3><div class="price">399 ₽ <small>/ 30 дней</small></div><p class="note">Автопродление, отмена в любой момент в Telegram-боте. Доступ до конца оплаченного периода.</p><button class="btn" data-plan="month">Оплатить 399 ₽</button><p class="note">Нажимая кнопку, вы принимаете <a href="/legal/#offer">оферту</a> и автопродление каждые 30 дней. Отключить можно в боте командой /cancel.</p></div>
 <div class="card"><h3>Pro навсегда</h3><div class="price">4999 ₽ <small>разово</small></div><p class="note">Один платёж, без списаний. Бессрочный доступ, пока существует Сервис.</p><button class="btn" data-plan="life">Оплатить 4999 ₽</button></div>
 <div class="card"><h3>Поддержать проект</h3><div class="price">любая сумма</div><p class="note">Добровольный платёж. Дополнительных возможностей не даёт.</p><input id="amt" type="number" inputmode="numeric" min="50" max="100000" value="200" aria-label="Сумма, ₽"><button class="btn" data-plan="donate">Поддержать</button></div>
-<div class="box" id="st">Загрузка…</div>
-<input id="em" type="email" inputmode="email" autocomplete="email" placeholder="Email для чека">
-<div id="lg" class="box" hidden></div>
 <h2>Что входит в Pro</h2>
 <ul><li>Подписать PDF и фото без суточного лимита</li><li>Конвертер, сжатие фото, конвертер звука, PPTX → PDF без ограничений</li><li>Доступ привязывается к Telegram, до двух устройств</li></ul>
 <h2>Как получить доступ</h2>
@@ -61,9 +62,9 @@ try{tok=localStorage.getItem(TK)||'';$('em').value=localStorage.getItem('tap_pro
 function api(p,o){o=o||{};o.headers=Object.assign({'content-type':'application/json'},tok?{authorization:'Bearer '+tok}:{},o.headers||{});return fetch(API+p,o).then(function(r){return r.json()})}
 function fd(t){return new Date(t).toLocaleDateString('ru-RU')}
 function status(){
-  if(!tok){$('st').innerHTML='Вы не вошли. Вход нужен, чтобы привязать Pro к Telegram.';return Promise.resolve()}
+  if(!tok){$('st').innerHTML='<b>Шаг 1.</b> Войдите через Telegram: так Pro привяжется к вашему аккаунту.<button class="btn" id="lgb" style="opacity:1">Войти через Telegram</button>';$('lgb').onclick=function(){want='';login()};return Promise.resolve()}
   return api('/me').then(function(j){
-    if(!j.auth){tok='';try{localStorage.removeItem(TK);localStorage.removeItem(MK)}catch(e){}$('st').textContent='Вы не вошли.';return}
+    if(!j.auth){tok='';try{localStorage.removeItem(TK);localStorage.removeItem(MK)}catch(e){}return status()}
     try{localStorage.setItem(MK,JSON.stringify({life:!!j.life,until:j.until||0}))}catch(e){}
     var pro=j.life||j.until>Date.now();
     $('st').innerHTML='<b>'+(j.name||'Telegram')+'</b>: '+(j.life?'Pro навсегда':pro?'Pro до '+fd(j.until)+(j.auto?', автопродление включено':''):'Pro нет')+' · <a href="#" id="out">выйти</a>';
@@ -75,17 +76,17 @@ function login(){
   var b=$('lg');b.hidden=false;b.textContent='Готовлю вход…';
   api('/login',{method:'POST',body:'{}'}).then(function(j){
     b.innerHTML='1. Нажмите кнопку и в Telegram нажмите Start.<br><a class="btn" target="_blank" rel="noopener" href="'+j.link+'">Открыть бота</a><p class="note">2. Вернитесь сюда, страница сама продолжит.</p>';
-    var n=0;clearInterval(poll);poll=setInterval(function(){
-      if(++n>200){clearInterval(poll);b.textContent='Время вышло, нажмите кнопку оплаты ещё раз.';return}
-      api('/login/poll?code='+j.code).then(function(r){if(r.ok){clearInterval(poll);tok=r.token;try{localStorage.setItem(TK,tok)}catch(e){}b.hidden=true;status().then(function(){if(want)pay(want)})}}).catch(function(){})
-    },3000)
+    var n=0;function chk(){api('/login/poll?code='+j.code)    .then(function(r){if(r.ok){clearInterval(poll);tok=r.token;try{localStorage.setItem(TK,tok)}catch(e){}b.hidden=true;status().then(function(){if(want)pay(want)})}}).catch(function(){})}
+    clearInterval(poll);poll=setInterval(function(){if(++n>300){clearInterval(poll);b.textContent='Время вышло, попробуйте ещё раз.';return}chk()},2000);
+    document.addEventListener('visibilitychange',function(){if(!document.hidden&&!tok)chk()})
   }).catch(function(){b.textContent='Нет связи с сервером, попробуйте позже.'})
 }
-function pay(plan){
+function msg(t){var m=$('msg');m.textContent=t||'';m.hidden=!t}
+function pay(plan){msg('');
   var em=$('em').value.trim();
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){$('em').focus();$('em').style.borderColor='#e5484d';return}
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){msg('Введите email: на него придёт чек.');$('em').scrollIntoView({block:'center'});$('em').focus();$('em').style.borderColor='#e5484d';return}
   $('em').style.borderColor='';try{localStorage.setItem('tap_pro_email',em)}catch(e){}
-  if(plan!=='donate'&&!tok){want=plan;login();return}
+  if(plan!=='donate'&&!tok){want=plan;msg('Сначала войдите через Telegram: нажмите «Открыть бота» ниже.');login();$('lg').scrollIntoView({block:'center'});return}
   var bs=document.querySelectorAll('.btn[data-plan]');bs.forEach(function(x){x.disabled=true});
   api('/pay',{method:'POST',body:JSON.stringify({plan:plan,email:em,amount:+$('amt').value})}).then(function(j){
     if(j.url){try{if(window.ym)window.ym(109713949,'reachGoal','pay_start',{plan:plan})}catch(e){}location.href=j.url}

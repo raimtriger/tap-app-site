@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#141414">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
 <title>TAP APP Pro — тарифы | TAP APP</title>
-<meta name="description" content="Тарифы TAP APP Pro: 399 ₽ в месяц или 4999 ₽ навсегда. Снимает суточный лимит действий в инструментах.">
+<meta name="description" content="Тарифы TAP APP Pro: от 399 ₽ в месяц, год или навсегда. Снимает суточный лимит действий в инструментах.">
 <link rel="canonical" href="https://tap-app.ru/pro/">
 <meta name="robots" content="noindex">
 <style>
@@ -35,6 +35,7 @@ ul{padding-left:20px}
 input{width:100%;box-sizing:border-box;margin-top:8px;padding:13px;border-radius:12px;border:1px solid var(--muted);background:transparent;color:var(--ink);font:600 15px Montserrat,sans-serif}.box{background:var(--chip);border-radius:18px;padding:16px;margin:12px 0}.box a.btn{text-decoration:none;text-align:center;color:#141414}
 .note{color:var(--muted);font-size:13px}
 nav.l{display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0 4px;font-size:14px}
+.old{opacity:.5;font-size:.7em;margin-right:6px}#promo{font-weight:600}
 </style>
 </head>
 <body><main>
@@ -42,10 +43,12 @@ nav.l{display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0 4px;font-size:14px}
 <h1>TAP APP Pro</h1>
 <p class="sub">Без суточного ограничения на количество действий. Все инструменты и сейчас работают бесплатно в пределах дневного лимита.</p>
 <div class="box" id="st">Загрузка…</div>
+<p id="promo" class="note" hidden></p>
 <input id="em" class="ym-disable-keys" type="email" inputmode="email" autocomplete="email" placeholder="Ваш email, на него придёт чек">
 <p id="msg" class="note" style="color:#e5484d" hidden></p>
-<div class="card"><h3>Pro на месяц</h3><div class="price">399 ₽ <small>/ 30 дней</small></div><p class="note">Автопродление, отмена в любой момент в Telegram-боте. Доступ до конца оплаченного периода.</p><button class="btn" data-plan="month">Оплатить 399 ₽</button><p class="note">Нажимая кнопку, вы принимаете <a href="/legal/#offer">оферту</a>, <a href="/legal/#privacy">политику обработки персональных данных</a> и автопродление каждые 30 дней. Отключить можно в боте командой /cancel.</p></div>
-<div class="card"><h3>Pro навсегда</h3><div class="price">4999 ₽ <small>разово</small></div><p class="note">Один платёж, без списаний. Бессрочный доступ, пока существует Сервис.</p><button class="btn" data-plan="life">Оплатить 4999 ₽</button></div>
+<div class="card"><h3>Pro на месяц</h3><div class="price"><s class="old" data-old="month" hidden>599 ₽</s> <span data-p="month">399</span> ₽ <small>/ 30 дней</small></div><p class="note">Автопродление, отмена в любой момент в Telegram-боте. Доступ до конца оплаченного периода.</p><button class="btn" data-plan="month">Оплатить <span data-p="month">399</span> ₽</button><p class="note">Нажимая кнопку, вы принимаете <a href="/legal/#offer">оферту</a>, <a href="/legal/#privacy">политику обработки персональных данных</a> и автопродление каждые 30 дней. Отключить можно в боте командой /cancel.</p></div>
+<div class="card"><h3>Pro на год</h3><div class="price"><s class="old" data-old="year" hidden>5990 ₽</s> <span data-p="year">3990</span> ₽ <small>/ 365 дней</small></div><p class="note">Разовый платёж без автопродления. Выгоднее помесячной оплаты.</p><button class="btn" data-plan="year">Оплатить <span data-p="year">3990</span> ₽</button></div>
+<div class="card"><h3>Pro навсегда</h3><div class="price"><s class="old" data-old="life" hidden>8999 ₽</s> <span data-p="life">4999</span> ₽ <small>разово</small></div><p class="note">Один платёж, без списаний. Бессрочный доступ, пока существует Сервис.</p><button class="btn" data-plan="life">Оплатить <span data-p="life">4999</span> ₽</button></div>
 <div class="card"><h3>Поддержать проект</h3><div class="price">любая сумма</div><p class="note">Добровольный платёж. Дополнительных возможностей не даёт.</p><input id="amt" type="number" inputmode="numeric" min="50" max="100000" value="200" aria-label="Сумма, ₽"><button class="btn" data-plan="donate">Поддержать</button></div>
 <h2 id="cancel">Отмена подписки и отвязка карты</h2>
 <p>Автопродление можно отключить в любой момент самостоятельно: карта будет отвязана, новые списания прекратятся, доступ сохранится до конца оплаченного периода. Для этого войдите через Telegram и нажмите кнопку (или отправьте боту команду /cancel).</p>
@@ -91,6 +94,8 @@ function pay(plan){msg('');
   }).catch(function(){bs.forEach(function(x){x.disabled=false});alert('Нет связи с сервером')})
 }
 $('cx').onclick=function(){if(!tok){msg('Сначала войдите через Telegram (кнопка вверху страницы).');window.scrollTo(0,0);return}if(!confirm('Отменить подписку и отвязать карту? Доступ сохранится до конца оплаченного периода.'))return;api('/cancel',{method:'POST',body:'{}'}).then(function(j){alert(j.ok?'Подписка отменена, карта отвязана.':'Не удалось, попробуйте позже');status()}).catch(function(){alert('Нет связи с сервером')})};
+api('/plans').then(function(j){if(!j.plans)return;for(var k in j.plans){document.querySelectorAll('[data-p="'+k+'"]').forEach(function(e){e.textContent=j.plans[k].price});var o=document.querySelector('[data-old="'+k+'"]');if(o){o.textContent=j.plans[k].old+' ₽';o.hidden=!j.promo}}
+if(j.promo){var t=$('promo');t.hidden=false;var f=function(){var d=j.promoEnd-Date.now();if(d<=0){t.hidden=true;return}var D=Math.floor(d/864e5),H=Math.floor(d%864e5/36e5);t.textContent='Акция до 31 декабря 2026: осталось '+D+' дн. '+H+' ч. Потом цены вырастут.'};f();setInterval(f,6e4)}}).catch(function(){});
 document.querySelectorAll('.btn[data-plan]').forEach(function(b){b.onclick=function(){pay(b.dataset.plan)}});
 status();
 if(/[?&]paid=1/.test(location.search)&&/[?&]p=donate/.test(location.search)){var th=document.createElement('div');th.className='box';th.style.borderLeft='4px solid var(--accent)';th.innerHTML='<b>Спасибо за поддержку! ❤</b><br>Платёж получен. Благодаря таким людям TAP APP продолжает развиваться.';$('st').parentNode.insertBefore(th,$('st'));history.replaceState(null,'','/pro/')}

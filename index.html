@@ -61,7 +61,7 @@
   'Добавь хотя бы 2 варианта':'Add at least 2 options','Вариант':'Option','Добавить':'Add','Добавь варианты и крути рулетку':'Add options and spin the roulette','Тапни колесо — крутить':'Tap the wheel to spin','Максимум 8 — тапни колесо':'Max 8 — tap the wheel',
   'Барабанная дробь':'Drum roll','Дробь':'Drum roll','Победа':'Victory','Смех':'Laugh','Ууууу':'Boooo','Облом':'Fail','Овация':'Applause','Верно':'Correct','Ошибка':'Wrong','Восторг':'Cheer','Мяу':'Meow','Пук':'Toot','Твист':'Twist','Вау':'Wow','Стук':'Knock','Сирена':'Siren','Испуг':'Scare',
   'Бутылка':'Bottle','Крути, а не тапай':"Spin, don't tap",'Тапни — измерить шум':'Tap to measure noise','Тапни — измерить снова':'Tap to measure again','дБ':'dB','Тихо':'Quiet','Тишина':'Silence','Нормально':'Normal','Шумно':'Loud','Очень шумно':'Very loud','Оглушительно':'Deafening',
-  'Тапни 4 раза, чтобы задать ритм':'Tap 4 times to set the rhythm','Зажми и говори':'Hold and speak','Говори…':'Speak…','Слушай…':'Listen…','Обрабатываю…':'Processing…','Не получилось, попробуй ещё раз':"Didn't work, try again",'Запись не поддерживается':'Recording is not supported','Звук выключен':'Sound is off',
+  'Тапни 4 раза в ритм, и ритм продолжится сам':'Tap 4 times to the beat and it keeps going on its own','Зажми и говори':'Hold and speak','Говори…':'Speak…','Слушай…':'Listen…','Обрабатываю…':'Processing…','Не получилось, попробуй ещё раз':"Didn't work, try again",'Запись не поддерживается':'Recording is not supported','Звук выключен':'Sound is off',
   'Бас':'Bass','Монстр':'Monster','Бурундук':'Chipmunk','Робот':'Robot','Эхо':'Echo','Космос':'Space',
   'Запись':'Record','Воспроизвести':'Play','Воспроизвести реверс':'Play reversed','Играет! Тапни — остановить':'Playing! Tap to stop',
   'Тапни — бросок':'Tap to roll','Тапни или потряси':'Tap or shake','Бросок…':'Rolling…','Орёл':'Heads','Решка':'Tails','ОРЁЛ':'HEADS','РЕШКА':'TAILS','Тапни — подбросить':'Tap to flip','Кручу…':'Flipping…',
@@ -76,7 +76,7 @@
   'Тапни — крутить':'Tap to spin'
   };
   var RULES=[
-    [/^Тапни (\d+) раза, чтобы задать ритм$/,'Tap $1 times to set the rhythm'],
+    [/^Тапни (\d+) раза в ритм, и ритм продолжится сам$/,'Tap $1 times to the beat and it keeps going on its own'],
     [/^Тапни ещё (\d+) раз(а?)$/,function(m,n){return 'Tap '+n+' more time'+(n==='1'?'':'s');}],
     [/^Ещё (\d+) раз(а?)$/,function(m,n){return n+' more tap'+(n==='1'?'':'s');}],
     [/^Сумма: (\d+)$/,'Sum: $1'],
@@ -1685,7 +1685,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
 
   <div id="rhythmStage" style="display:none">
     <div id="rmDot"></div>
-    <div id="rmHint">Тапни 4 раза, чтобы задать ритм</div>
+    <div id="rmHint">Тапни 4 раза в ритм, и ритм продолжится сам</div>
   </div>
 
   <div id="voiceStage" style="display:none">
@@ -3191,7 +3191,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     rmTaps=[]; rmPattern=[]; rmLoopLen=0;
     rmStopLoop();
     rmDot.classList.remove('hit');
-    rmHint.textContent='Тапни '+RM_NEED+' раза, чтобы задать ритм';
+    rmHint.textContent='Тапни '+RM_NEED+' раза в ритм, и ритм продолжится сам';
     document.getElementById('resetRhythmBtn').classList.remove('on');
   }
   function rmScheduler(){

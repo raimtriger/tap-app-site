@@ -48,6 +48,9 @@ nav.l{display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0 4px;font-size:14px}
 <div class="card"><h3>Pro на месяц</h3><div class="price">399 ₽ <small>/ 30 дней</small></div><p class="note">Автопродление, отмена в любой момент в Telegram-боте. Доступ до конца оплаченного периода.</p><button class="btn" data-plan="month">Оплатить 399 ₽</button><p class="note">Нажимая кнопку, вы принимаете <a href="/legal/#offer">оферту</a> и автопродление каждые 30 дней. Отключить можно в боте командой /cancel.</p></div>
 <div class="card"><h3>Pro навсегда</h3><div class="price">4999 ₽ <small>разово</small></div><p class="note">Один платёж, без списаний. Бессрочный доступ, пока существует Сервис.</p><button class="btn" data-plan="life">Оплатить 4999 ₽</button></div>
 <div class="card"><h3>Поддержать проект</h3><div class="price">любая сумма</div><p class="note">Добровольный платёж. Дополнительных возможностей не даёт.</p><input id="amt" type="number" inputmode="numeric" min="50" max="100000" value="200" aria-label="Сумма, ₽"><button class="btn" data-plan="donate">Поддержать</button></div>
+<h2 id="cancel">Отмена подписки и отвязка карты</h2>
+<p>Автопродление можно отключить в любой момент самостоятельно: карта будет отвязана, новые списания прекратятся, доступ сохранится до конца оплаченного периода. Для этого войдите через Telegram и нажмите кнопку (или отправьте боту команду /cancel).</p>
+<button class="btn" id="cx" style="background:transparent;color:var(--ink);border:1px solid var(--muted)">Отменить подписку и отвязать карту</button>
 <h2>Что входит в Pro</h2>
 <ul><li>Подписать PDF и фото без суточного лимита</li><li>Конвертер, сжатие фото, конвертер звука, PPTX → PDF без ограничений</li><li>Доступ привязывается к Telegram, до двух устройств</li></ul>
 <h2>Как получить доступ</h2>
@@ -93,6 +96,7 @@ function pay(plan){msg('');
     else{bs.forEach(function(x){x.disabled=false});alert(j.error==='auth'?'Нужно войти через Telegram':j.error==='amount'?'Сумма от 50 до 100000 ₽':'Не удалось создать платёж, попробуйте позже')}
   }).catch(function(){bs.forEach(function(x){x.disabled=false});alert('Нет связи с сервером')})
 }
+$('cx').onclick=function(){if(!tok){msg('Сначала войдите через Telegram (кнопка вверху страницы).');window.scrollTo(0,0);return}if(!confirm('Отменить подписку и отвязать карту? Доступ сохранится до конца оплаченного периода.'))return;api('/cancel',{method:'POST',body:'{}'}).then(function(j){alert(j.ok?'Подписка отменена, карта отвязана.':'Не удалось, попробуйте позже');status()}).catch(function(){alert('Нет связи с сервером')})};
 document.querySelectorAll('.btn[data-plan]').forEach(function(b){b.onclick=function(){pay(b.dataset.plan)}});
 status();
 if(/[?&]paid=1/.test(location.search)){var k=0,t=setInterval(function(){$('st').textContent='Проверяем оплату…';status().then(function(p){if(p||++k>40){clearInterval(t);if(!p)$('st').innerHTML='Оплата обрабатывается. Если доступ не появился за несколько минут, напишите на raimtriger@yandex.ru'}})},3000)}

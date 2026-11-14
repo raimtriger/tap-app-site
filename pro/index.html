@@ -31,7 +31,8 @@ ul{padding-left:20px}
 .card h3{margin:0 0 4px;font:700 18px Montserrat,sans-serif}
 .price{font:800 28px Benzin,Montserrat,sans-serif;margin:6px 0}
 .price small{font:600 14px Montserrat,sans-serif;color:var(--muted)}
-.btn{display:block;width:100%;margin-top:12px;border:0;border-radius:14px;padding:14px;background:var(--accent);color:#141414;font:700 15px Montserrat,sans-serif;opacity:.45}
+.btn{display:block;width:100%;margin-top:12px;border:0;border-radius:14px;padding:14px;background:var(--accent);color:#141414;font:700 15px Montserrat,sans-serif}.btn:disabled{opacity:.5}
+input{width:100%;box-sizing:border-box;margin-top:8px;padding:13px;border-radius:12px;border:1px solid var(--muted);background:transparent;color:var(--ink);font:600 15px Montserrat,sans-serif}.box{background:var(--chip);border-radius:18px;padding:16px;margin:12px 0}.box a.btn{text-decoration:none;text-align:center;color:#141414}
 .note{color:var(--muted);font-size:13px}
 nav.l{display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0 4px;font-size:14px}
 </style>
@@ -40,9 +41,12 @@ nav.l{display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0 4px;font-size:14px}
 <a class="back" href="/">← TAP APP</a>
 <h1>TAP APP Pro</h1>
 <p class="sub">Без суточного ограничения на количество действий. Все инструменты и сейчас работают бесплатно в пределах дневного лимита.</p>
-<div class="card"><h3>Pro на месяц</h3><div class="price">399 ₽ <small>/ 30 дней</small></div><p class="note">Автопродление, отмена в любой момент в Telegram-боте. Доступ до конца оплаченного периода.</p><button class="btn" disabled>Скоро</button></div>
-<div class="card"><h3>Pro навсегда</h3><div class="price">4999 ₽ <small>разово</small></div><p class="note">Один платёж, без списаний. Бессрочный доступ, пока существует Сервис.</p><button class="btn" disabled>Скоро</button></div>
-<div class="card"><h3>Поддержать проект</h3><div class="price">любая сумма</div><p class="note">Добровольный платёж. Дополнительных возможностей не даёт.</p><button class="btn" disabled>Скоро</button></div>
+<div class="card"><h3>Pro на месяц</h3><div class="price">399 ₽ <small>/ 30 дней</small></div><p class="note">Автопродление, отмена в любой момент в Telegram-боте. Доступ до конца оплаченного периода.</p><button class="btn" data-plan="month">Оплатить 399 ₽</button><p class="note">Нажимая кнопку, вы принимаете <a href="/legal/#offer">оферту</a> и автопродление каждые 30 дней. Отключить можно в боте командой /cancel.</p></div>
+<div class="card"><h3>Pro навсегда</h3><div class="price">4999 ₽ <small>разово</small></div><p class="note">Один платёж, без списаний. Бессрочный доступ, пока существует Сервис.</p><button class="btn" data-plan="life">Оплатить 4999 ₽</button></div>
+<div class="card"><h3>Поддержать проект</h3><div class="price">любая сумма</div><p class="note">Добровольный платёж. Дополнительных возможностей не даёт.</p><input id="amt" type="number" inputmode="numeric" min="50" max="100000" value="200" aria-label="Сумма, ₽"><button class="btn" data-plan="donate">Поддержать</button></div>
+<div class="box" id="st">Загрузка…</div>
+<input id="em" type="email" inputmode="email" autocomplete="email" placeholder="Email для чека">
+<div id="lg" class="box" hidden></div>
 <h2>Что входит в Pro</h2>
 <ul><li>Подписать PDF и фото без суточного лимита</li><li>Конвертер, сжатие фото, конвертер звука, PPTX → PDF без ограничений</li><li>Доступ привязывается к Telegram, до двух устройств</li></ul>
 <h2>Как получить доступ</h2>
@@ -50,5 +54,49 @@ nav.l{display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0 4px;font-size:14px}
 <p class="note">Оплата банковской картой через ЮKassa, чек на email. <a href="/legal/#offer">Оферта</a> · <a href="/legal/#refund">Возврат</a> · <a href="/legal/#privacy">Конфиденциальность</a> · <a href="/legal/#contacts">Контакты</a></p>
 <p class="note">Индивидуальный предприниматель Хуснимарданов Раим Ильнурович, ИНН 165717251752, ОГРНИП 322169000018680, raimtriger@yandex.ru</p>
 </main>
+<script>
+(function(){
+var API='https://dl.tap-app.ru:8443/tapapp/api',TK='tap_pro_token',MK='tap_pro_me',$=function(i){return document.getElementById(i)},tok='',want='',poll;
+try{tok=localStorage.getItem(TK)||'';$('em').value=localStorage.getItem('tap_pro_email')||''}catch(e){}
+function api(p,o){o=o||{};o.headers=Object.assign({'content-type':'application/json'},tok?{authorization:'Bearer '+tok}:{},o.headers||{});return fetch(API+p,o).then(function(r){return r.json()})}
+function fd(t){return new Date(t).toLocaleDateString('ru-RU')}
+function status(){
+  if(!tok){$('st').innerHTML='Вы не вошли. Вход нужен, чтобы привязать Pro к Telegram.';return Promise.resolve()}
+  return api('/me').then(function(j){
+    if(!j.auth){tok='';try{localStorage.removeItem(TK);localStorage.removeItem(MK)}catch(e){}$('st').textContent='Вы не вошли.';return}
+    try{localStorage.setItem(MK,JSON.stringify({life:!!j.life,until:j.until||0}))}catch(e){}
+    var pro=j.life||j.until>Date.now();
+    $('st').innerHTML='<b>'+(j.name||'Telegram')+'</b>: '+(j.life?'Pro навсегда':pro?'Pro до '+fd(j.until)+(j.auto?', автопродление включено':''):'Pro нет')+' · <a href="#" id="out">выйти</a>';
+    $('out').onclick=function(e){e.preventDefault();tok='';try{localStorage.removeItem(TK);localStorage.removeItem(MK)}catch(x){}status()};
+    return pro
+  }).catch(function(){$('st').textContent='Нет связи с сервером, попробуйте позже.'})
+}
+function login(){
+  var b=$('lg');b.hidden=false;b.textContent='Готовлю вход…';
+  api('/login',{method:'POST',body:'{}'}).then(function(j){
+    b.innerHTML='1. Нажмите кнопку и в Telegram нажмите Start.<br><a class="btn" target="_blank" rel="noopener" href="'+j.link+'">Открыть бота</a><p class="note">2. Вернитесь сюда, страница сама продолжит.</p>';
+    var n=0;clearInterval(poll);poll=setInterval(function(){
+      if(++n>200){clearInterval(poll);b.textContent='Время вышло, нажмите кнопку оплаты ещё раз.';return}
+      api('/login/poll?code='+j.code).then(function(r){if(r.ok){clearInterval(poll);tok=r.token;try{localStorage.setItem(TK,tok)}catch(e){}b.hidden=true;status().then(function(){if(want)pay(want)})}}).catch(function(){})
+    },3000)
+  }).catch(function(){b.textContent='Нет связи с сервером, попробуйте позже.'})
+}
+function pay(plan){
+  var em=$('em').value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){$('em').focus();$('em').style.borderColor='#e5484d';return}
+  $('em').style.borderColor='';try{localStorage.setItem('tap_pro_email',em)}catch(e){}
+  if(plan!=='donate'&&!tok){want=plan;login();return}
+  var bs=document.querySelectorAll('.btn[data-plan]');bs.forEach(function(x){x.disabled=true});
+  api('/pay',{method:'POST',body:JSON.stringify({plan:plan,email:em,amount:+$('amt').value})}).then(function(j){
+    if(j.url){try{if(window.ym)window.ym(109713949,'reachGoal','pay_start',{plan:plan})}catch(e){}location.href=j.url}
+    else{bs.forEach(function(x){x.disabled=false});alert(j.error==='auth'?'Нужно войти через Telegram':j.error==='amount'?'Сумма от 50 до 100000 ₽':'Не удалось создать платёж, попробуйте позже')}
+  }).catch(function(){bs.forEach(function(x){x.disabled=false});alert('Нет связи с сервером')})
+}
+document.querySelectorAll('.btn[data-plan]').forEach(function(b){b.onclick=function(){pay(b.dataset.plan)}});
+status();
+if(/[?&]paid=1/.test(location.search)){var k=0,t=setInterval(function(){$('st').textContent='Проверяем оплату…';status().then(function(p){if(p||++k>40){clearInterval(t);if(!p)$('st').innerHTML='Оплата обрабатывается. Если доступ не появился за несколько минут, напишите на raimtriger@yandex.ru'}})},3000)}
+})();
+</script>
+
 </body>
 </html>

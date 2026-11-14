@@ -1489,6 +1489,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>
       <span id="langLbl">English</span>
     </a>
+    <a class="appbtn" href="/pro/" id="proLink"><span>Pro</span></a>
     <a class="appbtn" href="/legal/" id="legalLink"><span>Оферта и контакты</span></a>
   </nav>
 
@@ -1890,6 +1891,36 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
   <div id="editLock"></div>
 
 <script>
+/* TAP PRO: суточные лимиты + статус Pro (мягкий пейволл) */
+(function(){
+  var API='https://dl.tap-app.ru:8443/tapapp/api',LK='tap_lim',TK='tap_pro_token',MK='tap_pro_me',MAXA=5,MAXN=5,me=null;
+  function en(){return window.__LANG==='en'}
+  function day(){try{return new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Moscow'})}catch(e){return new Date().toISOString().slice(0,10)}}
+  function ld(){try{var o=JSON.parse(localStorage.getItem(LK)||'{}');if(o.d!==day())o={d:day(),apps:[],n:0};o.apps=o.apps||[];o.n=o.n||0;return o}catch(e){return{d:day(),apps:[],n:0}}}
+  function sv(o){try{localStorage.setItem(LK,JSON.stringify(o))}catch(e){}}
+  try{me=JSON.parse(localStorage.getItem(MK)||'null')}catch(e){}
+  function pro(){return !!(me&&(me.life||me.until>Date.now()))}
+  function css(){if(document.getElementById('proCss'))return;var s=document.createElement('style');s.id='proCss';s.textContent='#proMod{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.6)}#proMod .pm{max-width:380px;width:100%;background:var(--chip,#1a1a1f);color:var(--ink,#f3efe6);border-radius:22px;padding:22px;font-family:var(--fu,Montserrat,sans-serif);text-align:left}#proMod h3{margin:0 0 8px;font:800 20px/1.2 Benzin,Montserrat,sans-serif;text-transform:uppercase}#proMod p{margin:0 0 16px;font:600 14px/1.5 Montserrat,sans-serif;color:var(--muted,#9a9aa3)}#proMod a,#proMod button{display:block;width:100%;box-sizing:border-box;margin-top:8px;padding:14px;border:0;border-radius:14px;font:700 15px Montserrat,sans-serif;text-align:center;text-decoration:none;cursor:pointer}#proMod a{background:var(--accent,#e0a85e);color:#141414}#proMod button{background:transparent;color:var(--ink,#f3efe6);border:1px solid var(--muted,#9a9aa3)}#proToast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:99998;background:var(--chip,#1a1a1f);color:var(--ink,#f3efe6);padding:9px 16px;border-radius:99px;font:700 13px Montserrat,sans-serif;opacity:0;transition:opacity .25s;pointer-events:none}#proToast.on{opacity:1}'; document.head.appendChild(s)}
+  function modal(kind){
+    css();var o=document.getElementById('proMod');if(o)o.remove();
+    var E=en(),t=kind==='open'?(E?'Daily tool limit reached':'Лимит инструментов на сегодня'):(E?'Daily action limit reached':'Лимит действий на сегодня'),
+    x=kind==='open'?(E?'You opened '+MAXA+' different tools today. The counter resets at midnight (Moscow time), or get Pro with no limits.':'Сегодня открыто '+MAXA+' разных инструментов. Счётчик обнулится в полночь по Москве, или оформи Pro без ограничений.'):(E?'You used '+MAXN+' actions today. The counter resets at midnight (Moscow time), or get Pro with no limits.':'Сегодня использовано '+MAXN+' действий. Счётчик обнулится в полночь по Москве, или оформи Pro без ограничений.');
+    var d=document.createElement('div');d.id='proMod';d.innerHTML='<div class="pm"><h3></h3><p></p><a href="/pro/"></a><button type="button"></button></div>';
+    d.querySelector('h3').textContent=t;d.querySelector('p').textContent=x;d.querySelector('a').textContent=E?'Get Pro':'Оформить Pro';d.querySelector('button').textContent=E?'Close':'Закрыть';
+    d.addEventListener('click',function(e){if(e.target===d||e.target.tagName==='BUTTON')d.remove()});document.body.appendChild(d);
+    try{if(window.ym)window.ym(109713949,'reachGoal','limit_hit',{kind:kind})}catch(e){}
+  }
+  var tt;function toast(n){css();var el=document.getElementById('proToast');if(!el){el=document.createElement('div');el.id='proToast';document.body.appendChild(el)}el.textContent=en()?('Actions left today: '+n):('Осталось действий сегодня: '+n);el.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){el.classList.remove('on')},2200)}
+  window.TapPro={
+    isPro:pro,
+    open:function(a){if(a==='home'||pro())return true;var o=ld();if(o.apps.indexOf(a)>=0)return true;if(o.apps.length>=MAXA){modal('open');return false}o.apps.push(a);sv(o);return true},
+    act:function(){if(pro())return true;var o=ld();if(o.n>=MAXN){modal('act');return false}o.n++;sv(o);toast(MAXN-o.n);return true}
+  };
+  try{var tk=localStorage.getItem(TK);if(tk)fetch(API+'/me',{headers:{authorization:'Bearer '+tk}}).then(function(r){return r.json()}).then(function(j){if(j&&j.auth){me={life:!!j.life,until:j.until||0};localStorage.setItem(MK,JSON.stringify(me))}else if(j&&j.auth===false){me=null;localStorage.removeItem(MK);localStorage.removeItem(TK)}}).catch(function(){})}catch(e){}
+})();
+</script>
+
+<script>
 (function(){
   var LS={C:-2,D:-1,E:0,F:1,G:2,A:3,B:4};
   // pitch classes; black keys carry both spellings
@@ -2209,6 +2240,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
   };
   window.addEventListener('popstate',function(){fromPop=true;try{setApp(appFromPath())}finally{fromPop=false}});
   function setApp(a){
+    if(window.TapPro&&!window.TapPro.open(a))return;
     app=a;
     if(LAZY_APP_MAP[a]) lazyLoad(LAZY_APP_MAP[a]);
     (function(){
@@ -4337,6 +4369,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     if(dlBusy) return;
     var url=dlExtractUrl(dlInput.value);
     if(!url){ dlHint.textContent='Нужна ссылка на видео'; return; }
+    if(window.TapPro&&!window.TapPro.act()) return;
     dlInput.blur(); dlBusy=true; dlGo.disabled=true; dlAbort=('AbortController' in window)?new AbortController():null;
     dlStage.classList.add('busy'); dlProg(null); dlHint.textContent='Ищу видео…';
     var sig=dlAbort?{signal:dlAbort.signal}:{};
@@ -5159,6 +5192,7 @@ function dl(arr){
   });
 }
 function save(arr){
+  if(window.TapPro&&!window.TapPro.act())return;
   var files=arr.map(function(o){return new File([o.blob],o.name,{type:o.blob.type})});
   if(navigator.canShare&&navigator.share){
     var ok=false;
@@ -5520,7 +5554,7 @@ function recompute(){if(!items.length)return;gen++;var g=gen;items.forEach(funct
 
 /* ---- save ---- */
 function dl(arr){arr.forEach(function(o,i){setTimeout(function(){var a=document.createElement('a');a.href=URL.createObjectURL(o.blob);a.download=o.name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},4000)},i*350)})}
-function saveF(arr){var files=arr.map(function(o){return new File([o.blob],o.name,{type:o.blob.type})});
+function saveF(arr){if(window.TapPro&&!window.TapPro.act())return;var files=arr.map(function(o){return new File([o.blob],o.name,{type:o.blob.type})});
  if(navigator.canShare&&navigator.share){var ok=false;try{ok=navigator.canShare({files:files})}catch(e){}
   if(ok){navigator.share({files:files}).catch(function(e){if(!e||e.name!=='AbortError')dl(arr)});return}}
  dl(arr)}
@@ -5678,7 +5712,7 @@ function convert(it){if(it.busy||it.enc||!it.buf)return EQ;it.enc=true;it.prog=0
 
 /* save */
 function dl(arr){arr.forEach(function(o,i){setTimeout(function(){var a=document.createElement('a');a.href=URL.createObjectURL(o.blob);a.download=o.name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},4000)},i*350)})}
-function saveF(arr){var files=arr.map(function(o){return new File([o.blob],o.name,{type:o.blob.type})});
+function saveF(arr){if(window.TapPro&&!window.TapPro.act())return;var files=arr.map(function(o){return new File([o.blob],o.name,{type:o.blob.type})});
  if(navigator.canShare&&navigator.share){var ok=false;try{ok=navigator.canShare({files:files})}catch(e){}
   if(ok){navigator.share({files:files}).catch(function(e){if(!e||e.name!=='AbortError')dl(arr)});return}}
  dl(arr)}
@@ -5987,7 +6021,7 @@ function ready(o){sheet.textContent='';var h=el('h3');h.textContent=T('Гото�
 function busy(msg){sheet.textContent='';var m=el('p','sg-msg');m.textContent=msg;sheet.appendChild(m);openModal()}
 function fail(e){sheet.textContent='';var m=el('p','sg-msg');m.textContent=(e&&e.message==='lib')?T('Не загрузилась библиотека PDF, проверь интернет и повтори','PDF library failed to load, check connection and retry'):T('Не хватило памяти или файл повреждён','Out of memory or the file is broken');sheet.appendChild(m);
  var c=el('button','cv-btn');c.type='button';c.textContent=T('Закрыть','Close');c.onclick=closeModal;sheet.appendChild(c);openModal()}
-function run(p){busy(T('Готовлю файл…','Preparing file…'));p.then(function(o){goal('sign_save');ready(o)},fail)}
+function run(p){if(window.TapPro&&!window.TapPro.act())return;busy(T('Готовлю файл…','Preparing file…'));p.then(function(o){goal('sign_save');ready(o)},fail)}
 function doSave(){
  if(!pls.length){busy(T('Сначала поставь подпись или текст на страницу.','Place a signature or text on the page first.'));var c=el('button','cv-btn');c.type='button';c.textContent=T('Понятно','OK');c.onclick=closeModal;sheet.appendChild(c);return}
  select(null);

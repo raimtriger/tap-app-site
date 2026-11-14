@@ -4746,13 +4746,15 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
   });
   /* тряска телефона = бросок (iOS спрашивает разрешение при первом тапе) */
   var motionArmed=false, motionAsk=false, lastShake=0, mx=null,my=0,mz=0;
+  /* iOS: после вставки текста в поле тряска показывает «Отменить вставку»; сбрасываем историю правок полей до броска */
+  function clearUndo(){try{if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();document.querySelectorAll('input[type=text],input[type=url],input[type=search],input:not([type]),textarea').forEach(function(el){var v=el.value;if(v){el.value='';el.value=v}})}catch(_){}}
   function onMotion(e){
     if(app!=='dice') return;
     if(diceRolling){ lastShake=Date.now(); return; }      // пока кубики крутятся — таймер охлаждения не идёт
     var a=e.accelerationIncludingGravity; if(!a||a.x==null) return;
     if(mx!==null){
       var d=Math.abs(a.x-mx)+Math.abs(a.y-my)+Math.abs(a.z-mz);
-      if(d>30 && Date.now()-lastShake>1200){ lastShake=Date.now(); ensureAC(); rollDice(); }
+      if(d>30 && Date.now()-lastShake>1200){ lastShake=Date.now(); clearUndo(); ensureAC(); rollDice(); }
     }
     mx=a.x; my=a.y; mz=a.z;
   }

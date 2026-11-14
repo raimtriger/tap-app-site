@@ -545,10 +545,10 @@
   }
   #rmDot{
     width:min(34vw,28vh);height:min(34vw,28vh);border-radius:50%;
-    background:var(--chip);
-    transition:transform .09s cubic-bezier(.34,1.56,.64,1),background .09s ease;
+    background:var(--chip-on);box-shadow:inset 0 0 0 2px var(--muted);
+    transition:transform .09s cubic-bezier(.34,1.56,.64,1),background .09s ease,box-shadow .09s ease;
   }
-  #rmDot.hit{transform:scale(1.15);background:var(--accent);}
+  #rmDot.hit{transform:scale(1.15);background:var(--accent);box-shadow:none;}
   #rmHint{
     font:600 min(4.2vw,16px)/1 var(--fu);
     color:var(--muted);margin-top:26px;text-align:center;

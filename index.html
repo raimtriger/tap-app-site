@@ -929,7 +929,7 @@
   #menuOverlay.open{opacity:1;visibility:visible;}
 
   /* slide-out drawer */
-  .appnav{position:fixed;top:0;right:0;height:100%;width:min(76vw,290px);z-index:63;
+  .appnav{position:fixed;top:0;right:0;height:100%;width:min(88vw,330px);z-index:63;
     background:var(--panel);box-shadow:-14px 0 44px rgba(0,0,0,.34);
     display:flex;flex-direction:column;gap:6px;
     padding:calc(env(safe-area-inset-top) + 78px) 16px calc(env(safe-area-inset-bottom) + 22px);
@@ -944,7 +944,7 @@
     margin-top:14px;margin-bottom:2px;flex-shrink:0;}
   .appnav .cathdr:first-of-type{margin-top:4px;}
   a.appbtn{text-decoration:none;}
-  .newb{margin-left:auto;font:800 9.5px/1 var(--fu);font-style:normal;letter-spacing:.05em;padding:4px 7px;border-radius:99px;background:var(--accent);color:#141414;flex-shrink:0;}
+  .newb{margin-left:auto;font:800 9px/1 var(--fu);font-style:normal;letter-spacing:.05em;padding:3px 6px;border-radius:99px;background:var(--accent);color:#141414;flex-shrink:0;}
   .appbtn{width:100%;border:0;border-radius:14px;background:transparent;color:var(--muted);
     display:flex;flex-direction:row;align-items:center;gap:14px;justify-content:flex-start;
     padding:13px 14px;cursor:pointer;transition:background .15s,color .15s,transform .3s ease,opacity .3s ease;
@@ -985,7 +985,7 @@
   .appbtn svg.pico{width:26px;height:26px;}
   .appbtn small{font:600 11px/1 var(--fu);letter-spacing:.04em;opacity:.8;margin-left:auto;}
   .appnav.open .appbtn.soon{opacity:.4;cursor:default;pointer-events:none;}
-  .appbtn span{font:600 16px/1 var(--fu);letter-spacing:.01em;}
+  .appbtn span{font:600 16px/1 var(--fu);font-size:clamp(13.5px,4.2vw,16px);letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
   .appbtn.on{background:var(--chip-on);color:var(--ink);}
   /* до первого setApp() ничего не показываем — иначе мелькает аппка «нота» */
   html:not(.ready) #stage,html:not(.ready) .titlewrap{visibility:hidden;}
@@ -4804,11 +4804,10 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
   document.querySelectorAll('#wordModeSeg button').forEach(function(b){
     b.addEventListener('click',function(e){
       e.stopPropagation();
-      wordMode=b.dataset.wm; lastWord=-1;
+      wordMode=b.dataset.wm; lastWord=-1; wordText.textContent='—'; fitWord();
       document.querySelectorAll('#wordModeSeg button').forEach(function(x){
         x.classList.toggle('on',x.dataset.wm===wordMode);
       });
-      nextWord();
     });
   });
   document.getElementById('resetTimerBtn').addEventListener('click',function(e){
@@ -6195,6 +6194,20 @@ menu();window.favSync(window.__curApp||'home');
     if(ok&&!i){i=document.createElement('i');i.className='newb';i.textContent='NEW';b.appendChild(i)}else if(!ok&&i)i.remove()})}
   var o=window.__trackOpen;window.__trackOpen=function(a){try{mark(a)}catch(e){}return o&&o.apply(this,arguments)};
   apply();
+})();
+</script>
+<script>
+/* Telegram Mini App: не закрываться свайпом вниз (подпись пальцем, слайдеры) и раскрыться на весь экран */
+(function(){
+  var tg=false;try{tg=/tgWebApp/.test(location.hash)||!!window.TelegramWebviewProxy||sessionStorage.getItem('tap_tg')==='1';if(tg)sessionStorage.setItem('tap_tg','1')}catch(e){}
+  if(!tg)return;
+  function post(ev,data){try{
+    var s=JSON.stringify({eventType:ev,eventData:data||{}});
+    if(window.parent&&window.parent!==window)window.parent.postMessage(s,'*');
+    else if(window.TelegramWebviewProxy&&window.TelegramWebviewProxy.postEvent)window.TelegramWebviewProxy.postEvent(ev,JSON.stringify(data||{}));
+    else if(window.external&&'notify' in window.external)window.external.notify(s);
+  }catch(e){}}
+  post('web_app_ready');post('web_app_expand');post('web_app_setup_swipe_behavior',{allow_vertical_swipe:false});
 })();
 </script>
 <script>

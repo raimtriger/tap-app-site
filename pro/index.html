@@ -93,7 +93,8 @@ function pay(plan){msg('');
 $('cx').onclick=function(){if(!tok){msg('Сначала войдите через Telegram (кнопка вверху страницы).');window.scrollTo(0,0);return}if(!confirm('Отменить подписку и отвязать карту? Доступ сохранится до конца оплаченного периода.'))return;api('/cancel',{method:'POST',body:'{}'}).then(function(j){alert(j.ok?'Подписка отменена, карта отвязана.':'Не удалось, попробуйте позже');status()}).catch(function(){alert('Нет связи с сервером')})};
 document.querySelectorAll('.btn[data-plan]').forEach(function(b){b.onclick=function(){pay(b.dataset.plan)}});
 status();
-if(/[?&]paid=1/.test(location.search)){var k=0,t=setInterval(function(){$('st').textContent='Проверяем оплату…';status().then(function(p){if(p||++k>40){clearInterval(t);if(!p)$('st').innerHTML='Оплата обрабатывается. Если доступ не появился за несколько минут, напишите на raimtriger@yandex.ru'}})},3000)}
+if(/[?&]paid=1/.test(location.search)&&/[?&]p=donate/.test(location.search)){var th=document.createElement('div');th.className='box';th.style.borderLeft='4px solid var(--accent)';th.innerHTML='<b>Спасибо за поддержку! ❤</b><br>Платёж получен. Благодаря таким людям TAP APP продолжает развиваться.';$('st').parentNode.insertBefore(th,$('st'));history.replaceState(null,'','/pro/')}
+else if(/[?&]paid=1/.test(location.search)){var k=0,t=setInterval(function(){$('st').textContent='Проверяем оплату…';status().then(function(p){if(p||++k>40){clearInterval(t);if(!p)$('st').innerHTML='Оплата обрабатывается. Если доступ не появился за несколько минут, напишите на raimtriger@yandex.ru'}})},3000)}
 })();
 </script>
 

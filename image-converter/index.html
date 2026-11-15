@@ -6288,22 +6288,21 @@ menu();window.favSync(window.__curApp||'home');
    '<line id="sgStream" x1="'+CX+'" x2="'+CX+'" stroke="#f0c36e" stroke-width="1.8" stroke-linecap="round" opacity="0" style="transition:opacity .25s"/>'+
    '<line id="sgDash" x1="'+CX+'" x2="'+CX+'" stroke="#fff6dc" stroke-width="1" stroke-dasharray="1.5 5" stroke-linecap="round" opacity="0" style="transition:opacity .25s"/>'+
    '<path d="'+glass+'" fill="none" style="stroke:var(--muted)" stroke-width="1.8"/>'+
-   '<path d="'+shineL+'" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="3" stroke-linecap="round"/>'+
    '<rect x="30" y="8" width="180" height="22" rx="6" style="fill:var(--muted)"/><rect x="30" y="330" width="180" height="22" rx="6" style="fill:var(--muted)"/>'+
-   '<rect x="30" y="8" width="180" height="9" rx="4" fill="#fff" opacity=".16"/><rect x="30" y="330" width="180" height="9" rx="4" fill="#fff" opacity=".16"/></g>';
+   '</g>';
   var gRot=svg.querySelector('#sgRot'),eTop=svg.querySelector('#sgTop'),eBot=svg.querySelector('#sgBot'),eSt=svg.querySelector('#sgStream'),eDa=svg.querySelector('#sgDash');
-  var D=60,p=1,started=false,flowing=false,flipping=false,done=false,dip=0,mound=5,off=0,last=0,raf=0,shown=false,th=0,ths=0,ft=0,FD=1.1,HOLD=0.35;
+  var streamAmt=0,D=60,p=1,started=false,flowing=false,flipping=false,done=false,dip=0,mound=5,off=0,last=0,raf=0,shown=false,th=0,ths=0,ft=0,FD=1.35,HOLD=0.35;
   function fmt(sec){sec=Math.max(0,Math.ceil(sec-1e-6));var m=Math.floor(sec/60),s=sec%60;return (m<10?'0':'')+m+':'+(s<10?'0':'')+s}
   function render(){
     var upright=!flipping&&Math.abs(ths)<0.02,x0=CX-R-3,x1=CX+R+3;
     if(upright){
-      var yT=NECK-inv(p)*H,yB=NECK+inv(p)*H;  // верх: уровень от горла; низ: симметрично по остатку ниже
-      var sB=inv(1-p);yB=NECK+(1-sB)*H;
+      var yT=NECK-inv(p)*H,q=1-p,T=0.68,mAr=AB*0,m=Math.min(mound,Math.sqrt(Math.max(0,q*AB*0.8*T)));
+      var qf=Math.max(0,q-m*m/T/AB),yB=NECK+inv(1-qf)*H,hw=m/T;
       eTop.setAttribute('d',p>0.002?'M'+x0+' '+(yT+dip*0.4).toFixed(1)+'Q'+CX+' '+(yT+dip*2).toFixed(1)+' '+x1+' '+(yT+dip*0.4).toFixed(1)+'L'+x1+' '+(NECK+7)+'L'+x0+' '+(NECK+7)+'Z':'');
-      if(1-p>0.002){var y0=yB+mound*0.35,c=yB-mound*1.65;eBot.setAttribute('d','M'+x0+' '+y0.toFixed(1)+'Q'+CX+' '+c.toFixed(1)+' '+x1+' '+y0.toFixed(1)+'L'+x1+' '+(BOT+4)+'L'+x0+' '+(BOT+4)+'Z')}else eBot.setAttribute('d','');
-      var on=flowing&&p>0.002;
-      if(on){var yp=yB-mound;eSt.setAttribute('y1',NECK-3);eSt.setAttribute('y2',yp.toFixed(1));eDa.setAttribute('y1',NECK-3);eDa.setAttribute('y2',yp.toFixed(1));eDa.setAttribute('stroke-dashoffset',off.toFixed(1))}
-      eSt.setAttribute('opacity',on?1:0);eDa.setAttribute('opacity',on?.9:0);
+      if(q>0.0005){eBot.setAttribute('d','M'+x0+' '+yB.toFixed(1)+'L'+(CX-hw).toFixed(1)+' '+yB.toFixed(1)+'L'+CX+' '+(yB-m).toFixed(1)+'L'+(CX+hw).toFixed(1)+' '+yB.toFixed(1)+'L'+x1+' '+yB.toFixed(1)+'L'+x1+' '+(BOT+4)+'L'+x0+' '+(BOT+4)+'Z')}else eBot.setAttribute('d','');
+      var on=streamAmt>0.02&&p>0.002;
+      if(on){var yp=yB-m;eSt.setAttribute('y1',NECK-3);eSt.setAttribute('y2',yp.toFixed(1));eDa.setAttribute('y1',NECK-3);eDa.setAttribute('y2',yp.toFixed(1));eDa.setAttribute('stroke-dashoffset',off.toFixed(1));eSt.setAttribute('stroke-width',(1.7*streamAmt).toFixed(2));eDa.setAttribute('stroke-width',(1*streamAmt).toFixed(2))}
+      eSt.setAttribute('opacity',on?streamAmt:0);eDa.setAttribute('opacity',on?.9*streamAmt:0);
     }else{
       var gx=Math.sin(ths),gy=Math.cos(ths);
       eTop.setAttribute('d',pool(bulbT,AT,p,gx,gy));eBot.setAttribute('d',pool(bulbB,AB,1-p,gx,gy));
@@ -6313,7 +6312,7 @@ menu();window.favSync(window.__curApp||'home');
     var shownP=(flipping&&th>Math.PI/2)?1-p:p;timeEl.textContent=fmt(shownP*D);
   }
   function setHint(){hint.textContent=!started?'Тапни — запустить':done?'Готово. Тапни — перевернуть':'Тапни — перевернуть'}
-  function ease(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
+  function ease(t){return 0.5-0.5*Math.cos(Math.PI*t)}
   function loop(t){
     raf=requestAnimationFrame(loop);var dt=last?Math.min((t-last)/1000,5):0;last=t;
     if(flipping){
@@ -6327,11 +6326,12 @@ menu();window.favSync(window.__curApp||'home');
         if(p<=0){p=0;flowing=false;done=true;setHint();try{if(navigator.vibrate)navigator.vibrate([40,60,40])}catch(e){}timeEl.classList.add('done')}
       }
     }
-    var fl=flowing&&!flipping&&p>0.002,tdip=fl?Math.min(9,3+p*8):0,tm=fl?9:5,kr=flipping?22:6;
-    dip+=(tdip-dip)*Math.min(1,dt*kr);mound+=(tm-mound)*Math.min(1,dt*(flipping?22:4));
+    var fl=flowing&&!flipping&&p>0.002,tdip=fl?Math.min(8,2+p*7):0,tm=fl?12:0;
+    streamAmt+=((fl?1:0)-streamAmt)*Math.min(1,dt*(fl?2.2:7));
+    dip+=(tdip-dip)*Math.min(1,dt*(flipping?22:1.4));mound+=(tm-mound)*Math.min(1,dt*(flipping?22:0.9));
     render();
   }
-  function reset(){flowing=false;flipping=false;done=false;started=false;p=1;th=0;ths=0;dip=0;mound=5;timeEl.classList.remove('done');setHint();render()}
+  function reset(){flowing=false;flipping=false;done=false;started=false;p=1;th=0;ths=0;dip=0;mound=0;streamAmt=0;timeEl.classList.remove('done');setHint();render()}
   function tap(){
     if(flipping)return;
     if(!started){started=true;flowing=true;setHint();try{if(navigator.vibrate)navigator.vibrate(10)}catch(e){}return}

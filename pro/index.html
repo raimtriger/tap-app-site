@@ -97,7 +97,9 @@ $('cx').onclick=function(){if(!tok){msg('Сначала войдите чере�
 api('/plans').then(function(j){if(!j.plans)return;for(var k in j.plans){document.querySelectorAll('[data-p="'+k+'"]').forEach(function(e){e.textContent=j.plans[k].price});var o=document.querySelector('[data-old="'+k+'"]');if(o){o.textContent=j.plans[k].old+' ₽';o.hidden=!j.promo}}
 if(j.promo){var t=$('promo');t.hidden=false;var f=function(){var d=j.promoEnd-Date.now();if(d<=0){t.hidden=true;return}var D=Math.floor(d/864e5),H=Math.floor(d%864e5/36e5);t.textContent='Акция до 31 декабря 2026: осталось '+D+' дн. '+H+' ч. Потом цены вырастут.'};f();setInterval(f,6e4)}}).catch(function(){});
 document.querySelectorAll('.btn[data-plan]').forEach(function(b){b.onclick=function(){pay(b.dataset.plan)}});
-status();
+function tgInit(){try{var h=location.hash.slice(1),d=h?new URLSearchParams(h).get('tgWebAppData'):'';if(d)sessionStorage.setItem('tap_tgd',d);return d||sessionStorage.getItem('tap_tgd')||''}catch(e){return ''}}
+var ti=!tok&&tgInit();
+if(ti){api('/login/tg',{method:'POST',body:JSON.stringify({initData:ti})}).then(function(j){if(j&&j.token){tok=j.token;try{localStorage.setItem(TK,tok)}catch(e){}}status()}).catch(function(){status()})}else status();
 if(/[?&]paid=1/.test(location.search)&&/[?&]p=donate/.test(location.search)){var th=document.createElement('div');th.className='box';th.style.borderLeft='4px solid var(--accent)';th.innerHTML='<b>Спасибо за поддержку! ❤</b><br>Платёж получен. Благодаря таким людям TAP APP продолжает развиваться.';$('st').parentNode.insertBefore(th,$('st'));history.replaceState(null,'','/pro/')}
 else if(/[?&]paid=1/.test(location.search)){var k=0,t=setInterval(function(){$('st').textContent='Проверяем оплату…';status().then(function(p){if(p||++k>40){clearInterval(t);if(!p)$('st').innerHTML='Оплата обрабатывается. Если доступ не появился за несколько минут, напишите на raimtriger@yandex.ru'}})},3000)}
 })();

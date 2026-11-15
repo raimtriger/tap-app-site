@@ -1917,7 +1917,10 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     open:function(a){if(a==='home'||pro())return true;var o=ld();if(o.apps.indexOf(a)>=0)return true;if(o.apps.length>=MAXA){modal('open');return false}o.apps.push(a);sv(o);return true},
     act:function(){if(pro())return true;var o=ld();if(o.n>=MAXN){modal('act');return false}o.n++;sv(o);toast(MAXN-o.n);return true}
   };
-  try{var tk=localStorage.getItem(TK);if(tk)fetch(API+'/me',{headers:{authorization:'Bearer '+tk}}).then(function(r){return r.json()}).then(function(j){if(j&&j.auth){me={life:!!j.life,until:j.until||0};localStorage.setItem(MK,JSON.stringify(me))}else if(j&&j.auth===false){me=null;localStorage.removeItem(MK);localStorage.removeItem(TK)}}).catch(function(){})}catch(e){}
+  function tgInit(){try{var h=location.hash.slice(1),d=h?new URLSearchParams(h).get('tgWebAppData'):'';if(d)sessionStorage.setItem('tap_tgd',d);return d||sessionStorage.getItem('tap_tgd')||''}catch(e){return ''}}
+  function tgLogin(){var d=tgInit();if(!d)return;fetch(API+'/login/tg',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({initData:d})}).then(function(r){return r.json()}).then(function(j){if(j&&j.token){try{localStorage.setItem(TK,j.token)}catch(e){}fetch(API+'/me',{headers:{authorization:'Bearer '+j.token}}).then(function(r){return r.json()}).then(function(m){if(m&&m.auth){me={life:!!m.life,until:m.until||0};try{localStorage.setItem(MK,JSON.stringify(me))}catch(e){}}}).catch(function(){})}}).catch(function(){})}
+  try{if(!localStorage.getItem(TK))tgLogin()}catch(e){}
+  try{var tk=localStorage.getItem(TK);if(tk)fetch(API+'/me',{headers:{authorization:'Bearer '+tk}}).then(function(r){return r.json()}).then(function(j){if(j&&j.auth){me={life:!!j.life,until:j.until||0};localStorage.setItem(MK,JSON.stringify(me))}else if(j&&j.auth===false){me=null;localStorage.removeItem(MK);localStorage.removeItem(TK);tgLogin()}}).catch(function(){})}catch(e){}
 })();
 </script>
 

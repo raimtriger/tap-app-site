@@ -46,7 +46,7 @@
   document.write('<script src="assets/words-en.js"><\/script>');
   var D={
   'Меню':'Menu','Главная':'Home','ИГРЫ':'GAMES','ТВОРЧЕСТВО':'CREATIVE','УТИЛИТЫ':'TOOLS','СОЦСЕТИ АВТОРА':"AUTHOR'S SOCIALS",'ПРОЕКТЫ АВТОРА':"AUTHOR'S PROJECTS",'скоро':'soon','ЯЗЫК':'LANGUAGE',
-  'Да / Нет':'Yes / No','Бутылочка':'Spin the bottle','Кубик':'Dice','Орёл или решка':'Heads or tails','Рулетка выбора':'Choice roulette','Саундборд':'Soundboard',
+  'Да / Нет':'Yes / No','Песочные часы':'Hourglass','ПЕСОЧНЫЕ ЧАСЫ':'HOURGLASS','Тапни — запустить':'Tap to start','Тапни — перевернуть':'Tap to flip','Готово. Тапни — перевернуть':'Done. Tap to flip','1 м':'1 min','5 м':'5 min','10 м':'10 min','Бутылочка':'Spin the bottle','Кубик':'Dice','Орёл или решка':'Heads or tails','Рулетка выбора':'Choice roulette','Саундборд':'Soundboard',
   'Случайное слово':'Random word','10 секунд':'10 seconds','Реверс аудио':'Reverse audio','Случайная нота':'Random note','Цвет':'Color','Случайный цвет':'Random color',
   'BPM кликер':'BPM clicker','Метроном':'Metronome','Прямая бочка':'Four on the floor','Изменитель голоса':'Voice changer','Тюнер':'Tuner','Счётчик':'Counter',
   'Случайное число':'Random number','Генератор QR':'QR generator','Скачать видео':'Save video','Ссылка на видео':'Video link','Найти':'Find','Вставить из буфера':'Paste from clipboard','Сохранить в галерею':'Save to gallery','Скачать файлом':'Download file','Поделиться':'Share','Другая ссылка':'Another link','Ищу видео…':'Looking for the video…','Качаю…':'Downloading…','Нужна ссылка на видео':'A video link is needed','Сохранить в «Файлы»':'Save to Files','Готово! Нажми и выбери «Сохранить видео»':'Done! Tap and choose “Save Video”','Готово!':'Done!','Слишком часто — подожди минуту':'Too many requests — wait a minute','Ролик закрытый или нужен вход':'Private video or login required','Ролик недоступен или удалён':'Video unavailable or removed','Эта ссылка не поддерживается':'This link is not supported','Эта соцсеть пока не поддерживается':'This network is not supported yet','Соцсеть не отдала видео — попробуй позже':'The network did not return the video — try later','Не получилось скачать — попробуй другую ссылку':'Could not download — try another link','Не получилось скачать — попробуй позже':'Could not download — try later','Сервер не отвечает — попробуй позже':'Server is not responding — try later','В этом посте только фото':'This post has only photos','Это видео пока не поддерживается':'This video is not supported yet','Файл скачан — ищи в галерее или «Загрузках»':'File saved — check your gallery or Downloads','Буфер пустой':'Clipboard is empty','Вставь ссылку долгим нажатием в поле':'Long-press the field to paste the link','Бегущая строка':'Scrolling text','Фонарик Морзе':'Morse flashlight','Уровень шума':'Noise meter','Точное время':'Exact time',
@@ -222,6 +222,13 @@
   }
   #bpmStage.tapped #bpmNum{opacity:.55;transform:scale(.97);}
 
+  /* ---- sand timer ---- */
+  #sandStage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;cursor:pointer;gap:0;padding:0 18px;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+  #sandWrap{width:min(62vw,36vh);will-change:transform}
+  #sandSvg{display:block;width:100%;height:auto;overflow:visible}
+  #sandTime{font-family:var(--fd);font-weight:700;font-size:min(16vw,10vh);line-height:1;margin-top:18px;color:var(--ink);font-variant-numeric:lining-nums tabular-nums;font-feature-settings:"lnum" 1,"tnum" 1;transition:color .3s}
+  #sandTime.done{color:var(--accent)}
+  #sandHint{font:600 min(4vw,15px)/1 var(--fu);color:var(--muted);margin-top:14px}
   /* ---- counter ---- */
   #counterStage{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -1321,7 +1328,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
 <body>
 <section class="seo"><h2>Точное время онлайн</h2><p>Точное время онлайн показывает часы, минуты и секунды.</p></section>
 
-<nav class="seo-nav" aria-label="Все инструменты"><!--NAV--><a href="/">TAP APP</a><a href="/sign/">ПОДПИСЬ</a><a href="/compress-photo/">СЖАТИЕ ФОТО</a><a href="/audio-converter/">КОНВЕРТЕР ЗВУКА</a><a href="/time-calculator/">ТАЙМ-КАЛЬКУЛЯТОР</a><a href="/image-converter/">КОНВЕРТЕР</a><a href="/random-note/">СЛУЧАЙНАЯ НОТА</a><a href="/bpm-tapper/">BPM КЛИКЕР</a><a href="/10-seconds/">10 СЕКУНД</a><a href="/tuner/">ТЮНЕР</a><a href="/random-word/">СЛУЧАЙНОЕ СЛОВО</a><a href="/random-number/">СЛУЧАЙНОЕ ЧИСЛО</a><a href="/dice/">КУБИК</a><a href="/coin-flip/">ОРЁЛ ИЛИ РЕШКА</a><a href="/random-color/">СЛУЧАЙНЫЙ ЦВЕТ</a><a href="/scrolling-text/">БЕГУЩАЯ СТРОКА</a><a href="/qr-generator/">ГЕНЕРАТОР QR</a><a href="/video-download/">СКАЧАТЬ ВИДЕО</a><a href="/counter/">СЧЁТЧИК</a><a href="/morse-flashlight/">ФОНАРИК МОРЗЕ</a><a href="/yes-or-no/">ДА ИЛИ НЕТ</a><a href="/spin-the-bottle/">БУТЫЛОЧКА</a><a href="/noise-meter/">УРОВЕНЬ ШУМА</a><a href="/kick-drum/">ПРЯМАЯ БОЧКА</a><a href="/voice-changer/">ИЗМЕНИТЕЛЬ ГОЛОСА</a><a href="/reverse-audio/">РЕВЕРС АУДИО</a><a href="/metronome/">МЕТРОНОМ</a><a href="/exact-time/">ТОЧНОЕ ВРЕМЯ</a><a href="/roulette/">РУЛЕТКА ВЫБОРА</a><a href="/soundboard/">САУНДБОРД</a><!--/NAV--></nav>
+<nav class="seo-nav" aria-label="Все инструменты"><!--NAV--><a href="/">TAP APP</a><a href="/sign/">ПОДПИСЬ</a><a href="/compress-photo/">СЖАТИЕ ФОТО</a><a href="/audio-converter/">КОНВЕРТЕР ЗВУКА</a><a href="/time-calculator/">ТАЙМ-КАЛЬКУЛЯТОР</a><a href="/image-converter/">КОНВЕРТЕР</a><a href="/random-note/">СЛУЧАЙНАЯ НОТА</a><a href="/bpm-tapper/">BPM КЛИКЕР</a><a href="/10-seconds/">10 СЕКУНД</a><a href="/tuner/">ТЮНЕР</a><a href="/random-word/">СЛУЧАЙНОЕ СЛОВО</a><a href="/random-number/">СЛУЧАЙНОЕ ЧИСЛО</a><a href="/dice/">КУБИК</a><a href="/coin-flip/">ОРЁЛ ИЛИ РЕШКА</a><a href="/random-color/">СЛУЧАЙНЫЙ ЦВЕТ</a><a href="/scrolling-text/">БЕГУЩАЯ СТРОКА</a><a href="/qr-generator/">ГЕНЕРАТОР QR</a><a href="/video-download/">СКАЧАТЬ ВИДЕО</a><a href="/counter/">СЧЁТЧИК</a><a href="/morse-flashlight/">ФОНАРИК МОРЗЕ</a><a href="/yes-or-no/">ДА ИЛИ НЕТ</a><a href="/hourglass/">ПЕСОЧНЫЕ ЧАСЫ</a><a href="/spin-the-bottle/">БУТЫЛОЧКА</a><a href="/noise-meter/">УРОВЕНЬ ШУМА</a><a href="/kick-drum/">ПРЯМАЯ БОЧКА</a><a href="/voice-changer/">ИЗМЕНИТЕЛЬ ГОЛОСА</a><a href="/reverse-audio/">РЕВЕРС АУДИО</a><a href="/metronome/">МЕТРОНОМ</a><a href="/exact-time/">ТОЧНОЕ ВРЕМЯ</a><a href="/roulette/">РУЛЕТКА ВЫБОРА</a><a href="/soundboard/">САУНДБОРД</a><!--/NAV--></nav>
   <div class="titlewrap">
     <h1 class="title" id="title">ТОЧНОЕ ВРЕМЯ</h1>
   </div>
@@ -1345,6 +1352,10 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     <button class="appbtn" data-app="bottle" aria-label="Бутылочка">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4M11 2v4.5c0 .6-.2 1-.6 1.5L9 9.6c-.6.7-1 1.6-1 2.6v7.3A2 2 0 0 0 10 21.5h4a2 2 0 0 0 2-2V12.2c0-1-.4-1.9-1-2.6l-1.4-1.6c-.4-.5-.6-.9-.6-1.5V2"/></svg>
       <span>Бутылочка</span>
+    </button>
+    <button class="appbtn" data-app="sand" aria-label="Песочные часы">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12M6 21h12M7 3c0 5 3 7 5 9-2 2-5 4-5 9M17 3c0 5-3 7-5 9 2 2 5 4 5 9"/></svg>
+      <span>Песочные часы</span>
     </button>
     <button class="appbtn" data-app="dice" aria-label="Кубик">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor" stroke="none"/></svg>
@@ -1724,6 +1735,11 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     <div id="diceHint">Тапни или потряси</div>
   </div>
 
+  <div id="sandStage" style="display:none">
+    <div id="sandWrap"><svg id="sandSvg" viewBox="0 0 240 360" role="img" aria-label="Песочные часы"></svg></div>
+    <div id="sandTime">00:00</div>
+    <div id="sandHint">Тапни — запустить</div>
+  </div>
   <div id="coinStage" style="display:none">
     <div id="coin">
       <div id="coinInner">
@@ -1863,6 +1879,11 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
       <button data-wm="noun" class="on">Сущ</button>
       <button data-wm="adj">Прил</button>
       <button data-wm="verb">Глаг</button>
+    </div>
+    <div class="seg" id="sandSeg" style="display:none">
+      <button data-sd="60" class="on">1 м</button>
+      <button data-sd="300">5 м</button>
+      <button data-sd="600">10 м</button>
     </div>
     <div class="seg" id="diceSeg" style="display:none">
       <button data-dn="1" class="on">1</button>
@@ -2221,8 +2242,8 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     setTimeout(function(){ render(n); el.classList.remove('pop'); },80);
   }
 
-  var TITLES={home:'TAP APP',sg:'ПОДПИСАТЬ ДОКУМЕНТ',ac:'КОНВЕРТЕР ЗВУКА',pc:'СЖАТИЕ ФОТО',tc:'ТАЙМ-КАЛЬКУЛЯТОР',cv:'КОНВЕРТЕР КАРТИНОК',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',dl:'СКАЧАТЬ ВИДЕО',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
-  var SLUG={sg:'sign',pc:'compress-photo',ac:'audio-converter',tc:'time-calculator',cv:'image-converter',note:'random-note',bpm:'bpm-tapper',timer:'10-seconds',tuner:'tuner',word:'random-word',num:'random-number',dice:'dice',coin:'coin-flip',color:'random-color',ticker:'scrolling-text',qr:'qr-generator',dl:'video-download',counter:'counter',morse:'morse-flashlight',yn:'yes-or-no',bottle:'spin-the-bottle',noise:'noise-meter',rhythm:'kick-drum',voice:'voice-changer',rev:'reverse-audio',metro:'metronome',time:'exact-time',roulette:'roulette',sb:'soundboard'};
+  var TITLES={home:'TAP APP',sg:'ПОДПИСАТЬ ДОКУМЕНТ',ac:'КОНВЕРТЕР ЗВУКА',pc:'СЖАТИЕ ФОТО',tc:'ТАЙМ-КАЛЬКУЛЯТОР',cv:'КОНВЕРТЕР КАРТИНОК',note:'СЛУЧАЙНАЯ НОТА',bpm:'BPM КЛИКЕР',timer:'10 СЕКУНД',tuner:'ТЮНЕР',word:'СЛУЧАЙНОЕ СЛОВО',num:'СЛУЧАЙНОЕ ЧИСЛО',dice:'КУБИК',coin:'ОРЁЛ ИЛИ РЕШКА',sand:'ПЕСОЧНЫЕ ЧАСЫ',color:'СЛУЧАЙНЫЙ ЦВЕТ',ticker:'БЕГУЩАЯ СТРОКА',qr:'ГЕНЕРАТОР QR',dl:'СКАЧАТЬ ВИДЕО',counter:'СЧЁТЧИК',morse:'ФОНАРИК МОРЗЕ',yn:'ДА ИЛИ НЕТ',bottle:'БУТЫЛОЧКА',noise:'УРОВЕНЬ ШУМА',rhythm:'ПРЯМАЯ БОЧКА',voice:'ИЗМЕНИТЕЛЬ ГОЛОСА',rev:'РЕВЕРС АУДИО',metro:'МЕТРОНОМ',time:'ТОЧНОЕ ВРЕМЯ',roulette:'РУЛЕТКА ВЫБОРА',sb:'САУНДБОРД'};
+  var SLUG={sg:'sign',pc:'compress-photo',ac:'audio-converter',tc:'time-calculator',cv:'image-converter',note:'random-note',bpm:'bpm-tapper',timer:'10-seconds',tuner:'tuner',word:'random-word',num:'random-number',dice:'dice',coin:'coin-flip',sand:'hourglass',color:'random-color',ticker:'scrolling-text',qr:'qr-generator',dl:'video-download',counter:'counter',morse:'morse-flashlight',yn:'yes-or-no',bottle:'spin-the-bottle',noise:'noise-meter',rhythm:'kick-drum',voice:'voice-changer',rev:'reverse-audio',metro:'metronome',time:'exact-time',roulette:'roulette',sb:'soundboard'};
   var SLUG_R={};Object.keys(SLUG).forEach(function(k){SLUG_R[SLUG[k]]=k});
   function appFromPath(){var m=location.pathname.replace(/index\.html$/,'').replace(/^\/+|\/+$/g,'');return SLUG_R[m]||'home'}
   var urlFirst=true,fromPop=false;
@@ -2280,6 +2301,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     voiceStage.style.display = a==='voice'?'flex':'none';
     diceStage.style.display = a==='dice'?'flex':'none';
     coinStage.style.display = a==='coin'?'flex':'none';
+    document.getElementById('sandStage').style.display = a==='sand'?'flex':'none';
     colorStage.style.display = a==='color'?'flex':'none';
     tickerStage.style.display = a==='ticker'?'flex':'none';
     morseStage.style.display = a==='morse'?'flex':'none';
@@ -2296,6 +2318,8 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     document.getElementById('mode').style.display = a==='note'?'flex':'none';
     document.getElementById('wordModeSeg').style.display = a==='word'?'flex':'none';
     document.getElementById('diceSeg').style.display = a==='dice'?'flex':'none';
+    document.getElementById('sandSeg').style.display = a==='sand'?'flex':'none';
+    if(a==='sand'){if(window.sandShow)window.sandShow()}else if(window.sandHide)window.sandHide();
     document.getElementById('numModeSeg').style.display = a==='num'?'flex':'none';
     document.getElementById('metroSigSeg').style.display = a==='metro'?'flex':'none';
     document.getElementById('metroSndSeg').style.display = a==='metro'?'flex':'none';
@@ -6136,7 +6160,7 @@ menu();window.favSync(window.__curApp||'home');
   if(!nav||!inp)return;
   var EN=window.__LANG==='en',sent=false;
   inp.placeholder=EN?'Search tools':'Найти инструмент';
-  var KW={sg:'подпись подписать pdf документ договор скан sign signature',pc:'сжать фото картинка уменьшить размер вес compress jpeg',ac:'аудио mp3 wav звук обрезать конвертер audio convert trim',cv:'png jpg jpeg webp pdf изображение картинка формат heic image convert',tc:'время часы минуты секунды сложить вычесть time calculator',note:'нота музыка пианино random note piano',bpm:'темп тап bpm clicker tempo',timer:'таймер секунды 10 seconds',tuner:'тюнер гитара укулеле настроить микрофон tuner guitar',word:'слово рифма word rhyme',num:'число рандом number random',dice:'кубик кости игральные dice',coin:'монетка орел решка coin flip',color:'цвет hex палитра color',ticker:'бегущая строка текст экран ticker marquee',qr:'qr код ссылка qr code',dl:'скачать видео video download',counter:'счетчик считать counter',morse:'морзе фонарик torch flashlight',yn:'да нет yes no',bottle:'бутылочка вечеринка bottle',noise:'шум децибел громкость noise db',rhythm:'бочка бит kick beat',voice:'голос запись voice',rev:'реверс запись аудио наоборот reverse',metro:'метроном темп metronome',time:'время часы точное clock',roulette:'рулетка колесо выбор розыгрыш wheel',sb:'саундборд звуки мемы soundboard',home:'главная home'};
+  var KW={sand:'песочные часы таймер hourglass sand timer',sg:'подпись подписать pdf документ договор скан sign signature',pc:'сжать фото картинка уменьшить размер вес compress jpeg',ac:'аудио mp3 wav звук обрезать конвертер audio convert trim',cv:'png jpg jpeg webp pdf изображение картинка формат heic image convert',tc:'время часы минуты секунды сложить вычесть time calculator',note:'нота музыка пианино random note piano',bpm:'темп тап bpm clicker tempo',timer:'таймер секунды 10 seconds',tuner:'тюнер гитара укулеле настроить микрофон tuner guitar',word:'слово рифма word rhyme',num:'число рандом number random',dice:'кубик кости игральные dice',coin:'монетка орел решка coin flip',color:'цвет hex палитра color',ticker:'бегущая строка текст экран ticker marquee',qr:'qr код ссылка qr code',dl:'скачать видео video download',counter:'счетчик считать counter',morse:'морзе фонарик torch flashlight',yn:'да нет yes no',bottle:'бутылочка вечеринка bottle',noise:'шум децибел громкость noise db',rhythm:'бочка бит kick beat',voice:'голос запись voice',rev:'реверс запись аудио наоборот reverse',metro:'метроном темп metronome',time:'время часы точное clock',roulette:'рулетка колесо выбор розыгрыш wheel',sb:'саундборд звуки мемы soundboard',home:'главная home'};
   var empty=document.createElement('div');empty.className='mempty';empty.hidden=true;empty.textContent=EN?'Nothing found':'Ничего не найдено';nav.appendChild(empty);
   function norm(s){return String(s||'').toLowerCase().replace(/ё/g,'е')}
   var keep=[];
@@ -6202,7 +6226,7 @@ menu();window.favSync(window.__curApp||'home');
 <script>
 /* NEW-метки: 14 дней с даты добавления, пропадают после первого открытия аппки */
 (function(){
-  var NEW={cv:'2026-11-14',tc:'2026-11-14',pc:'2026-11-14',ac:'2026-11-14',sg:'2026-11-14'},DAYS=14,K='tap_seen_new';
+  var NEW={sand:'2026-11-15',cv:'2026-11-14',tc:'2026-11-14',pc:'2026-11-14',ac:'2026-11-14',sg:'2026-11-14'},DAYS=14,K='tap_seen_new';
   function seen(){try{return JSON.parse(localStorage.getItem(K)||'[]')}catch(e){return[]}}
   function mark(a){if(!NEW[a])return;var s=seen();if(s.indexOf(a)<0){s.push(a);try{localStorage.setItem(K,JSON.stringify(s))}catch(e){}}apply()}
   function apply(){var s=seen(),now=Date.now();Object.keys(NEW).forEach(function(a){
@@ -6227,6 +6251,80 @@ menu();window.favSync(window.__curApp||'home');
   post('web_app_ready');post('web_app_expand');post('web_app_setup_swipe_behavior',{allow_vertical_swipe:false});
 })();
 </script>
+<script>
+/* ---- песочные часы ---- */
+(function(){
+  var stage=document.getElementById('sandStage');if(!stage)return;
+  var wrap=document.getElementById('sandWrap'),svg=document.getElementById('sandSvg'),timeEl=document.getElementById('sandTime'),hint=document.getElementById('sandHint'),seg=document.getElementById('sandSeg');
+  var CX=120,TOP=46,NECK=180,BOT=314,R=68,N=3.2,H=NECK-TOP,NS='http://www.w3.org/2000/svg';
+  function wd(s){var b=Math.sin(Math.min(1,s/0.6)*Math.PI/2),w=N+(R-N)*Math.pow(b,1.1);if(s>0.72){var k=(s-0.72)/0.28;w*=0.3+0.7*Math.sqrt(Math.max(0,1-k*k))}return w}
+  var K=240,cum=[0];for(var i=1;i<=K;i++){var s=i/K,w=wd(s);cum.push(cum[i-1]+w*w)}
+  var tot=cum[K];
+  function inv(f){f=Math.max(0,Math.min(1,f))*tot;var lo=0,hi=K;while(hi-lo>1){var m=(lo+hi)>>1;if(cum[m]<f)lo=m;else hi=m}var d=cum[hi]-cum[lo];return (lo+(d>0?(f-cum[lo])/d:0))/K}
+  // контур стекла
+  var L=[],Rr=[],j,y;
+  for(j=0;j<=60;j++){var ss=1-j/60;y=NECK-ss*H;L.push([CX-wd(ss),y]);Rr.push([CX+wd(ss),y])}
+  for(j=1;j<=60;j++){var s2=j/60;y=NECK+s2*H;L.push([CX-wd(s2),y]);Rr.push([CX+wd(s2),y])}
+  var glass='M'+L.map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1)}).join('L')+'L'+Rr.slice().reverse().map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1)}).join('L')+'Z';
+  function shn(a,b){return 'M'+L.filter(function(p,i){return i%2==0&&i>=a&&i<=b}).map(function(p){return (p[0]+8).toFixed(1)+' '+p[1].toFixed(1)}).join('L')}
+  var shineL=shn(12,44)+shn(70,108);
+  svg.innerHTML=
+   '<defs><clipPath id="sgc"><path d="'+glass+'"/></clipPath>'+
+   '<linearGradient id="sgs" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c98a3a"/><stop offset=".45" stop-color="#f0c36e"/><stop offset="1" stop-color="#b87a2c"/></linearGradient>'+
+   '<linearGradient id="sgm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".34"/><stop offset="1" stop-color="#fff" stop-opacity=".04"/></linearGradient></defs>'+
+   '<rect x="37" y="30" width="5" height="304" rx="2.5" style="fill:var(--muted)" opacity=".8"/><rect x="198" y="30" width="5" height="304" rx="2.5" style="fill:var(--muted)" opacity=".8"/>'+
+   '<rect x="84" y="28" width="72" height="20" rx="4" style="fill:var(--chip-on)"/><rect x="84" y="312" width="72" height="20" rx="4" style="fill:var(--chip-on)"/>'+
+   '<path d="'+glass+'" style="fill:var(--chip);fill-opacity:.55"/>'+
+   '<g clip-path="url(#sgc)"><path id="sgTop" fill="url(#sgs)"/><path id="sgBot" fill="url(#sgs)"/><path id="sgTopHi" fill="url(#sgm)" opacity=".5"/></g>'+
+   '<line id="sgStream" x1="'+CX+'" x2="'+CX+'" stroke="#f0c36e" stroke-width="1.8" stroke-linecap="round" opacity="0" style="transition:opacity .25s"/>'+
+   '<line id="sgDash" x1="'+CX+'" x2="'+CX+'" stroke="#fff6dc" stroke-width="1" stroke-dasharray="1.5 5" stroke-linecap="round" opacity="0" style="transition:opacity .25s"/>'+
+   '<path d="'+glass+'" fill="none" style="stroke:var(--muted)" stroke-width="1.8"/>'+
+   '<path d="'+shineL+'" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="3" stroke-linecap="round"/>'+
+   '<rect x="30" y="8" width="180" height="22" rx="6" style="fill:var(--muted)"/><rect x="30" y="330" width="180" height="22" rx="6" style="fill:var(--muted)"/>'+
+   '<rect x="30" y="8" width="180" height="9" rx="4" fill="#fff" opacity=".16"/><rect x="30" y="330" width="180" height="9" rx="4" fill="#fff" opacity=".16"/>';
+  var eTop=svg.querySelector('#sgTop'),eBot=svg.querySelector('#sgBot'),eHi=svg.querySelector('#sgTopHi'),eSt=svg.querySelector('#sgStream'),eDa=svg.querySelector('#sgDash');
+  var D=60,p=1,o=1,started=false,flowing=false,flipping=false,done=false,dip=0,mound=5,off=0,last=0,raf=0,shown=false;
+  function fmt(sec){sec=Math.max(0,Math.round(sec));var m=Math.floor(sec/60),s=sec%60;return (m<10?'0':'')+m+':'+(s<10?'0':'')+s}
+  function render(){
+    var sT=inv(p),yT=NECK-sT*H,q=1-p,sB=inv(1-q),yB=NECK+sB*H;
+    var d=dip,x0=CX-R-3,x1=CX+R+3;
+    if(p>0.002){eTop.setAttribute('d','M'+x0+' '+(yT+d*0.4).toFixed(1)+'Q'+CX+' '+(yT+d*2).toFixed(1)+' '+x1+' '+(yT+d*0.4).toFixed(1)+'L'+x1+' '+(NECK+7)+'L'+x0+' '+(NECK+7)+'Z');eHi.setAttribute('d','M'+x0+' '+yT.toFixed(1)+'L'+x1+' '+yT.toFixed(1)+'L'+x1+' '+(yT+16)+'L'+x0+' '+(yT+16)+'Z')}
+    else{eTop.setAttribute('d','');eHi.setAttribute('d','')}
+    if(q>0.002){var m=mound,y0=yB+m*0.35,c=yB-m*1.65;eBot.setAttribute('d','M'+x0+' '+y0.toFixed(1)+'Q'+CX+' '+c.toFixed(1)+' '+x1+' '+y0.toFixed(1)+'L'+x1+' '+(BOT+4)+'L'+x0+' '+(BOT+4)+'Z')}else eBot.setAttribute('d','');
+    var on=flowing&&p>0.002&&!flipping;
+    if(on){var yp=yB-mound;eSt.setAttribute('y1',NECK-3);eSt.setAttribute('y2',yp.toFixed(1));eDa.setAttribute('y1',NECK-3);eDa.setAttribute('y2',yp.toFixed(1));eDa.setAttribute('stroke-dashoffset',off.toFixed(1))}
+    eSt.setAttribute('opacity',on?1:0);eDa.setAttribute('opacity',on?.9:0);
+    var a=o>0?1-p:p;timeEl.textContent=fmt(a*D);
+  }
+  function setHint(){hint.textContent=!started?'Тапни — запустить':done?'Готово. Тапни — перевернуть':'Тапни — перевернуть'}
+  function loop(t){
+    raf=requestAnimationFrame(loop);var dt=last?Math.min((t-last)/1000,5):0;last=t;
+    if(flowing&&!flipping){
+      p-=dt/D;off-=dt*40;
+      if(p<=0){p=0;flowing=false;done=true;setHint();try{if(navigator.vibrate)navigator.vibrate([40,60,40])}catch(e){}timeEl.classList.add('done')}
+    }
+    var tdip=(flowing&&!flipping&&p>0.002)?Math.min(9,3+p*8):0,tm=(flowing&&!flipping)?9:5;
+    dip+=(tdip-dip)*Math.min(1,dt*6);mound+=(tm-mound)*Math.min(1,dt*4);
+    render();
+  }
+  function reset(){flowing=false;flipping=false;done=false;started=false;p=1;o=1;dip=0;mound=5;wrap.style.transition='none';wrap.style.transform='none';timeEl.classList.remove('done');setHint();render()}
+  function tap(){
+    if(flipping)return;
+    if(!started){started=true;flowing=true;setHint();try{if(navigator.vibrate)navigator.vibrate(10)}catch(e){}return}
+    flipping=true;flowing=false;done=false;timeEl.classList.remove('done');
+    wrap.style.transition='transform .8s cubic-bezier(.5,.05,.25,1)';wrap.style.transform='rotate(180deg)';
+    try{if(navigator.vibrate)navigator.vibrate(12)}catch(e){}
+    setTimeout(function(){wrap.style.transition='none';wrap.style.transform='none';p=1-p;o=-o;flipping=false;flowing=p>0.002;if(!flowing)done=true;setHint();render()},820);
+  }
+  stage.addEventListener('pointerdown',function(e){if(e.target.closest&&e.target.closest('.seg'))return;e.preventDefault();tap()});
+  seg.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;D=+b.dataset.sd;[].forEach.call(seg.children,function(x){x.classList.toggle('on',x===b)});reset()});
+  window.sandShow=function(){if(shown)return;shown=true;reset();last=0;raf=requestAnimationFrame(loop)};
+  window.sandHide=function(){if(!shown)return;shown=false;cancelAnimationFrame(raf);reset()};
+  reset();
+  if(window.__curApp==='sand')window.sandShow();
+})();
+</script>
+
 <script>
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){

@@ -1097,7 +1097,7 @@
 .sg-app{font-family:var(--fu);color:var(--ink);width:100%;max-width:640px;margin:0 auto}
 .sg-app *{box-sizing:border-box}
 .sg-app [hidden]{display:none!important}
-.sg-bar{position:sticky;top:calc(var(--padT) - 6px);z-index:20;background:var(--bg);padding:8px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sg-bar{position:sticky;bottom:-58px;z-index:20;background:var(--bg);padding:8px 0;margin-top:8px;box-shadow:0 -10px 12px -4px var(--bg);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .sg-inks{display:inline-flex;gap:8px;align-items:center}
 .sg-bar .cv-chip,.sg-bar .cv-btn{flex:none;white-space:nowrap}
 .sg-ink{flex:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--muted);cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
@@ -2594,7 +2594,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     numValue.style.transition='';
     numValue.style.transform='scale(1)';
     numHint.textContent='Крутим…';
-    var DUR=5000;
+    var DUR=4000;
     if(numSpinSrc){ try{numSpinSrc.stop();}catch(e){} numSpinSrc=null; }
     if(prizBuf) numSpinSrc=playBufNode(prizBuf); else playDrumRoll(DUR/1000);
     var start=performance.now();
@@ -2670,7 +2670,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     editLock.classList.add('on');
     ynValue.style.transition=''; ynValue.style.transform='scale(1)';
     ynHint.textContent='Спрашиваем…';
-    var DUR=5000;
+    var DUR=4000;
     if(ynSpinSrc){ try{ynSpinSrc.stop();}catch(e){} ynSpinSrc=null; }
     if(yesnoBuf) ynSpinSrc=playBufNode(yesnoBuf); else if(prizBuf) ynSpinSrc=playBufNode(prizBuf); else playDrumRoll(DUR/1000);
     var start=performance.now();
@@ -2960,6 +2960,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
   }
   var btlGainNode=null;
   function btlSoundStart(){
+    return;   // звук бутылочки пока выключен
     if(!soundOn||!AC||!(bottleLoopBuf||bottleBuf)) return;
     btlSoundStop(true);                       // мгновенно оборвать предыдущий, если ещё играл
     var s=AC.createBufferSource(); s.loop=true;
@@ -5815,10 +5816,10 @@ host.innerHTML=
 '<label class="cv-pick" for="sg-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg><span></span></label>'+
 '<input class="cv-hide" id="sg-input" type="file" accept="application/pdf,.pdf,image/*"><p class="cv-note" id="sg-note" role="status"></p></div>'+
 '<div id="sg-work" hidden>'+
+'<div id="sg-pages"></div>'+
 '<div class="sg-bar" id="sg-bar"><button type="button" class="cv-chip" id="sg-sig"></button><button type="button" class="cv-chip" id="sg-date"></button><button type="button" class="cv-chip" id="sg-txt"></button>'+
 '<span class="sg-inks"><button type="button" class="sg-ink" data-c="#111111" style="background:#111111" aria-label="Black"></button><button type="button" class="sg-ink" data-c="#1a3fbf" style="background:#1a3fbf" aria-label="Blue"></button></span>'+
 '</div>'+
-'<div id="sg-pages"></div>'+
 '<div class="sg-save"><button type="button" class="cv-btn" id="sg-done2"></button><button type="button" class="cv-ghost" id="sg-other"></button></div></div></div>'+
 '<div class="sg-modal" id="sg-modal" hidden><div class="sg-sheet" id="sg-sheet"></div></div>';
 function $(q){return host.querySelector(q)}

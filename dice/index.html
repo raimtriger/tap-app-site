@@ -1930,7 +1930,7 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
   function setMe(m){me={life:!!m.life,until:m.until||0,ref:m.ref||null};try{localStorage.setItem(MK,JSON.stringify(me))}catch(e){}refUI()}
   function hasRef(){return !!(me&&me.ref&&me.ref.link)}
   function refUI(){var a=document.getElementById('refLink');if(!a)return;a.hidden=!hasRef();if(!hasRef())return;var r=me.ref,E=en(),sp=a.querySelector('span');if(sp)sp.textContent=E?('Invite a friend · +'+(r.days||7)+' days Pro'+(r.max?' ('+(r.count||0)+'/'+r.max+')':'')):('Позвать друга · +'+(r.days||7)+' дней Pro'+(r.max?' ('+(r.count||0)+'/'+r.max+')':''))}
-  function invite(){if(!hasRef())return;var E=en(),l=me.ref.link,t=E?'Try TAP APP: sandglass, metronome, tuner and dozens of mini tools':'Залетай в TAP APP: песочные часы, метроном, тюнер и ещё куча мини-инструментов';
+  function invite(){if(!hasRef())return;var E=en(),l=me.ref.link,t=E?'Try TAP APP: 30+ mini tools in one app (PDF signing, photo compression, tuner, metronome, hourglass). Join via my link and get 3 days of Pro free 🎁':'Зову тебя в TAP APP — 30+ мини-инструментов в одном приложении: подпись PDF, сжатие фото, тюнер, метроном, песочные часы. По моей ссылке тебе +3 дня Pro бесплатно 🎁';
     try{var w=window.Telegram&&window.Telegram.WebApp;if(w&&w.openTelegramLink&&w.initData){w.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(l)+'&text='+encodeURIComponent(t));return}}catch(e){}
     try{if(navigator.share){navigator.share({title:'TAP APP',text:t,url:l}).catch(function(){});return}}catch(e){}
     try{navigator.clipboard.writeText(l);toast2(E?'Link copied':'Ссылка скопирована')}catch(e){prompt(E?'Copy the link':'Скопируй ссылку',l)}

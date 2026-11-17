@@ -1952,9 +1952,29 @@ html.introout #menuBtn,html.introout .utilbar{animation:homeFade .8s ease .55s b
     open:function(a){if(a==='home'||pro())return true;var o=ld();if(o.apps.indexOf(a)>=0)return true;if(o.apps.length>=MAXA){modal('open');return false}o.apps.push(a);sv(o);return true},
     act:function(){if(pro())return true;var o=ld();if(o.n>=MAXN){modal('act');return false}o.n++;sv(o);toast(MAXN-o.n);return true}
   };
+  /* реферальный код: ?ref=123 или ?ref=ref_123 -> localStorage; уходит на сервер при входе через Telegram */
+  var RK='tap_ref';
+  function getRef(){try{return localStorage.getItem(RK)||''}catch(e){return ''}}
+  try{var rq=new URLSearchParams(location.search).get('ref');if(rq){rq=String(rq).replace(/^ref_/,'');if(/^\d{1,15}$/.test(rq)&&!localStorage.getItem(TK)){localStorage.setItem(RK,rq)}}}catch(e){}
   function tgInit(){try{var h=location.hash.slice(1),d=h?new URLSearchParams(h).get('tgWebAppData'):'';if(d)sessionStorage.setItem('tap_tgd',d);return d||sessionStorage.getItem('tap_tgd')||''}catch(e){return ''}}
-  function tgLogin(){var d=tgInit();if(!d)return;fetch(API+'/login/tg',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({initData:d})}).then(function(r){return r.json()}).then(function(j){if(j&&j.token){try{localStorage.setItem(TK,j.token)}catch(e){}fetch(API+'/me',{headers:{authorization:'Bearer '+j.token}}).then(function(r){return r.json()}).then(function(m){if(m&&m.auth){setMe(m)}}).catch(function(){})}}).catch(function(){})}
+  function tgLogin(){var d=tgInit();if(!d)return;fetch(API+'/login/tg',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({initData:d,ref:getRef()||undefined})}).then(function(r){return r.json()}).then(function(j){if(j&&j.token){try{localStorage.removeItem(RK)}catch(e){}try{localStorage.setItem(TK,j.token)}catch(e){}fetch(API+'/me',{headers:{authorization:'Bearer '+j.token}}).then(function(r){return r.json()}).then(function(m){if(m&&m.auth){setMe(m)}}).catch(function(){})}}).catch(function(){})}
   try{var rl=document.getElementById('refLink');if(rl)rl.addEventListener('click',function(e){e.preventDefault();invite()});refUI()}catch(e){}
+  /* приглашённый на сайте (не в Telegram): баннер «Войди через Telegram — +3 дня Pro» */
+  var wl={code:'',link:'',timer:0,n:0};
+  function webPrep(cb){fetch(API+'/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({ref:getRef()||undefined})}).then(function(r){return r.json()}).then(function(j){if(j&&j.code){wl.code=j.code;wl.link=j.link;cb&&cb()}}).catch(function(){})}
+  function webPoll(done){clearInterval(wl.timer);wl.n=0;wl.timer=setInterval(function(){if(!wl.code||++wl.n>270){clearInterval(wl.timer);return}fetch(API+'/login/poll?code='+encodeURIComponent(wl.code)).then(function(r){return r.json()}).then(function(r){if(r&&r.ok&&r.token){clearInterval(wl.timer);try{localStorage.setItem(TK,r.token);localStorage.removeItem(RK)}catch(e){}fetch(API+'/me',{headers:{authorization:'Bearer '+r.token}}).then(function(r2){return r2.json()}).then(function(m){if(m&&m.auth)setMe(m);done&&done()}).catch(function(){done&&done()})}}).catch(function(){})},2000)}
+  function refBanner(){
+    var E=en();if(!getRef()||localStorage.getItem(TK)||document.getElementById('refBn'))return;
+    try{if(/tgWebApp/.test(location.hash)||sessionStorage.getItem('tap_tgd'))return}catch(e){}
+    css();var d=document.createElement('div');d.id='refBn';
+    d.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:9998;max-width:420px;margin:0 auto;background:var(--chip,#1a1a1f);color:var(--ink,#f3efe6);border-radius:18px;padding:14px 16px;font:600 13px/1.4 Montserrat,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.4)';
+    d.innerHTML='<div class="t" style="margin-bottom:8px"></div><a class="go" target="_blank" rel="noopener" style="display:block;text-align:center;padding:12px;border-radius:12px;background:var(--accent,#e0a85e);color:#141414;text-decoration:none;font:700 14px Montserrat,sans-serif"></a><button type="button" class="x" style="display:block;width:100%;margin-top:6px;padding:8px;border:0;background:none;color:var(--muted,#9a9aa3);font:600 12px Montserrat,sans-serif;cursor:pointer"></button>';
+    d.querySelector('.t').textContent=E?'A friend invited you. Sign in with Telegram and get 3 days of Pro for free.':'Тебя пригласил друг. Войди через Telegram и получи 3 дня Pro бесплатно.';
+    var go=d.querySelector('.go');go.textContent=E?'Sign in with Telegram':'Войти через Telegram';go.href='#';
+    go.addEventListener('click',function(e){if(!wl.link){e.preventDefault();return}go.href=wl.link;webPoll(function(){d.remove();toast2(pro()?(E?'Done! Pro is active':'Готово! Pro активирован'):(E?'Signed in':'Вы вошли'))});try{if(window.ym)window.ym(109713949,'reachGoal','ref_web_login')}catch(x){}});
+    d.querySelector('.x').textContent=E?'Not now':'Не сейчас';d.querySelector('.x').addEventListener('click',function(){d.remove()});
+    document.body.appendChild(d);webPrep(function(){go.href=wl.link})}
+  try{refBanner()}catch(e){}
   try{if(!localStorage.getItem(TK))tgLogin()}catch(e){}
   try{var tk=localStorage.getItem(TK);if(tk)fetch(API+'/me',{headers:{authorization:'Bearer '+tk}}).then(function(r){return r.json()}).then(function(j){if(j&&j.auth){setMe(j)}else if(j&&j.auth===false){me=null;localStorage.removeItem(MK);localStorage.removeItem(TK);tgLogin()}}).catch(function(){})}catch(e){}
 })();

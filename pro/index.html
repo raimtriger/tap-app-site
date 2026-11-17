@@ -70,7 +70,7 @@ function status(){
   if(!tok){$('st').innerHTML='<b>Шаг 1.</b> Войдите через Telegram: так Pro привяжется к вашему аккаунту.<a class="btn" id="lgb" target="_blank" rel="noopener" href="'+(ll||'#')+'">Войти через Telegram</a><p class="note">Откроется бот: нажмите в нём Start и вернитесь сюда, страница сама продолжит.</p>';$('lgb').onclick=function(){if(!ll){msg('Секунду, готовлю вход…');return false}};if(!lc)prep();return Promise.resolve()}
   return api('/me').then(function(j){
     if(!j.auth){tok='';try{localStorage.removeItem(TK);localStorage.removeItem(MK)}catch(e){}return status()}
-    try{localStorage.setItem(MK,JSON.stringify({life:!!j.life,until:j.until||0}))}catch(e){}
+    try{localStorage.setItem(MK,JSON.stringify({life:!!j.life,until:j.until||0,ref:j.ref||null}))}catch(e){}
     var pro=j.life||j.until>Date.now();
     $('st').innerHTML='<b>'+(j.name||'Telegram')+'</b>: '+(j.life?'Pro навсегда':pro?'Pro до '+fd(j.until)+(j.auto?', автопродление включено':''):'Pro нет')+' · <a href="#" id="out">выйти</a>';
     $('out').onclick=function(e){e.preventDefault();tok='';try{localStorage.removeItem(TK);localStorage.removeItem(MK)}catch(x){}status()};
@@ -78,7 +78,7 @@ function status(){
   }).catch(function(){$('st').textContent='Нет связи с сервером, попробуйте позже.'})
 }
 var lc='',ll='',pt;
-function prep(){api('/login',{method:'POST',body:'{}'}).then(function(j){lc=j.code;ll=j.link;var a=$('lgb');if(a)a.href=ll;clearInterval(pt);var n=0;pt=setInterval(function(){if(tok){clearInterval(pt);return}if(++n>270){prep();return}chk()},2000)}).catch(function(){})}
+function prep(){api('/login',{method:'POST',body:JSON.stringify({ref:(function(){try{return localStorage.getItem('tap_ref')||undefined}catch(e){}})()})}).then(function(j){lc=j.code;ll=j.link;var a=$('lgb');if(a)a.href=ll;clearInterval(pt);var n=0;pt=setInterval(function(){if(tok){clearInterval(pt);return}if(++n>270){prep();return}chk()},2000)}).catch(function(){})}
 function chk(){if(!lc||tok)return;api('/login/poll?code='+lc).then(function(r){if(r.ok){clearInterval(pt);tok=r.token;try{localStorage.setItem(TK,tok)}catch(e){}status().then(function(){if(want)pay(want)})}}).catch(function(){})}
 document.addEventListener('visibilitychange',function(){if(!document.hidden)chk()});
 function msg(t){var m=$('msg');m.textContent=t||'';m.hidden=!t}

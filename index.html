@@ -5874,7 +5874,7 @@ host.innerHTML=
 '<div class="sg-app">'+
 '<div id="sg-start"><p class="cv-sub"></p>'+
 '<label class="cv-pick" for="sg-input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg><span></span></label>'+
-'<input class="cv-hide" id="sg-input" type="file" accept="application/pdf,.pdf,image/*"><p class="cv-note" id="sg-note" role="status"></p></div>'+
+'<input class="cv-hide" id="sg-input" type="file" accept="application/pdf,.pdf,image/*,.docx,.txt,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><p class="cv-note" id="sg-note" role="status"></p></div>'+
 '<div id="sg-work" hidden>'+
 '<div id="sg-pages"></div>'+
 '<div class="sg-bar" id="sg-bar"><button type="button" class="cv-chip" id="sg-sig"></button><button type="button" class="cv-chip" id="sg-date"></button><button type="button" class="cv-chip" id="sg-txt"></button>'+
@@ -5883,8 +5883,8 @@ host.innerHTML=
 '<div class="sg-save"><button type="button" class="cv-btn" id="sg-done2"></button><button type="button" class="cv-ghost" id="sg-other"></button></div></div></div>'+
 '<div class="sg-modal" id="sg-modal" hidden><div class="sg-sheet" id="sg-sheet"></div></div>';
 function $(q){return host.querySelector(q)}
-$('.cv-sub').textContent=T('Загрузи PDF или фото документа, распишись пальцем и поставь подпись куда нужно (тап по странице ставит последнюю подпись). Всё на устройстве, файл никуда не отправляется.','Upload a PDF or a photo of a document, sign with your finger and place the signature anywhere (tap a page to drop your last signature). Everything stays on your device.');
-$('.cv-pick span').textContent=T('Выбрать PDF или фото','Choose PDF or photo');
+$('.cv-sub').textContent=T('Загрузи PDF, DOCX, TXT или фото документа, распишись пальцем и поставь подпись куда нужно (тап по странице ставит последнюю подпись). Всё на устройстве, файл никуда не отправляется.','Upload a PDF, DOCX, TXT or a photo of a document, sign with your finger and place the signature anywhere (tap a page to drop your last signature). Everything stays on your device.');
+$('.cv-pick span').textContent=T('Выбрать PDF, DOCX, TXT или фото','Choose PDF, DOCX, TXT or photo');
 $('#sg-sig').textContent=T('Подпись','Signature');$('#sg-date').textContent=T('Дата','Date');$('#sg-txt').textContent=T('Текст','Text');$('#sg-done2').textContent=T('Сохранить','Save');$('#sg-other').textContent=T('Другой файл','Another file');
 var pagesBox=$('#sg-pages'),note=$('#sg-note'),modal=$('#sg-modal'),sheet=$('#sg-sheet');document.body.appendChild(modal);
 function inks(){host.querySelectorAll('.sg-ink').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-c')===S.ink))})}
@@ -5896,16 +5896,185 @@ function needPdfjs(){if(pdfjs)return Promise.resolve(pdfjs);
  return import(new URL('assets/pdf.min.mjs?v='+V,document.baseURI).href).then(function(m){m.GlobalWorkerOptions.workerSrc=new URL('assets/pdf.worker.min.mjs?v='+V,document.baseURI).href;pdfjs=m;return m})}
 function needPL(){if(window.PDFLib)return Promise.resolve(window.PDFLib);return loadScript('assets/pdf-lib.min.js?v='+V).then(function(){return window.PDFLib})}
 
+/* ---------- TXT / DOCX → PDF (страницы рисуются на канвас и кладутся в PDF картинками) ---------- */
+var PK=2.5,SANS='Arial,Helvetica,"Liberation Sans",Montserrat,sans-serif',SERIF='"Times New Roman",Times,"Liberation Serif",Georgia,serif',MONO='"Courier New",Courier,monospace';
+function needZip(){return window.JSZip?Promise.resolve():loadScript('assets/jszip.min.js?v=1')}
+function fontsReady(){try{return Promise.all([document.fonts.load('400 12px Montserrat','Жя'),document.fonts.load('700 12px Montserrat','Жя')]).catch(function(){})}catch(e){return Promise.resolve()}}
+function Pager(pw,ph,mt,mb,ml,mr){
+ var cv=document.createElement('canvas');cv.width=Math.round(pw*PK);cv.height=Math.round(ph*PK);
+ var x=cv.getContext('2d'),pages=[],P={x:x,pw:pw,ph:ph,mt:mt,mb:mb,ml:ml,mr:mr,y:mt,used:false,dry:false,nb:false,pages:pages};
+ function reset(){x.setTransform(1,0,0,1,0,0);x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.setTransform(PK,0,0,PK,0,0);x.textBaseline='alphabetic';P.used=false;P.y=mt}
+ reset();
+ P.room=function(h){return P.y+h<=ph-mb+.01};
+ P.next=function(){if(pages.length>=300)throw new Error('big');pages.push(cv.toDataURL('image/jpeg',.9));reset()};
+ P.finish=function(){if(P.used||!pages.length)pages.push(cv.toDataURL('image/jpeg',.9));return pages};
+ return P}
+function fnt(t){return (t.i?'italic ':'')+(t.b?'700 ':'400 ')+t.sz+'px '+t.f}
+function mkLines(P,par,wfn){
+ var ctx=P.x,out=[],cur={it:[],w:0,a:0,h:0,ms:0},W=wfn(0),lh=par.lh||1.15;
+ function fin(brk){while(cur.it.length&&cur.it[cur.it.length-1].sp)cur.w-=cur.it.pop().w;
+  if(!cur.it.length){cur.a=par.sz*.8;cur.h=par.sz*lh}else cur.h=Math.max(cur.h,cur.a+cur.ms*.25);
+  cur.brk=brk;out.push(cur);cur={it:[],w:0,a:0,h:0,ms:0};W=wfn(out.length)}
+ function add(t){
+  if(t.sp&&!cur.it.length&&!(par.keep&&!out.length))return;
+  if(!t.sp&&cur.w+t.w>W+.01&&cur.it.length)fin();
+  cur.it.push(t);cur.w+=t.w;
+  if(t.img){if(t.h>cur.a)cur.a=t.h;cur.h=Math.max(cur.h,t.h)}else{if(t.sz*.8>cur.a)cur.a=t.sz*.8;cur.h=Math.max(cur.h,t.sz*lh);if(t.sz>cur.ms)cur.ms=t.sz}}
+ par.runs.forEach(function(r){
+  if(r.br){fin(r.pg?'pg':'br');return}
+  if(r.img){var k=Math.min(1,Math.max(10,Math.min(wfn(0),wfn(1)))/r.w,(P.ph-P.mt-P.mb)/r.h);add({img:r.img,w:r.w*k,h:r.h*k});return}
+  ctx.font=fnt(r);
+  (r.t.match(/\s+|\S+/g)||[]).forEach(function(s){
+   if(/^\s/.test(s)){s=s.replace(/\t/g,'    ').replace(/[\r\n]/g,' ');var tw=ctx.measureText(s).width;add({sp:1,t:s,w:tw,f:r.f,sz:r.sz,b:r.b,i:r.i,u:r.u,c:r.c});return}
+   var tw=ctx.measureText(s).width,mw=Math.max(20,Math.min(wfn(0),wfn(1)));
+   if(tw<=mw){add({t:s,w:tw,f:r.f,sz:r.sz,b:r.b,i:r.i,u:r.u,c:r.c});return}
+   var piece='';for(var k=0;k<s.length;k++){var n=piece+s[k];if(piece&&ctx.measureText(n).width>mw){add({t:piece,w:ctx.measureText(piece).width,f:r.f,sz:r.sz,b:r.b,i:r.i,u:r.u,c:r.c});fin();piece=s[k]}else piece=n}
+   if(piece)add({t:piece,w:ctx.measureText(piece).width,f:r.f,sz:r.sz,b:r.b,i:r.i,u:r.u,c:r.c})})});
+ if(cur.it.length||!out.length)fin();
+ return out}
+function drawLine(P,ln,x,w,al,y){
+ var ctx=P.x,x0=x+(al==='center'?(w-ln.w)/2:al==='right'?w-ln.w:0),ex=0;
+ if(al==='both'&&!ln.brk){var ns=ln.it.filter(function(t){return t.sp}).length;if(ns)ex=Math.max(0,(w-ln.w)/ns)}
+ ln.it.forEach(function(t){
+  if(t.img){try{ctx.drawImage(t.img,x0,y+ln.a-t.h,t.w,t.h)}catch(e){}}
+  else{ctx.font=fnt(t);ctx.fillStyle=t.c||'#000';if(!t.sp)ctx.fillText(t.t,x0,y+ln.a);if(t.u){ctx.fillRect(x0,y+ln.a+t.sz*.12,t.w+(t.sp?ex:0),Math.max(.4,t.sz*.05))}}
+  x0+=t.w+(t.sp?ex:0)})}
+function drawBlocks(P,blocks,x,w){
+ blocks.forEach(function(b){
+  if(b.table)return drawTable(P,b,x,w);
+  var ind=b.ind||0,fi=b.label?0:(b.first||0),lx=x+ind+(b.first||0);
+  if(b.pb&&!P.dry&&!P.nb&&P.used)P.next();
+  var ls=mkLines(P,b,function(i){return Math.max(20,w-ind-(i===0?fi:0))});
+  if(P.dry||P.y>P.mt+.5)P.y+=(b.before||0);
+  ls.forEach(function(ln,i){
+   if(!P.dry&&!P.nb&&!P.room(ln.h)&&P.used)P.next();
+   if(!P.dry){
+    if(i===0&&b.label){var ctx=P.x;ctx.font=fnt({f:b.lf||SANS,sz:b.sz,b:0,i:0});ctx.fillStyle='#000';ctx.fillText(b.label,lx,P.y+ln.a)}
+    drawLine(P,ln,x+ind+(i===0?fi:0),Math.max(20,w-ind-(i===0?fi:0)),b.align,P.y);
+    if(ln.it.length)P.used=true}
+   P.y+=ln.h;
+   if(!P.dry&&!P.nb&&ln.brk==='pg')P.next()});
+  P.y+=(b.after||0)})}
+function drawTable(P,t,x,w){
+ var gw=t.cols.slice(),sum=gw.reduce(function(a,b){return a+b},0)||1,k=sum>w?w/sum:1;
+ var ctx=P.x,pad=3;
+ t.rows.forEach(function(row){
+  var xs=[],cx=x,hs=0;
+  var dry=P.dry,y0=P.y;P.dry=true;
+  row.forEach(function(c,ci){var cw=0;for(var s=0;s<c.span;s++)cw+=(gw[c.at+s]||sum/gw.length)*k;xs.push([cx,cw]);cx+=cw;P.y=0;drawBlocks(P,c.blocks,0,Math.max(10,cw-2*pad));hs=Math.max(hs,P.y)});
+  P.dry=dry;P.y=y0;var h=hs+2*pad,ry=y0;
+  if(!P.dry){
+   if(!P.nb&&!P.room(h)&&P.used)P.next();
+   ry=P.y;
+   row.forEach(function(c,ci){
+    if(t.grid){ctx.strokeStyle='#444';ctx.lineWidth=.5;ctx.strokeRect(xs[ci][0],ry,xs[ci][1],h)}
+    P.y=ry+pad;var nb=P.nb;P.nb=true;drawBlocks(P,c.blocks,xs[ci][0]+pad,Math.max(10,xs[ci][1]-2*pad));P.nb=nb});
+   P.used=true}
+  P.y=ry+h})}
+function pdfFromPages(urls,pw,ph){
+ return needPL().then(function(PLb){return PLb.PDFDocument.create().then(function(pd){
+  var p=Promise.resolve();
+  urls.forEach(function(u){p=p.then(function(){return pd.embedJpg(u).then(function(im){var pg=pd.addPage([pw,ph]);pg.drawImage(im,{x:0,y:0,width:pw,height:ph})})})});
+  return p.then(function(){return pd.save()})})})}
+function decodeTxt(buf){var t;try{t=new TextDecoder('utf-8',{fatal:true}).decode(buf)}catch(e){try{t=new TextDecoder('windows-1251').decode(buf)}catch(e2){t=new TextDecoder().decode(buf)}}return t.replace(/^﻿/,'')}
+function convTxt(f){
+ return Promise.all([f.arrayBuffer(),fontsReady()]).then(function(r){
+  var txt=decodeTxt(r[0]).replace(/\r\n?/g,'\n'),PW=595,PH=842,P=Pager(PW,PH,57,57,57,57),sz=11,lh=1.3;
+  var blocks=txt.split('\n').map(function(l){return {runs:[{t:l,sz:sz,f:SANS,c:'#000'}],sz:sz,lh:lh,keep:1,align:'left'}});
+  drawBlocks(P,blocks,P.ml,PW-P.ml-P.mr);
+  return pdfFromPages(P.finish(),PW,PH)})}
+function convDocx(f){
+ var W='http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+ function kids(n,nm){var o=[];if(!n)return o;for(var c=n.firstElementChild;c;c=c.nextElementSibling)if(c.localName===nm)o.push(c);return o}
+ function kid(n,nm){return kids(n,nm)[0]||null}
+ function at(n,a){return n?(n.getAttributeNS(W,a)||n.getAttribute('w:'+a)||''):''}
+ function on(n){if(!n)return false;var v=at(n,'val');return v!=='0'&&v!=='false'&&v!=='none'}
+ function xml(z,p){var e=z.file(p);return e?e.async('string').then(function(s){return new DOMParser().parseFromString(s,'application/xml')}):Promise.resolve(null)}
+ return Promise.all([needZip(),fontsReady()]).then(function(){return JSZip.loadAsync(f)}).then(function(z){
+  return Promise.all([xml(z,'word/document.xml'),xml(z,'word/styles.xml'),xml(z,'word/numbering.xml'),xml(z,'word/_rels/document.xml.rels')]).then(function(x){
+   var D=x[0],ST=x[1],NM=x[2],RL=x[3];if(!D||!D.documentElement||D.getElementsByTagName('parsererror').length)throw new Error('docx');
+   var rels={};if(RL)Array.prototype.forEach.call(RL.getElementsByTagName('Relationship'),function(r){rels[r.getAttribute('Id')]=r.getAttribute('Target')});
+   var imgs={},need=[];
+   Array.prototype.forEach.call(D.getElementsByTagName('*'),function(n){if(n.localName==='blip'){var id=n.getAttribute('r:embed')||n.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','embed');if(id&&rels[id]&&!imgs[id]&&need.indexOf(id)<0)need.push(id)}});
+   var loads=need.map(function(id){var p='word/'+String(rels[id]).replace(/^\/?(word\/)?/,'');var e=z.file(p);if(!e)return Promise.resolve();
+    return e.async('blob').then(function(b){var m=/\.png$/i.test(p)?'image/png':/\.jpe?g$/i.test(p)?'image/jpeg':/\.gif$/i.test(p)?'image/gif':/\.webp$/i.test(p)?'image/webp':'';if(!m)return;return createImageBitmap(new Blob([b],{type:m})).then(function(bm){imgs[id]=bm},function(){})}).catch(function(){})});
+   return Promise.all(loads).then(function(){
+    /* styles */
+    var sty={},dsz=11,dafter=0,dlh=1.15;
+    if(ST){var dd=ST.getElementsByTagNameNS(W,'docDefaults')[0];if(dd){var s0=dd.getElementsByTagNameNS(W,'sz')[0];if(s0)dsz=(+at(s0,'val')||22)/2;var sp0=dd.getElementsByTagNameNS(W,'spacing');for(var q=0;q<sp0.length;q++){if(sp0[q].parentNode.localName==='pPr'){dafter=(+at(sp0[q],'after')||0)/20;var l0=+at(sp0[q],'line');if(l0)dlh=l0/240}}}
+     Array.prototype.forEach.call(ST.getElementsByTagNameNS(W,'style'),function(s){var id=at(s,'styleId'),pp=kid(s,'pPr'),rp=kid(s,'rPr'),o={base:at(kid(s,'basedOn'),'val')};
+      if(rp){o.b=kid(rp,'b')?on(kid(rp,'b')):undefined;o.i=kid(rp,'i')?on(kid(rp,'i')):undefined;var z1=kid(rp,'sz');if(z1)o.sz=+at(z1,'val')/2;var c1=kid(rp,'color');if(c1&&at(c1,'val')!=='auto')o.c='#'+at(c1,'val');var rf=kid(rp,'rFonts');if(rf)o.f=at(rf,'ascii')}
+      if(pp){var j=kid(pp,'jc');if(j)o.jc=at(j,'val');var sp=kid(pp,'spacing');if(sp){if(at(sp,'before')!=='')o.before=+at(sp,'before')/20;if(at(sp,'after')!=='')o.after=+at(sp,'after')/20;if(+at(sp,'line'))o.lh=+at(sp,'line')/240}var nq=kid(pp,'numPr');if(nq&&kid(nq,'numId')){o.numId=at(kid(nq,'numId'),'val');o.ilvl=at(kid(nq,'ilvl'),'val')||'0'}}
+      sty[id]=o})}
+    function gs(id,d){d=d||0;var o=sty[id];if(!o||d>8)return {};var b=o.base?gs(o.base,d+1):{},r={};for(var k in b)r[k]=b[k];for(var k2 in o)if(o[k2]!==undefined&&k2!=='base')r[k2]=o[k2];return r}
+    /* numbering */
+    var absN={},numA={},cnt={};
+    if(NM){Array.prototype.forEach.call(NM.getElementsByTagNameNS(W,'abstractNum'),function(a){var lv={};kids(a,'lvl').forEach(function(l){var pp=kid(l,'pPr'),ind=pp&&kid(pp,'ind');lv[at(l,'ilvl')]={fmt:at(kid(l,'numFmt'),'val'),left:ind?(+at(ind,'left')||0)/20:36,hang:ind?(+at(ind,'hanging')||0)/20:18}});absN[at(a,'abstractNumId')]=lv});
+     Array.prototype.forEach.call(NM.getElementsByTagNameNS(W,'num'),function(n){numA[at(n,'numId')]=at(kid(n,'abstractNumId'),'val')})}
+    function roman(n){var r='',m=[[10,'x'],[9,'ix'],[5,'v'],[4,'iv'],[1,'i']];m.forEach(function(p){while(n>=p[0]){r+=p[1];n-=p[0]}});return r}
+    function label(numId,lvl){var lv=(absN[numA[numId]]||{})[lvl]||{fmt:'bullet',left:36,hang:18},k=numId+':'+lvl;
+     Object.keys(cnt).forEach(function(c){var p=c.split(':');if(p[0]===numId&&+p[1]>+lvl)delete cnt[c]});
+     cnt[k]=(cnt[k]||0)+1;var n=cnt[k],t;
+     if(lv.fmt==='decimal')t=n+'.';else if(lv.fmt==='lowerLetter')t=String.fromCharCode(96+(n-1)%26+1)+')';else if(lv.fmt==='upperLetter')t=String.fromCharCode(64+(n-1)%26+1)+')';else if(lv.fmt==='lowerRoman')t=roman(n)+'.';else if(lv.fmt==='upperRoman')t=roman(n).toUpperCase()+'.';else t='•';
+     return {t:t,left:lv.left,hang:lv.hang}}
+    function fam(n){return /times|georgia|cambria|garamond|serif|book|palatino/i.test(n||'')&&!/sans/i.test(n)?SERIF:/courier|consolas|mono/i.test(n||'')?MONO:SANS}
+    function runProps(rp,base){var o={b:base.b,i:base.i,u:base.u,sz:base.sz,c:base.c,f:base.f,caps:base.caps};
+     if(rp){var v;if(v=kid(rp,'b'))o.b=on(v);if(v=kid(rp,'i'))o.i=on(v);if(v=kid(rp,'u'))o.u=on(v);if(v=kid(rp,'caps'))o.caps=on(v);if(v=kid(rp,'sz'))o.sz=(+at(v,'val')||22)/2;if(v=kid(rp,'color')){var cv=at(v,'val');if(cv&&cv!=='auto')o.c='#'+cv}if(v=kid(rp,'rFonts')){var fn=at(v,'ascii')||at(v,'hAnsi');if(fn)o.f=fam(fn)}if(v=kid(rp,'vertAlign')){if(at(v,'val')!=='baseline')o.sz=Math.max(5,o.sz*.7)}}
+     return o}
+    function collect(node,base,out){
+     for(var c=node.firstElementChild;c;c=c.nextElementSibling){var n=c.localName;
+      if(n==='r'){var ro=runProps(kid(c,'rPr'),base);
+       for(var e=c.firstElementChild;e;e=e.nextElementSibling){var m=e.localName;
+        if(m==='t'||m==='noBreakHyphen'||m==='tab'||m==='br'||m==='cr'){
+         if(m==='br'||m==='cr'){out.push({br:1,pg:at(e,'type')==='page'})}
+         else{var tx=m==='tab'?'\t':m==='noBreakHyphen'?'-':e.textContent;if(ro.caps)tx=tx.toUpperCase();out.push({t:tx,sz:ro.sz,f:ro.f,b:ro.b,i:ro.i,u:ro.u,c:ro.c||'#000'})}}
+        else if(m==='drawing'){var bl=e.getElementsByTagName('*'),id='',cx=0,cy=0;for(var q=0;q<bl.length;q++){var nn=bl[q];if(nn.localName==='extent'&&!cx){cx=+nn.getAttribute('cx')||0;cy=+nn.getAttribute('cy')||0}if(nn.localName==='blip'&&!id)id=nn.getAttribute('r:embed')||nn.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','embed')||''}
+         if(id&&imgs[id]&&cx&&cy)out.push({img:imgs[id],w:cx/12700,h:cy/12700})}}}
+      else if(n==='hyperlink'||n==='ins'||n==='smartTag'||n==='sdt'||n==='sdtContent'||n==='fldSimple'||n==='customXml')collect(c,base,out)}}
+    function para(p){
+     var pp=kid(p,'pPr'),ps=pp&&kid(pp,'pStyle'),s=ps?gs(at(ps,'val')):{},base={sz:s.sz||dsz,b:s.b,i:s.i,c:s.c,f:s.f?fam(s.f):SANS},
+      o={runs:[],sz:base.sz,lh:s.lh||dlh,align:'left',before:s.before||0,after:s.after!==undefined?s.after:dafter,ind:0,first:0};
+     var jc=s.jc;if(pp){var v;if(v=kid(pp,'jc'))jc=at(v,'val');if(v=kid(pp,'spacing')){if(at(v,'before')!=='')o.before=+at(v,'before')/20;if(at(v,'after')!=='')o.after=+at(v,'after')/20;if(+at(v,'line')&&at(v,'lineRule')!=='exact'&&at(v,'lineRule')!=='atLeast')o.lh=+at(v,'line')/240}
+      if(v=kid(pp,'ind')){o.ind=(+at(v,'left')||+at(v,'start')||0)/20;var h=+at(v,'hanging')||0,fl=+at(v,'firstLine')||0;o.first=h?-h/20:fl/20}
+      if(kid(pp,'pageBreakBefore'))o.pb=on(kid(pp,'pageBreakBefore'));
+      var np=kid(pp,'numPr'),nid=np&&kid(np,'numId')?at(kid(np,'numId'),'val'):s.numId,nlv=np&&kid(np,'ilvl')?at(kid(np,'ilvl'),'val'):(np?'0':s.ilvl||'0');if(nid&&nid!=='0'){var lb=label(nid,nlv||'0');o.label=lb.t;o.lf=SANS;if(!kid(pp,'ind')){o.ind=lb.left;o.first=-lb.hang}else if(o.first>=0){o.first=-Math.min(18,o.ind)}}}
+     o.align=jc==='center'?'center':jc==='right'||jc==='end'?'right':jc==='both'?'both':'left';
+     collect(p,base,o.runs);
+     if(o.runs.length&&o.runs.every(function(r){return r.t!==undefined&&/^\s*$/.test(r.t)})&&!o.runs.some(function(r){return r.br}))o.runs=[];
+     return o}
+    function table(t){
+     var tg=kid(t,'tblGrid'),cols=tg?kids(tg,'gridCol').map(function(g){return (+at(g,'w')||0)/20}):[],grid=false;
+     var bd=kid(kid(t,'tblPr'),'tblBorders'),ts=kid(kid(t,'tblPr'),'tblStyle');
+     if(bd){for(var c=bd.firstElementChild;c;c=c.nextElementSibling){var vv=at(c,'val');if(vv&&vv!=='nil'&&vv!=='none')grid=true}}
+     else if(ts&&/grid/i.test(at(ts,'val')))grid=true;
+     var rows=kids(t,'tr').map(function(tr){var at0=0;return kids(tr,'tc').map(function(tc){var pr=kid(tc,'tcPr'),gsn=pr&&kid(pr,'gridSpan'),span=gsn?+at(gsn,'val')||1:1,c={at:at0,span:span,blocks:body(tc)};at0+=span;return c})});
+     var nc=rows.reduce(function(m,r){return Math.max(m,r.reduce(function(a,c){return a+c.span},0))},0);
+     if(!cols.length||cols.length<nc){cols=[];for(var i=0;i<nc;i++)cols.push(100)}
+     return {table:1,cols:cols,rows:rows,grid:grid}}
+    function body(node){var o=[];for(var c=node.firstElementChild;c;c=c.nextElementSibling){var n=c.localName;if(n==='p')o.push(para(c));else if(n==='tbl')o.push(table(c));else if(n==='sdt'){var sc=kid(c,'sdtContent');if(sc)o=o.concat(body(sc))}}return o}
+    var B=D.getElementsByTagNameNS(W,'body')[0];if(!B)throw new Error('docx');
+    var blocks=body(B),sp=null,sps=B.getElementsByTagNameNS(W,'sectPr');if(sps.length)sp=sps[sps.length-1];
+    var pz=sp&&kid(sp,'pgSz'),pm=sp&&kid(sp,'pgMar'),PW=pz&&+at(pz,'w')?+at(pz,'w')/20:595,PH=pz&&+at(pz,'h')?+at(pz,'h')/20:842;
+    if(PW>PH&&pz&&at(pz,'orient')!=='landscape'){}
+    PW=clamp(PW,200,1500);PH=clamp(PH,200,1500);
+    function mg(a,d){var v=pm&&+at(pm,a);return v?clamp(v/20,10,PW/3):d}
+    var P=Pager(PW,PH,mg('top',57),mg('bottom',57),mg('left',57),mg('right',57));
+    drawBlocks(P,blocks,P.ml,PW-P.ml-P.mr);
+    Object.keys(imgs).forEach(function(k){try{imgs[k].close()}catch(e){}});
+    return pdfFromPages(P.finish(),PW,PH)})})})}
+function convText(f,docx){return (docx?convDocx(f):convTxt(f)).then(function(bytes){return new File([bytes],f.name.replace(/\.[^.]+$/,'')+'.pdf',{type:'application/pdf'})})}
+
 /* ---------- open document ---------- */
 function say(m){note.textContent=m||''}
 function openFile(f){
  say('');if(!f)return;
- var isPdf=/pdf/i.test(f.type)||/\.pdf$/i.test(f.name);
- if(!isPdf&&!/^image\//.test(f.type)&&!/\.(heic|heif|avif|webp|png|jpe?g|gif|bmp)$/i.test(f.name)){say(T('Нужен PDF или картинка','Need a PDF or an image'));return}
+ var isPdf=/pdf/i.test(f.type)||/\.pdf$/i.test(f.name),isDocx=/\.docx$/i.test(f.name)||/wordprocessingml/.test(f.type),isTxt=/\.txt$/i.test(f.name)||f.type==='text/plain';
+ if(/\.doc$/i.test(f.name)){say(T('Формат .doc старый: сохрани файл как .docx или PDF','Old .doc format: save the file as .docx or PDF'));return}
+ if(!isPdf&&!isDocx&&!isTxt&&!/^image\//.test(f.type)&&!/\.(heic|heif|avif|webp|png|jpe?g|gif|bmp)$/i.test(f.name)){say(T('Нужен PDF, DOCX, TXT или картинка','Need a PDF, DOCX, TXT or an image'));return}
  if(f.size>80*1048576){say(T('Файл больше 80 МБ','File is over 80 MB'));return}
  say(T('Открываю…','Opening…'));
- (isPdf?openPdf(f):openImg(f)).then(function(){say('');startWork()},function(e){
-  say(e&&e.message==='pw'?T('PDF защищён паролем, сними защиту и попробуй снова','PDF is password protected, remove it and retry'):e&&e.message==='lib'?T('Не загрузилась библиотека PDF, проверь интернет','PDF library failed to load, check connection'):T('Не получилось открыть файл','Couldn\'t open the file'))})}
+ (isPdf?openPdf(f):(isDocx||isTxt)?convText(f,isDocx).then(openPdf):openImg(f)).then(function(){say('');startWork()},function(e){
+  say(e&&e.message==='big'?T('Слишком длинный документ (больше 300 страниц)','Document is too long (over 300 pages)'):e&&e.message==='docx'?T('Не получилось прочитать DOCX, файл повреждён?','Couldn\'t read the DOCX, is the file damaged?'):e&&e.message==='pw'?T('PDF защищён паролем, сними защиту и попробуй снова','PDF is password protected, remove it and retry'):e&&e.message==='lib'?T('Не загрузилась библиотека PDF, проверь интернет','PDF library failed to load, check connection'):T('Не получилось открыть файл','Couldn\'t open the file'))})}
 function openPdf(f){
  return Promise.all([needPdfjs(),f.arrayBuffer()]).then(function(r){
   var lib=r[0],bytes=r[1];

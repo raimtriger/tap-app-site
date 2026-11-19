@@ -64,10 +64,14 @@ nav.l{display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0 4px;font-size:14px}
 (function(){
 var API='https://dl.tap-app.ru:8443/tapapp/api',TK='tap_pro_token',MK='tap_pro_me',$=function(i){return document.getElementById(i)},tok='',want='',poll;
 try{tok=localStorage.getItem(TK)||'';$('em').value=localStorage.getItem('tap_pro_email')||''}catch(e){}
-function api(p,o){o=o||{};o.headers=Object.assign({'content-type':'application/json'},tok?{authorization:'Bearer '+tok}:{},o.headers||{});return fetch(API+p,o).then(function(r){return r.json()})}
+function api(p,o){o=o||{};var get=!o.method||o.method==='GET',max=get?3:1;o.headers=Object.assign({'content-type':'application/json'},tok?{authorization:'Bearer '+tok}:{},o.headers||{});
+  function go(n){var c=window.AbortController?new AbortController():null,t=c?setTimeout(function(){c.abort()},get?8000:25000):0,oo=Object.assign({},o);if(c)oo.signal=c.signal;
+    return fetch(API+p,oo).then(function(r){clearTimeout(t);return r.json()},function(e){clearTimeout(t);if(n<max)return new Promise(function(ok){setTimeout(ok,600)}).then(function(){return go(n+1)});throw e})}
+  return go(1)}
+var rtn=0;
 function fd(t){return new Date(t).toLocaleDateString('ru-RU')}
 function status(){
-  if(!tok){$('st').innerHTML='<b>Шаг 1.</b> Войдите через Telegram: так Pro привяжется к вашему аккаунту.<a class="btn" id="lgb" target="_blank" rel="noopener" href="'+(ll||'#')+'">Войти через Telegram</a><p class="note">Откроется бот: нажмите в нём Start и вернитесь сюда, страница сама продолжит.</p>';$('lgb').onclick=function(){if(!ll){msg('Секунду, готовлю вход…');return false}};if(!lc)prep();return Promise.resolve()}
+  if(!tok){$('st').innerHTML='<b>Шаг 1.</b> Войдите через Telegram: так Pro привяжется к вашему аккаунту.<a class="btn" id="lgb" target="_blank" rel="noopener" href="'+(ll||'#')+'">Войти через Telegram</a><p class="note">Откроется бот: нажмите в нём Start и вернитесь сюда, страница сама продолжит.</p>';$('lgb').onclick=function(){if(!ll){msg('Секунду, готовлю вход…');if(prn>8){prn=0;prep()}return false}};if(!lc)prep();return Promise.resolve()}
   return api('/me').then(function(j){
     if(!j.auth){tok='';try{localStorage.removeItem(TK);localStorage.removeItem(MK)}catch(e){}return status()}
     try{localStorage.setItem(MK,JSON.stringify({life:!!j.life,until:j.until||0,ref:j.ref||null}))}catch(e){}
@@ -75,10 +79,11 @@ function status(){
     $('st').innerHTML='<b>'+(j.name||'Telegram')+'</b>: '+(j.life?'Pro навсегда':pro?'Pro до '+fd(j.until)+(j.auto?', автопродление включено':''):'Pro нет')+' · <a href="#" id="out">выйти</a>';
     $('out').onclick=function(e){e.preventDefault();tok='';try{localStorage.removeItem(TK);localStorage.removeItem(MK)}catch(x){}status()};
     return pro
-  }).catch(function(){$('st').textContent='Нет связи с сервером, попробуйте позже.'})
+  }).catch(function(){$('st').innerHTML='Нет связи с сервером. <a href="#" id="rt">Повторить</a>';$('rt').onclick=function(e){e.preventDefault();$('st').textContent='Загрузка…';status()};if(++rtn<=6)setTimeout(function(){if($('rt'))status()},5000)})
 }
 var lc='',ll='',pt;
-function prep(){api('/login',{method:'POST',body:JSON.stringify({ref:(function(){try{return localStorage.getItem('tap_ref')||undefined}catch(e){}})()})}).then(function(j){lc=j.code;ll=j.link;var a=$('lgb');if(a)a.href=ll;clearInterval(pt);var n=0;pt=setInterval(function(){if(tok){clearInterval(pt);return}if(++n>270){prep();return}chk()},2000)}).catch(function(){})}
+function prep(){api('/login',{method:'POST',body:JSON.stringify({ref:(function(){try{return localStorage.getItem('tap_ref')||undefined}catch(e){}})()})}).then(function(j){lc=j.code;ll=j.link;var a=$('lgb');if(a)a.href=ll;clearInterval(pt);var n=0;pt=setInterval(function(){if(tok){clearInterval(pt);return}if(++n>270){prep();return}chk()},2000)}).catch(function(){if(!tok&&++prn<=8)setTimeout(prep,3000)})}
+var prn=0;
 function chk(){if(!lc||tok)return;api('/login/poll?code='+lc).then(function(r){if(r.ok){clearInterval(pt);tok=r.token;try{localStorage.setItem(TK,tok)}catch(e){}status().then(function(){if(want)pay(want)})}}).catch(function(){})}
 document.addEventListener('visibilitychange',function(){if(!document.hidden)chk()});
 function msg(t){var m=$('msg');m.textContent=t||'';m.hidden=!t}

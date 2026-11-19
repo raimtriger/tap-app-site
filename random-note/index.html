@@ -1101,12 +1101,14 @@
   /* ---- sign document ---- */
   #sgStage{flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;
     overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;
-    padding:calc(var(--padT) + 8px) var(--padX) 110px;
+    padding:calc(var(--padT) + 8px) var(--padX) 0;
     -webkit-mask-image:linear-gradient(to bottom,transparent calc(var(--padT) - 14px),#000 calc(var(--padT) + 2px));mask-image:linear-gradient(to bottom,transparent calc(var(--padT) - 14px),#000 calc(var(--padT) + 2px));}
 .sg-app{font-family:var(--fu);color:var(--ink);width:100%;max-width:640px;margin:0 auto}
 .sg-app *{box-sizing:border-box}
 .sg-app [hidden]{display:none!important}
-.sg-bar{position:sticky;bottom:-58px;z-index:20;background:var(--bg);padding:8px 0;margin-top:8px;box-shadow:0 -10px 12px -4px var(--bg);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sg-bar{position:sticky;bottom:0;z-index:20;background:var(--bg);padding:10px 0 calc(env(safe-area-inset-bottom) + 8px);margin-top:6px;box-shadow:0 -16px 14px -8px var(--bg);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sg-bar .sg-save{flex:1 0 100%}
+body:has(#sgStage[style*="flex"]):has(#sg-work:not([hidden])) .utilbar{visibility:hidden;pointer-events:none}
 .sg-inks{display:inline-flex;gap:8px;align-items:center}
 .sg-bar .cv-chip,.sg-bar .cv-btn{flex:none;white-space:nowrap}
 .sg-ink{flex:none;width:30px;height:30px;border-radius:50%;border:2px solid var(--muted);cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
@@ -1121,8 +1123,10 @@
 .sg-it.sel .sg-x,.sg-it.sel .sg-h,.sg-it.sel .sg-r{display:block}
 .sg-x svg,.sg-h svg,.sg-r svg{display:block;margin:8px;width:18px;height:18px}
 .sg-x{left:-17px;top:-17px}.sg-r{right:-17px;top:-17px}.sg-h{right:-17px;bottom:-17px;cursor:nwse-resize}
-.sg-save{display:flex;gap:10px;margin-top:14px}
-.sg-save .cv-btn{flex:1;min-height:48px}
+.sg-save{display:flex;gap:10px;margin-top:2px}
+.sg-save .cv-btn{flex:1;min-height:44px}
+.sg-save .cv-ghost{flex:none;padding:0 14px}
+.sg-page{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .sg-modal{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;font-family:var(--fu);color:var(--ink)}
 .sg-modal[hidden]{display:none}
 .sg-modal *{box-sizing:border-box}
@@ -5881,11 +5885,11 @@ host.innerHTML=
 '<div id="sg-pages"></div>'+
 '<div class="sg-bar" id="sg-bar"><button type="button" class="cv-chip" id="sg-sig"></button><button type="button" class="cv-chip" id="sg-date"></button><button type="button" class="cv-chip" id="sg-txt"></button>'+
 '<span class="sg-inks"><button type="button" class="sg-ink" data-c="#111111" style="background:#111111" aria-label="Black"></button><button type="button" class="sg-ink" data-c="#1a3fbf" style="background:#1a3fbf" aria-label="Blue"></button></span>'+
-'</div>'+
-'<div class="sg-save"><button type="button" class="cv-btn" id="sg-done2"></button><button type="button" class="cv-ghost" id="sg-other"></button></div></div></div>'+
+'<div class="sg-save"><button type="button" class="cv-btn" id="sg-done2"></button><button type="button" class="cv-ghost" id="sg-other"></button></div>'+
+'</div></div></div>'+
 '<div class="sg-modal" id="sg-modal" hidden><div class="sg-sheet" id="sg-sheet"></div></div>';
 function $(q){return host.querySelector(q)}
-$('.cv-sub').textContent=T('Загрузи PDF, DOCX, TXT или фото документа, распишись пальцем и поставь подпись куда нужно (тап по странице ставит последнюю подпись). Всё на устройстве, файл никуда не отправляется.','Upload a PDF, DOCX, TXT or a photo of a document, sign with your finger and place the signature anywhere (tap a page to drop your last signature). Everything stays on your device.');
+$('.cv-sub').textContent=T('Загрузи PDF, DOCX, TXT или фото документа, распишись пальцем и поставь подпись куда нужно (двойной тап по странице ставит последнюю подпись). Всё на устройстве, файл никуда не отправляется.','Upload a PDF, DOCX, TXT or a photo of a document, sign with your finger and place the signature anywhere (double-tap a page to drop your last signature). Everything stays on your device.');
 $('.cv-pick span').textContent=T('Выбрать PDF, DOCX, TXT или фото','Choose PDF, DOCX, TXT or photo');
 $('#sg-sig').textContent=T('Подпись','Signature');$('#sg-date').textContent=T('Дата','Date');$('#sg-txt').textContent=T('Текст','Text');$('#sg-done2').textContent=T('Сохранить','Save');$('#sg-other').textContent=T('Другой файл','Another file');
 var pagesBox=$('#sg-pages'),note=$('#sg-note'),modal=$('#sg-modal'),sheet=$('#sg-sheet');document.body.appendChild(modal);
@@ -5899,7 +5903,7 @@ function needPdfjs(){if(pdfjs)return Promise.resolve(pdfjs);
 function needPL(){if(window.PDFLib)return Promise.resolve(window.PDFLib);return loadScript('assets/pdf-lib.min.js?v='+V).then(function(){return window.PDFLib})}
 
 /* ---------- TXT / DOCX → PDF (страницы рисуются на канвас и кладутся в PDF картинками) ---------- */
-var PK=2.5,SANS='Arial,Helvetica,"Liberation Sans",Montserrat,sans-serif',SERIF='"Times New Roman",Times,"Liberation Serif",Georgia,serif',MONO='"Courier New",Courier,monospace';
+var PK=3,SANS='Arial,Helvetica,"Liberation Sans",Montserrat,sans-serif',SERIF='"Times New Roman",Times,"Liberation Serif",Georgia,serif',MONO='"Courier New",Courier,monospace';
 function needZip(){return window.JSZip?Promise.resolve():loadScript('assets/jszip.min.js?v=1')}
 function fontsReady(){try{return Promise.all([document.fonts.load('400 12px Montserrat','Жя'),document.fonts.load('700 12px Montserrat','Жя')]).catch(function(){})}catch(e){return Promise.resolve()}}
 function Pager(pw,ph,mt,mb,ml,mr){
@@ -5945,6 +5949,7 @@ function drawBlocks(P,blocks,x,w){
  blocks.forEach(function(b){
   if(b.table)return drawTable(P,b,x,w);
   var ind=b.ind||0,fi=b.label?0:(b.first||0),lx=x+ind+(b.first||0);
+  if(b.label){P.x.font=fnt({f:b.lf||SANS,sz:b.sz,b:0,i:0});fi=Math.max(0,(b.first||0)+P.x.measureText(b.label).width+4)}
   if(b.pb&&!P.dry&&!P.nb&&P.used)P.next();
   var ls=mkLines(P,b,function(i){return Math.max(20,w-ind-(i===0?fi:0))});
   if(P.dry||P.y>P.mt+.5)P.y+=(b.before||0);
@@ -6094,7 +6099,7 @@ function openImg(f){
   doc={type:'img',file:f,src:c,pages:[{dw:c.width,dh:c.height}]}})}
 
 /* ---------- page view ---------- */
-var io=null,tap=null;
+var io=null,tap=null,last=null;
 function startWork(){
  pls=[];sel=null;built=null;pagesBox.textContent='';
  $('#sg-start').hidden=true;$('#sg-work').hidden=false;
@@ -6105,15 +6110,18 @@ function startWork(){
   var w=el('div','sg-page');w.style.aspectRatio=pg.dw+' / '+pg.dh;w._pg=pg;w._i=i;pg.wrap=w;
   var bg=el('canvas','sg-bg');w.appendChild(bg);w._bg=bg;
   w.addEventListener('pointerdown',function(e){if(e.target!==w&&e.target!==bg)return;tap={x:e.clientX,y:e.clientY,t:Date.now(),was:!!sel,id:e.pointerId};select(null)});
-  w.addEventListener('pointerup',function(e){var t=tap;tap=null;if(!t||t.was||t.id!==e.pointerId)return;if(Math.hypot(e.clientX-t.x,e.clientY-t.y)>8||Date.now()-t.t>450)return;
-   var r=w.getBoundingClientRect();tapPlace(i,clamp((e.clientX-r.left)/r.width,.04,.96),clamp((e.clientY-r.top)/r.height,.03,.97))});
+  w.addEventListener('pointerup',function(e){var t=tap;tap=null;if(!t||t.id!==e.pointerId)return;if(Math.hypot(e.clientX-t.x,e.clientY-t.y)>8||Date.now()-t.t>450)return;
+   var now=Date.now();
+   if(last&&last.i===i&&now-last.t<380&&Math.hypot(e.clientX-last.x,e.clientY-last.y)<36){last=null;
+    var r=w.getBoundingClientRect();tapPlace(i,clamp((e.clientX-r.left)/r.width,.04,.96),clamp((e.clientY-r.top)/r.height,.03,.97))}
+   else last={i:i,x:e.clientX,y:e.clientY,t:now}});
   w.addEventListener('pointercancel',function(){tap=null});
   pagesBox.appendChild(w);if(io)io.observe(w);else renderPage(w,pg)});
  host.scrollTop=0}
 function freePage(w){if(w._task){try{w._task.cancel()}catch(e){}w._task=null}if(w._bg&&w._bg.width>1){w._bg.width=w._bg.height=1}w._ok=false}
 function renderPage(w,pg){
  if(w._ok||w._busy)return;w._busy=true;
- var cssW=w.clientWidth||320,dpr=Math.min(2,window.devicePixelRatio||1),px=Math.min(1600,Math.round(cssW*dpr)),cv=w._bg;
+ var cssW=w.clientWidth||320,dpr=Math.min(3,window.devicePixelRatio||1),px=Math.min(2400,Math.round(cssW*dpr*1.15)),cv=w._bg;
  if(doc.type==='img'){cv.width=px;cv.height=Math.round(px*pg.dh/pg.dw);cv.getContext('2d').drawImage(doc.src,0,0,cv.width,cv.height);w._ok=true;w._busy=false;return}
  var k=px/pg.dw,vp=pg.pg.getViewport({scale:k});cv.width=Math.round(vp.width);cv.height=Math.round(vp.height);
  var task=pg.pg.render({canvasContext:cv.getContext('2d'),viewport:vp});w._task=task;
